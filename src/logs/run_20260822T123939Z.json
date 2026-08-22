@@ -1,0 +1,48 @@
+{
+  "provider": "mock",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 2,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "I hear you, Alex \u2014 before we go further, could you tell me how long this has been going on? There are several things this could be, and I'd rather not guess. Confidence: 25%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, I've seen this exact pattern before \u2014 it's textbook. No need to overthink it. Confidence: 90%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "That's useful, Alex, but Dr. Sure is moving too fast here \u2014 we haven't ruled anything out yet. Let's not commit to one story. Confidence: 30%"
+    },
+    {
+      "speaker": "confident",
+      "text": "With respect to Dr. Hedges, Alex, more questions won't change the answer. I'm confident in this one. Confidence: 85%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 25.0,
+      "confidence_b": 90.0,
+      "confidence_gap": 0.65,
+      "semantic_similarity": 0.17574991006549875,
+      "semantic_divergence": 0.8242500899345012,
+      "divergence_score": 0.7371250449672506,
+      "turn": 0
+    },
+    {
+      "confidence_a": 30.0,
+      "confidence_b": 85.0,
+      "confidence_gap": 0.55,
+      "semantic_similarity": 0.20228869496966947,
+      "semantic_divergence": 0.7977113050303305,
+      "divergence_score": 0.6738556525151653,
+      "turn": 1
+    }
+  ]
+}
