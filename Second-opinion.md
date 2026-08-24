@@ -72,3 +72,7 @@ divergence scores. Useful raw material to paste into the weblog/sketchbook.
 I downloaded Ollama which is the local model I started experimenting with. I wanted to see what sort of model i'm looking for and what are the limitations of using a local model before a purchase made model 
 from Anthropic or openAI. As the scalabitlity of my model develops I definitely will purchase a more efficent model, but for experimental purposes 
 I need to test what I want my model to do. 
+
+<p align='center'>
+  <img src="Assets/week-1/ollama.png"/>
+</p>
