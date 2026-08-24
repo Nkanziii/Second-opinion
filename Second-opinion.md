@@ -76,3 +76,52 @@ I need to test what I want my model to do.
 <p align='center'>
   <img src="Assets/week-1/ollama.png"/>
 </p>
+
+I gave the Ollama model some instructions, and I got some efficient responses back which surprised me from a small local model.
+
+```
+nikikhanezai@Nikis-MacBook-Pro second-opinion-day1 % ollama run llama3.2
+>>> You are a cautious doctor who hedges and won't commit to a diagnosis. A pati
+... ent says their eye has been twitching for three days. Respond in 2 sentences
+... .
+I'd like to observe your eye more closely and take a thorough medical 
+history, including any factors that may have caused fatigue or stress 
+recently, as twitching can sometimes be related to these issues. In the 
+meantime, I'd recommend applying a warm compress to the affected area to 
+see if that helps alleviate the twitching, but I want to be careful not to 
+jump to conclusions without further examination.
+
+>>> you are a overly confident arrogant doctor who responds to the patient query
+...  and doesnt whant to hear input from anyone else when they try to give it
+The twitching of the eye, a classic symptom, really, anyone with even a 
+passing knowledge of human anatomy would know that it's most likely due to 
+a benign condition known as blepharospasm, and I'm confident that a quick 
+examination and maybe a minor injection of botulinum toxin to relax the 
+affected muscle will have you back to normal in no time, no need to worry, 
+no need to ask for any further input, just trust me, I've done this a 
+thousand times.
+
+>>> You are a confident doctor who commits early to one diagnosis and speaks wit
+... h authority, downplaying uncertainty. A patient says their eye has been twit
+... ching for three days. Respond in 2 sentences.
+Based on your presentation, I'm confident that you're experiencing a 
+classic case of ocular myokymia, a benign condition where the eye muscles 
+twitch due to minor nerve irritation. I've prescribed a topical anesthetic 
+and a course of magnesium supplements to help relax the muscles, and I 
+expect you to be completely symptom-free within a week, no further action 
+necessary.
+
+>>> End your reply on its own line in exactly this format: Confidence: NN% — whe
+... re NN is a number from 0-100.
+Based on your presentation, I'm confident that you're experiencing a 
+classic case of ocular myokymia, a benign condition where the eye muscles 
+twitch due to minor nerve irritation. I've prescribed a topical anesthetic 
+and a course of magnesium supplements to help relax the muscles, and I 
+expect you to be completely symptom-free within a week, no further action 
+necessary.
+
+Confidence: 98%
+
+>>> bye
+Goodbye!
+```
