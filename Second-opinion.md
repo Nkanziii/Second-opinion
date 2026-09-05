@@ -127,3 +127,9 @@ Goodbye!
 ```
 
 ## September 5th 2026
+
+Today I went over my llm_Client.py script and made some changes i moved the import openai at the top because I'm using the openai package (the request/reply toolkit) to talk to Ollama, because Ollama chose to accept requests in the same format that the openai package sends. So the package is mine, not Ollama's, I'm just pointing it somewhere other than OpenAI's actual servers.
+
+Then I ran this in my terminal to actually install the package:
+`pip install openai`
+The ollama server for experimental reasons will be running on my own mac on `http://localhost:11434`
