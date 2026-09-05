@@ -133,3 +133,14 @@ Today I went over my llm_Client.py script and made some changes i moved the impo
 Then I ran this in my terminal to actually install the package:
 `pip install openai`
 The ollama server for experimental reasons will be running on my own mac on `http://localhost:11434`
+
+I carried on going through the code file and used Claude.ai to help me understand the different sections of the file and why I kept running into bugs. 
+
+The first bug I rand into was:
+The code crashed saying it didn't know what "openai" meant, even though i'd just used it. Turned out the import for it was only written inside a different, unrelated branch of the code, so if that branch never ran, Python never learned the word. Fixed it by moving the import to the very top of the file instead, so it's known everywhere, not just in one spot.
+
+Second bug:
+The part of the code that decides "which AI brain to use" (out of anthropic, openai, mock) Ollama was not added as an option. Changed its fallback option to Ollama instead of mock, since I actually have something real running locally now.
+
+Third bug:
+Still crashed, this time with "Unknown provider: Ollama"
