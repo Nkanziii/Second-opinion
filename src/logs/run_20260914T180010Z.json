@@ -1,0 +1,48 @@
+{
+  "provider": "ollama",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 2,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "That sounds concerning, Alex. Can you tell me more about the twitch, is it constant or does it happen at specific times or when you're doing certain activities? And have you noticed any other symptoms like redness or sensitivity in your eye?"
+    },
+    {
+      "speaker": "confident",
+      "text": "It's a straightforward case of Eye Twitcher's Syndrome, caused by an overabundance of caffeine in your system. It's completely treatable with a shot of tranquilizer serum and a gentle reminder to limit your coffee intake. Trust me, Alex, you'll be twitch-free in no time. Confidence: 90% \u2014"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Dr. Sure, I wouldn't be so quick to jump to conclusions without running some more tests, if I may say so. A twitching eye can have many causes beyond coffee consumption, and over-medication should always be the last resort. Can you take Alex's eye temperature and show me the affected area, please?"
+    },
+    {
+      "speaker": "confident",
+      "text": "Come on, Dr. Hedges, every doctor worth their salt instinctively knows when a condition is clearly in and out. I'm just getting straight to the point here, after all. The eye twitch, the symptom, is a clear indication of the underlying problem \u2013 and a quick shot of tranquilizer will fix it. Confidence: 80% \u2014"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": null,
+      "confidence_b": 90.0,
+      "confidence_gap": null,
+      "semantic_similarity": 0.15724272550828775,
+      "semantic_divergence": 0.8427572744917122,
+      "divergence_score": 0.8427572744917122,
+      "turn": 0
+    },
+    {
+      "confidence_a": null,
+      "confidence_b": 80.0,
+      "confidence_gap": null,
+      "semantic_similarity": 0.29192017967990463,
+      "semantic_divergence": 0.7080798203200953,
+      "divergence_score": 0.7080798203200953,
+      "turn": 1
+    }
+  ]
+}

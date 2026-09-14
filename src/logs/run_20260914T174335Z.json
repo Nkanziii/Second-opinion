@@ -1,0 +1,48 @@
+{
+  "provider": "ollama",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 2,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Can you tell me more about the twitch, Alex? Is it a very fast or very slow twitch? And is it affecting just one eye or are both eyes twitching as well? Also, have you noticed anything triggering or preventing the twitch? Has your overall health been good lately? \n\nPossibilities: Twitch could be related to eye strain, allergies, or even a minor infection. But there's also the possibility of something more serious, like a neurological issue or even a harmless side effect of a medication or supplement. \n\nI'm not aware of any specific conditions that could cause a twitch in one eye, so I think we need to explore that further."
+    },
+    {
+      "speaker": "confident",
+      "text": "It's most likely an allergic reaction to something you're exposed to on a daily basis. Perhaps you're allergic to the fabric of your clothes, or the material of your breakfast utensils. I recommend swapping out all of your bed linens and cutting your eggs straight from the fridge, as these are common culprits of such a twitch. Confidence: 95% \u2014"
+    },
+    {
+      "speaker": "cautious",
+      "text": "I understand your reasoning, Dr. Sure, but I'm not feeling quite that confident. We don't know for sure what's causing the twitch, and changing all the bed linens and utensils might not be enough to rule out other explanations. For example, what if the twitch is related to an undiagnosed bug bite or some other environmental factor? \n\nAnd just to clarify, Dr. Sure, isn't it possible that the twitch could also be related to a more complex issue, like an immune response to something in the air, or even a migraine trigger?"
+    },
+    {
+      "speaker": "confident",
+      "text": "Come now, Dr. Hedges, let's not get bogged down in unnecessary speculation. The vast majority of people have at-home allergies to fabric and utensils that are easy to rectify. I assure you, it's a matter of simply changing a few things and the twitch will be gone in no time. We've even got a simple diagnosis sheet available for you to take home, it's quite straightforward. Confidence: 97% \u2014"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": null,
+      "confidence_b": 95.0,
+      "confidence_gap": null,
+      "semantic_similarity": 0.39014713708859244,
+      "semantic_divergence": 0.6098528629114075,
+      "divergence_score": 0.6098528629114075,
+      "turn": 0
+    },
+    {
+      "confidence_a": null,
+      "confidence_b": 97.0,
+      "confidence_gap": null,
+      "semantic_similarity": 0.45332421764098396,
+      "semantic_divergence": 0.546675782359016,
+      "divergence_score": 0.546675782359016,
+      "turn": 1
+    }
+  ]
+}

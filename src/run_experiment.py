@@ -28,14 +28,14 @@ from llm_client import LLMClient, get_provider
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA
 
 
-def build_messages_for(persona_id: str, transcript: list) -> list:
+def build_messages_for(persona_id: str, transcript: list) -> list: # the function that determins what each persona sees of the convo so far
     messages = []
     for turn in transcript:
-        role = "assistant" if turn["speaker"] == persona_id else "user"
-        label = "You" if role == "assistant" else turn["speaker"]
-        messages.append({"role": role, "content": f"[{label}] {turn['text']}"})
+        if turn["speaker"] == persona_id:
+            messages.append({"role": "assistant", "content": turn["text"]})
+        else:
+            messages.append({"role": "user", "content": f"[{turn['speaker']}] {turn['text']}"})
     return messages
-
 
 def run(visitor_name: str, symptom: str, turns: int, force_mock: bool):
     llm = LLMClient(force_mock=force_mock)

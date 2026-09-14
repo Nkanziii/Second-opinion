@@ -14,9 +14,11 @@ model for rapid iteration vs. a stronger one for the final installation.
 """
 
 import os
+import openai
 
 ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929"
 OPENAI_MODEL = "gpt-4o-mini"
+OLLAMA_MODEL = "llama3.2"
 
 _MOCK_RESPONSES = {
     "cautious": [
@@ -47,11 +49,11 @@ def get_provider(force_mock: bool = False) -> str:
         return "anthropic"
     if os.environ.get("OPENAI_API_KEY"):
         return "openai"
-    return "mock"
+    return "ollama"
 
 
 class LLMClient:
-    def __init__(self, force_mock: bool = False):
+    def __init__(self, force_mock: bool = False): # a little container that holds these 2 main things
         self.provider = get_provider(force_mock)
         self._client = None
         if self.provider == "anthropic":
@@ -59,9 +61,10 @@ class LLMClient:
 
             self._client = anthropic.Anthropic()
         elif self.provider == "openai":
-            import openai
-
             self._client = openai.OpenAI()
+
+        elif self.provider == "ollama":
+            self._client = openai.OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
 
     def reply(self, system_prompt: str, conversation: list, persona_id: str,
               visitor_name: str, turn_index: int) -> str:
@@ -74,17 +77,17 @@ class LLMClient:
         if self.provider == "anthropic":
             resp = self._client.messages.create(
                 model=ANTHROPIC_MODEL,
-                max_tokens=200,
+                max_tokens=250,
                 system=system_prompt,
                 messages=conversation,
             )
             return resp.content[0].text
 
-        if self.provider == "openai":
+        if self.provider in ("openai", "ollama"):
             messages = [{"role": "system", "content": system_prompt}] + conversation
             resp = self._client.chat.completions.create(
-                model=OPENAI_MODEL,
-                max_tokens=200,
+                model=OLLAMA_MODEL if self.provider == "ollama" else OPENAI_MODEL,
+                max_tokens=250,
                 messages=messages,
             )
             return resp.choices[0].message.content

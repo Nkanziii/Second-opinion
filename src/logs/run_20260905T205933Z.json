@@ -1,0 +1,48 @@
+{
+  "provider": "ollama",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 2,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, that's a concerning symptom, but it could also be a minor annoyance. Can you tell me more about what's happening with this twitch? Is it constant, or does it come and go? And have you noticed any other unusual sensations, like puffiness or redness around your eye? \u2014 Confidence: 60% \u2014"
+    },
+    {
+      "speaker": "confident",
+      "text": "\"The twitch is relentless, Alex. I've tracked the twitch's trajectory for 72 hours straight, and I'm convinced it's related to a dormant mercury deposit in the orbital sac. This is a classic mercurial twitch, and I'm prescribing an immediate dose of ultrasonic wave therapy to clear the blockage.\" \u2014 Confidence: 90% \u2014"
+    },
+    {
+      "speaker": "cautious",
+      "text": "[You] Hold on, Dr. Sure, I think we need to slow down here. While a mercury deposit in the orbital sac is an interesting possibility, we're jumping to conclusions without more data. I'd like to explore other potential causes for Alex's twitch, such as dry eyes, digital eye strain, or even a more mundane issue like fatigue. Can we run some further assessments to rule out more common explanations? \u2014 Confidence: 40% \u2014"
+    },
+    {
+      "speaker": "confident",
+      "text": "[You] \"I disagree, Dr. Hedges. The facts are clear: the twitch is a manifestation of a rare neurological response triggered by the alignment of the celestial meridian. Your fixation on dry eyes and fatigue is a textbook example of the 'analyst's fallacy' \u2013 you're letting your preconceptions cloud your objectivity. I've seen it before, and I know what I'm talking about. Ultrasonic wave therapy is not a trial, it's a proven treatment for mercurial twitch syndrome.\" \u2014 Confidence: 99% \u2014"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 60.0,
+      "confidence_b": 90.0,
+      "confidence_gap": 0.3,
+      "semantic_similarity": 0.21100998983696248,
+      "semantic_divergence": 0.7889900101630375,
+      "divergence_score": 0.5444950050815187,
+      "turn": 0
+    },
+    {
+      "confidence_a": 40.0,
+      "confidence_b": 99.0,
+      "confidence_gap": 0.59,
+      "semantic_similarity": 0.25506397494413713,
+      "semantic_divergence": 0.7449360250558629,
+      "divergence_score": 0.6674680125279314,
+      "turn": 1
+    }
+  ]
+}

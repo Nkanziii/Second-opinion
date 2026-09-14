@@ -64,28 +64,29 @@ def bow_cosine_similarity(text_a: str, text_b: str) -> float:
         return 0.0
     return float(np.dot(vec_a, vec_b) / denom)
 
-
 def divergence_score(response_a: str, response_b: str) -> dict:
     conf_a = parse_confidence(response_a)
     conf_b = parse_confidence(response_b)
-    confidence_gap = abs(conf_a - conf_b) / 100.0 if conf_a is not None and conf_b is not None else None
+
+    fallback_used = conf_a is None or conf_b is None
+    if conf_a is None:
+        conf_a = 50.0
+    if conf_b is None:
+        conf_b = 50.0
+    confidence_gap = abs(conf_a - conf_b) / 100.0
 
     text_a = strip_confidence_line(response_a)
     text_b = strip_confidence_line(response_b)
     similarity = bow_cosine_similarity(text_a, text_b)
     semantic_divergence = 1.0 - similarity
 
-    # combine: if we have a confidence gap, weight it evenly with semantic
-    # divergence; otherwise fall back to semantic divergence alone.
-    if confidence_gap is not None:
-        combined = 0.5 * confidence_gap + 0.5 * semantic_divergence
-    else:
-        combined = semantic_divergence
+    combined = 0.5 * confidence_gap + 0.5 * semantic_divergence
 
     return {
         "confidence_a": conf_a,
         "confidence_b": conf_b,
         "confidence_gap": confidence_gap,
+        "confidence_fallback_used": fallback_used,
         "semantic_similarity": similarity,
         "semantic_divergence": semantic_divergence,
         "divergence_score": combined,
