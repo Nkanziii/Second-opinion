@@ -26,6 +26,7 @@ from datetime import datetime, timezone
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA
+from osc_sender import send_divergence
 
 
 def build_messages_for(persona_id: str, transcript: list) -> list: # the function that determins what each persona sees of the convo so far
@@ -62,6 +63,7 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool):
             print(f"[{persona['label']}] {reply}\n")
 
         score = divergence_score(turn_responses["cautious"], turn_responses["confident"])
+        send_divergence(score)
         score["turn"] = turn_index
         scores.append(score)
         print(f"  -> divergence_score: {score['divergence_score']:.2f} "
