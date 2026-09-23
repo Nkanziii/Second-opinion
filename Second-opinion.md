@@ -185,3 +185,8 @@ Confidence: 95%
 
   -> divergence_score: 0.37 (confidence_gap=0.0, semantic_similarity=0.26)
 ```
+
+## Wednesday 23rd September
+
+In this session I created a the OSC_sender file available at: [OSC_sender.py](src/osc_sender.py)
+
