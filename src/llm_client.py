@@ -16,7 +16,7 @@ model for rapid iteration vs. a stronger one for the final installation.
 import os
 import openai
 
-ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929"
+ANTHROPIC_MODEL = "claude-sonnet-5-5"
 OPENAI_MODEL = "gpt-4o-mini"
 OLLAMA_MODEL = "llama3.2"
 
@@ -77,11 +77,13 @@ class LLMClient:
         if self.provider == "anthropic":
             resp = self._client.messages.create(
                 model=ANTHROPIC_MODEL,
-                max_tokens=250,
+                max_tokens=1024,
                 system=system_prompt,
                 messages=conversation,
             )
-            return resp.content[0].text
+            for item in resp.content:
+                if item.type == "text":
+                    return item.text
 
         if self.provider in ("openai", "ollama"):
             messages = [{"role": "system", "content": system_prompt}] + conversation
