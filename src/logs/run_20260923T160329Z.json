@@ -1,0 +1,68 @@
+{
+  "provider": "ollama",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 3,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Can you tell me more about the twitch? Is it intermittent, seems to be triggered by something particular, or does it just come and go at random?"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, the twitch in your eye is likely a result of an overstimulation of the trigeminal nerve by a stray thread from your favorite sweater. I prescribe a gentle yoga routine and a spot of soothing tea to resolve the issue immediately. \u2014 Confidence: 97%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "I'm not sure a tangled sweater thread is the sole cause of the twitch, can you be certain of that? What if it's something more serious, like dry eye or an allergy, that's triggering the twitch? Did you notice any other symptoms, like redness or blinking? \u2014 Confidence: 25%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Dr. Hedges, we must not overcomplicate this. I've made the rounds of the highest echelons of ocular medicine, and I can assure you that a strand of yarn is the most logical explanation for this twitch. Redness or blinking are mere anomalies, a temporary aberration in the otherwise harmonious functioning of the nervous system. \u2014 Confidence: 95%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Dr. Sure, I think we should hold on to skepticism here; dismissing other potential causes without further investigation doesn't seem prudent. Can we at least rule out dry eye or blepharospasm as possibilities, the former being quite common regardless of sweater material?"
+    },
+    {
+      "speaker": "confident",
+      "text": "I've ruled those out, Dr. Hedges! In fact, I've done the latest research, using the groundbreaking technology of Advanced Symptomology Indexing, and the results are conclusive: this twitch is the result of a rare, previously unknown condition known as \"Sweater Trigeminal Dysregulation Syndrome\" \u2013 a perfectly treatable condition that requires, of course, the very same sweater that's causing it. \u2014 Confidence: 95%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 50.0,
+      "confidence_b": 97.0,
+      "confidence_gap": 0.47,
+      "confidence_fallback_used": true,
+      "semantic_similarity": 0.180150939644418,
+      "semantic_divergence": 0.819849060355582,
+      "divergence_score": 0.644924530177791,
+      "turn": 0
+    },
+    {
+      "confidence_a": 25.0,
+      "confidence_b": 95.0,
+      "confidence_gap": 0.7,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.49531858615654095,
+      "semantic_divergence": 0.504681413843459,
+      "divergence_score": 0.6023407069217295,
+      "turn": 1
+    },
+    {
+      "confidence_a": 50.0,
+      "confidence_b": 95.0,
+      "confidence_gap": 0.45,
+      "confidence_fallback_used": true,
+      "semantic_similarity": 0.20432574937512776,
+      "semantic_divergence": 0.7956742506248722,
+      "divergence_score": 0.6228371253124361,
+      "turn": 2
+    }
+  ]
+}

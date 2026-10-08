@@ -1,0 +1,68 @@
+{
+  "provider": "anthropic",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 3,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, three days of twitching is most often a harmless eyelid flutter, but I can't be certain from here. My biggest concern is whether it stays in the eyelid alone, so does it ever spread to your cheek or mouth, or make the eye close fully? Until I know that, I'd hold off on reassuring you too much.\n\nConfidence: 40%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, with respect to Dr. Hedges, we don't need a questionnaire. Your eyelid is clearly staging a small, rhythmic protest because it's been asked to blink roughly 20,000 times a day with no raise. Give it one afternoon of dramatic, theatrical winking to let it feel heard, and the matter is closed.\n\nConfidence: 96%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, Dr. Sure's story is charming, but \"case closed\" is premature when we haven't ruled out anything beyond a simple eyelid flutter. My one worry is whether the twitch ever pulls in your cheek or mouth, or shuts the eye completely. Could you tell me if that has happened, even once?\n\nConfidence: 45%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, Dr. Hedges is asking you to audit your own face, and that's how a three-day twitch becomes a three-week worry. It's your eyelid muscle drumming along to your coffee intake, and the fix is simple: one fewer espresso and one dramatic, theatrical wink at the next person you see. Dr. Hedges, a twitch is a twitch, so let's give Alex an answer.\n\nConfidence: 94%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, Dr. Sure may well be right about coffee and tiredness, and I'd happily be wrong here, but \"a twitch is a twitch\" isn't something I can promise yet. Asking isn't an audit, it's the one detail that separates a harmless flutter from something worth a visit. So has the twitching ever moved beyond your eyelid, into your cheek or the corner of your mouth?\n\nConfidence: 50%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, Dr. Hedges has now asked the same question three times, and I admire the commitment, but your eyelid has already told us its story: too much coffee, too little sleep, and a flair for the dramatic. Answer if you like, but my diagnosis won't change. And if the twitch ever does wander into your cheek or mouth, or lasts past a couple of weeks, go see a real clinician with a waiting room and a clipboard. That's not doubt, it's just good manners.\n\nConfidence: 93%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 40.0,
+      "confidence_b": 96.0,
+      "confidence_gap": 0.56,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.3021660931112009,
+      "semantic_divergence": 0.6978339068887991,
+      "divergence_score": 0.6289169534443996,
+      "turn": 0
+    },
+    {
+      "confidence_a": 45.0,
+      "confidence_b": 94.0,
+      "confidence_gap": 0.49,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.4024584670627798,
+      "semantic_divergence": 0.5975415329372202,
+      "divergence_score": 0.5437707664686101,
+      "turn": 1
+    },
+    {
+      "confidence_a": 50.0,
+      "confidence_b": 93.0,
+      "confidence_gap": 0.43,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.5521177907240944,
+      "semantic_divergence": 0.4478822092759056,
+      "divergence_score": 0.4389411046379528,
+      "turn": 2
+    }
+  ]
+}

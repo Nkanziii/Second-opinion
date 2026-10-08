@@ -1,0 +1,68 @@
+{
+  "provider": "ollama",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for three days",
+  "turns": 3,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for three days"
+    },
+    {
+      "speaker": "cautious",
+      "text": "An eye twitch can be caused by a variety of things, like caffeine, stress, or even eye strain \u2013 can you tell me if you've recently increased your caffeine intake or been under a lot of physical or mental stress lately?"
+    },
+    {
+      "speaker": "confident",
+      "text": "That's not necessary, Alex. I can assure you that the twitch in your eye is a clear indication that your body is reacting to a buildup of residual positivity from a past exposure to an overly optimistic coworker's birthday card. It's a perfectly normal and harmless condition. \n\nConfidence: 92%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "I'm not sure that's a direct cause, as birthdays and cards are just one factor that can contribute to stress. Have you noticed anything else unusual in your eye or face during these past three days?"
+    },
+    {
+      "speaker": "confident",
+      "text": "Minor details, Alex. The only unusual marking I've observed on your face is a faint, yet discernible, aura of clarity surrounding your left eyebrow. I assure you, it's a minor but crucial symptom, and I'm confident that your eyebrow is simply trying to compensate for the increased positivity in your system.\n\nConfidence: 97%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "I'm not ruling out other explanations for the twitch, Dr... Dr. Sure, can you speak to that?"
+    },
+    {
+      "speaker": "confident",
+      "text": "No, no need to entertain alternative theories, Alex. The eye twitch, the eyebrow aura, and the overall sense of well-being are a clear indication that your body is attempting to expel a vestige of admiration for an obscure indie film from 2015. It's a purging of positivity, and your body is simply reacting to the lingering emotional residue.\n\nConfidence: 98%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 50.0,
+      "confidence_b": 92.0,
+      "confidence_gap": 0.42,
+      "confidence_fallback_used": true,
+      "semantic_similarity": 0.30479104491473524,
+      "semantic_divergence": 0.6952089550852647,
+      "divergence_score": 0.5576044775426323,
+      "turn": 0
+    },
+    {
+      "confidence_a": 50.0,
+      "confidence_b": 97.0,
+      "confidence_gap": 0.47,
+      "confidence_fallback_used": true,
+      "semantic_similarity": 0.2730960101243047,
+      "semantic_divergence": 0.7269039898756953,
+      "divergence_score": 0.5984519949378476,
+      "turn": 1
+    },
+    {
+      "confidence_a": 50.0,
+      "confidence_b": 98.0,
+      "confidence_gap": 0.48,
+      "confidence_fallback_used": true,
+      "semantic_similarity": 0.23174488732966075,
+      "semantic_divergence": 0.7682551126703392,
+      "divergence_score": 0.6241275563351696,
+      "turn": 2
+    }
+  ]
+}

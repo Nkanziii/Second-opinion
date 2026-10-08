@@ -1,0 +1,68 @@
+{
+  "provider": "anthropic",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 3,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, three days of twitching is most often harmless, but I can't be sure from here. My main worry is whether it's staying in your eyelid or spreading to other parts of your face, like your cheek or mouth. Has it stayed in one spot, and does your eyelid ever close fully on its own?\n\nConfidence: 35%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, Dr. Hedges is asking about cheeks and mouths, but we don't need a tour of your face. This is clearly an overworked eyelid muscle that has taken up freelance Morse code, and it's been tapping out your coffee order for three days. Cut back on caffeine and get some sleep, and the message should stop by Thursday. Dr. Hedges, a clear answer is a kindness.\n\nConfidence: 94%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, Dr. Sure's explanation is the likeliest one, but promising it will stop by Thursday is more certainty than anyone can have from here. My one concern is the twitch spreading beyond your eyelid or making it clamp fully shut, so please watch for that. If it does either, or lasts more than a couple of weeks, have someone examine you in person.\n\nConfidence: 60%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, Dr. Hedges has just agreed with me and then charged a caveat fee for it. Your eyelid is a tiny overtired drummer, and with less coffee and more sleep he'll clock out, Thursday or thereabouts. Fine, if your face starts joining in or the lid clamps shut, go get examined in person, but that's a plot twist, not the plot. Dr. Hedges, \"likeliest\" is just \"correct\" in a nervous coat.\n\nConfidence: 91%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, \"likeliest\" and \"correct\" are different words, Dr. Sure, and the gap between them is where the rare cases hide. Cutting caffeine and sleeping more is sensible advice, and I'd be glad to be wrong about needing more. Has the twitch stayed only in your eyelid, Alex, or has it tugged at your cheek or mouth too?\n\nConfidence: 62%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, the gap between \"likeliest\" and \"correct\" is where Dr. Hedges lives, and frankly he's never paid rent. Your eyelid is filing a formal complaint about too much coffee and too little sleep, and the complaint gets withdrawn by the weekend. Humor Dr. Hedges and tell us whether it's only the eyelid, but I already know the answer, and if your cheek or mouth does join the protest, you get examined in person.\n\nConfidence: 90%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 35.0,
+      "confidence_b": 94.0,
+      "confidence_gap": 0.59,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.34893157889942655,
+      "semantic_divergence": 0.6510684211005735,
+      "divergence_score": 0.6205342105502867,
+      "turn": 0
+    },
+    {
+      "confidence_a": 60.0,
+      "confidence_b": 91.0,
+      "confidence_gap": 0.31,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.39333786756324446,
+      "semantic_divergence": 0.6066621324367556,
+      "divergence_score": 0.4583310662183778,
+      "turn": 1
+    },
+    {
+      "confidence_a": 62.0,
+      "confidence_b": 90.0,
+      "confidence_gap": 0.28,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.6119900613621047,
+      "semantic_divergence": 0.38800993863789535,
+      "divergence_score": 0.3340049693189477,
+      "turn": 2
+    }
+  ]
+}

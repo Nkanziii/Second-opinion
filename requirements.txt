@@ -1,3 +1,4 @@
 numpy
 anthropic
 openai
+python-osc

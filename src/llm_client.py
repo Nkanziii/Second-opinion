@@ -16,6 +16,27 @@ model for rapid iteration vs. a stronger one for the final installation.
 import os
 import openai
 
+def _load_env():
+    """Read KEY=value lines from the project's .env into os.environ, so the
+    API key is found without having to `export` it in the terminal first.
+    Blank values and keys already set in the shell are left alone."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    for path in (os.path.join(here, "..", ".env"), os.path.join(here, ".env")):
+        if not os.path.exists(path):
+            continue
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key, value = key.strip(), value.strip().strip('"').strip("'")
+                if value and key not in os.environ:
+                    os.environ[key] = value
+
+
+_load_env()
+
 ANTHROPIC_MODEL = "claude-sonnet-5-5"
 OPENAI_MODEL = "gpt-4o-mini"
 OLLAMA_MODEL = "llama3.2"
@@ -95,3 +116,4 @@ class LLMClient:
             return resp.choices[0].message.content
 
         raise RuntimeError(f"Unknown provider: {self.provider}")
+

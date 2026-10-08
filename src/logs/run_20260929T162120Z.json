@@ -1,0 +1,50 @@
+{
+  "provider": "anthropic",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 2,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, three days of a twitch is most often harmless, but I can't be sure from here. My biggest concern is whether it's staying in that one eyelid or spreading, so has it ever pulled at your cheek or mouth, or made your eyelid droop or close fully? Until we know that, I'd hold off on any conclusions.\n\nConfidence: 35%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, with respect, Dr. Hedges, we don't need a questionnaire. This is a classic case of eyelid over-scheduling: your left eyelid is working overtime because your right one has been slacking, and it's twitching to file a complaint. Three days is exactly how long that takes, so cut back on coffee, give both eyelids a stern talking-to, and it will settle.\n\nConfidence: 94%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Dr. Sure, Alex never said which eye, and I don't know of any \"eyelid over-scheduling\" that explains a twitch, so 94% seems premature. Cutting back on coffee is sensible, Alex, but my one worry is spreading, so has it ever pulled at your cheek or mouth, or made the eyelid close fully? If so, or if it lasts beyond a couple of weeks, please have it examined.\n\nConfidence: 40%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Dr. Hedges, whichever eye it is, the diagnosis holds: one eyelid is clearly carrying the other's workload, and the twitch is the union rep. Alex, the plan is simple: less coffee, more sleep, and a firm word with both lids at bedtime. Yes, if it ever spreads to your cheek or lasts a couple of weeks, go get examined, but I don't expect that, because I've already decided this is a scheduling dispute.\n\nConfidence: 92%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 35.0,
+      "confidence_b": 94.0,
+      "confidence_gap": 0.59,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.3720654892896797,
+      "semantic_divergence": 0.6279345107103202,
+      "divergence_score": 0.6089672553551602,
+      "turn": 0
+    },
+    {
+      "confidence_a": 40.0,
+      "confidence_b": 92.0,
+      "confidence_gap": 0.52,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.530993947350665,
+      "semantic_divergence": 0.46900605264933504,
+      "divergence_score": 0.4945030263246675,
+      "turn": 1
+    }
+  ]
+}

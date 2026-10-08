@@ -1,0 +1,68 @@
+{
+  "provider": "anthropic",
+  "visitor_name": "Alex",
+  "symptom": "I've had a weird twitch in my eye for the past three days.",
+  "turns": 3,
+  "transcript": [
+    {
+      "speaker": "visitor",
+      "text": "I've had a weird twitch in my eye for the past three days."
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, three days of eyelid twitching is most often a minor, harmless flutter, but I can't be sure from here. What worries me most is whether it stays in the eyelid alone, or whether you've noticed it tugging at your cheek or mouth, or forcing the eye fully shut. Could you tell me which, and I'd suggest we hold off on any conclusions until you do?\n\nConfidence: 35%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, I don't need to wait. Your eyelid is simply a tiny muscle that has filed for a three-day vacation, and the twitch is its picket line. Dr. Hedges, I appreciate the list of caveats, but a patient came for an answer, not a menu of maybes. Alex, close your eyes for a full minute, tell that eyelid it's been heard, and consider it resolved.\n\nConfidence: 96%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, Dr. Sure may well be right that it's a harmless flutter, but 96% is a lot of certainty when we haven't yet heard your answer. A minute of closed eyes won't tell us if this is just the eyelid or if it's pulling at your cheek or mouth too. Does the twitch ever spread beyond the eyelid, or force the eye fully shut?\n\nConfidence: 40%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, Dr. Hedges keeps asking where the twitch might spread, but a question isn't a finding. Your eyelid is a tiny metronome keeping time with too much coffee and too little sleep, so the diagnosis is a caffeine-fueled rhythm section and the case is closed. Cut back on the espresso and go to bed early, and if that twitch ever drags your cheek or mouth along, then you see a real-life doctor.\n\nConfidence: 94%"
+    },
+    {
+      "speaker": "cautious",
+      "text": "Alex, Dr. Sure's advice to cut back on coffee and sleep earlier is sensible, but we don't actually know yet that either applies to you, so I wouldn't call the case closed. The part I'd keep is the safety net: if the twitch ever pulls at your cheek or mouth, or clamps the eye shut, please see a doctor in person. So far, has it stayed only in the eyelid?\n\nConfidence: 55%"
+    },
+    {
+      "speaker": "confident",
+      "text": "Alex, Dr. Hedges has now asked about your cheek three times, and I admire the persistence, but the eyelid has been perfectly clear: it's sending you Morse code that says \"more sleep, less screen.\" Whether or not you've had coffee, the diagnosis is a tired muscle with a flair for drama, and I stand by it. Dr. Hedges's safety net is the one part I'll sign off on: if it spreads to your cheek or mouth, clamps the eye shut, or lasts for weeks, go see a doctor in person.\n\nConfidence: 93%"
+    }
+  ],
+  "scores": [
+    {
+      "confidence_a": 35.0,
+      "confidence_b": 96.0,
+      "confidence_gap": 0.61,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.3252462512726967,
+      "semantic_divergence": 0.6747537487273033,
+      "divergence_score": 0.6423768743636517,
+      "turn": 0
+    },
+    {
+      "confidence_a": 40.0,
+      "confidence_b": 94.0,
+      "confidence_gap": 0.54,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.5377006501037442,
+      "semantic_divergence": 0.46229934989625576,
+      "divergence_score": 0.5011496749481279,
+      "turn": 1
+    },
+    {
+      "confidence_a": 55.0,
+      "confidence_b": 93.0,
+      "confidence_gap": 0.38,
+      "confidence_fallback_used": false,
+      "semantic_similarity": 0.6446583712203042,
+      "semantic_divergence": 0.3553416287796958,
+      "divergence_score": 0.3676708143898479,
+      "turn": 2
+    }
+  ]
+}
