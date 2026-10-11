@@ -26,7 +26,8 @@ from datetime import datetime, timezone
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA
-from osc_sender import send_divergence
+from osc_sender import send_divergence, send_speaking
+from speech import speak_reply
 
 
 def build_messages_for(persona_id: str, transcript: list) -> list: # the function that determins what each persona sees of the convo so far
@@ -38,7 +39,7 @@ def build_messages_for(persona_id: str, transcript: list) -> list: # the functio
             messages.append({"role": "user", "content": f"[{turn['speaker']}] {turn['text']}"})
     return messages
 
-def run(visitor_name: str, symptom: str, turns: int, force_mock: bool):
+def run(visitor_name: str, symptom: str, turns: int, force_mock: bool, speak: bool = False):
     llm = LLMClient(force_mock=force_mock)
     provider = llm.provider
     print(f"--- provider: {provider} ---\n")
@@ -61,6 +62,12 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool):
             transcript.append({"speaker": persona["id"], "text": reply})
             turn_responses[persona["id"]] = reply
             print(f"[{persona['label']}] {reply}\n")
+            if speak:
+                send_speaking(persona["id"], 1.0)
+                try:
+                    speak_reply(persona["id"], reply)
+                finally:
+                    send_speaking(persona["id"], 0.0)
 
         score = divergence_score(turn_responses["cautious"], turn_responses["confident"])
         send_divergence(score)
@@ -82,9 +89,23 @@ def main():
     )
     parser.add_argument("--turns", type=int, default=3)
     parser.add_argument("--mock", action="store_true", help="force mock mode")
+    parser.add_argument("--voice", action="store_true",
+                        help="speak the symptom into the microphone instead of typing it")
+    parser.add_argument("--speak", action="store_true",
+                        help="have each doctor speak their reply out loud (macOS)")
+    parser.add_argument("--listen-seconds", type=int, default=8,
+                        help="how long to record in --voice mode")
     args = parser.parse_args()
 
-    transcript, scores, provider = run(args.visitor_name, args.symptom, args.turns, args.mock)
+    symptom = args.symptom
+    if args.voice:
+        from voice_input import listen
+        symptom = listen(args.listen_seconds)
+        if not symptom:
+            print("Did not catch anything. Try again, a bit closer to the mic.")
+            return
+
+    transcript, scores, provider = run(args.visitor_name, symptom, args.turns, args.mock, args.speak)
 
     os.makedirs("logs", exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -94,7 +115,7 @@ def main():
             {
                 "provider": provider,
                 "visitor_name": args.visitor_name,
-                "symptom": args.symptom,
+                "symptom": symptom,
                 "turns": args.turns,
                 "transcript": transcript,
                 "scores": scores,
