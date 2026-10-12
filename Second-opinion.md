@@ -1,8 +1,14 @@
 # Second Opinion
 
 ## This is the complete markdown file for my entire thesis, with dated entries to show real progress and development.
-
 ---
+# (LLM Use Disclaimer)
+# (project description)
+# (technical description) 
+# (demo video)
+# (images of final prototype)
+# (all code and visual files)
+# (research)
 
 ## Second Opinion — experiment harness (Day 1)
 
@@ -266,6 +272,8 @@ Another thing I was amused by is the semantic_similarity score, which just basic
 
 For a couple days now I have been working on my visuals and how I wanted it to look, I was going through several tutorials on youtube however the tutorials that resembled what i wanted the visuals too look like, had pre-made packages i had to download which i did not want to do as i felt it made my file system very cluttered and it was not what i wanted to do. I had several failed attempts. The journey originially started with building with Claude but it then didn't work out as there was a problem with the render TOP not displaying any visuals that were connected to it. I then left that project and created some from a tutorial which also didn't work I don't understand what was going wrong but every effort was a fail.
 
+# (moodboard wat i want it to look like)
+
 ### Tutorials and methods I tried
 
 **Four approaches, in the order I tried them. The first three failed.**
@@ -393,3 +401,5 @@ I want whoever is talking to have a high-noise cloud, and whoever is silent to c
 My script now sends a speaking signal over OSC (/cautious_speaking and /confident_speaking, 1 while that doctor talks, 0 when silent). In TouchDesigner, a second Lag CHOP (lagspeak, 0.4 seconds) smooths those signals. Each cloud's noise Amplitude is 0.05 + speaking * (0.3 + song loudness (capped at 0.5) + conflict * 0.2), so a silent doctor's cloud goes calm and a talking doctor's cloud swells. It worked in the swap test.
 Gotcha: the node name in the expression has to match the node's name exactly (I'd typed lag_speak once and the node was lagspeak).
 Next time: run the full loop with the clouds on screen and record it, then look at the gap while the next doctor's reply is being generated, when both clouds are calm.
+
+# (REFERENCES)
