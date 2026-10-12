@@ -356,3 +356,6 @@ To stop the clouds ballooning, I capped the song's effect on the noise. Amplitud
 The VS Code error that confused me. Nothing was actually broken, I just ran the wrong file.
 
  <img width="1500" height="974" alt="image" src="https://github.com/user-attachments/assets/04e0cb11-071f-429d-b5e8-bbc187d15091" />
+
+ One habit that helped: press Cmd+S after every single step, so a freeze never costs me much.
+
