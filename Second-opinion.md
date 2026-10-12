@@ -297,3 +297,7 @@ This route needed no downloaded packages, which kept my file system tidy and let
 • Rebuilding was faster than repairing. After several failed fixes, starting again was quicker than finding the original fault.
 
 • Save versions often. A very large Frequency value froze TouchDesigner once, and the numbered backups let me go back.
+
+## current visuals
+
+
