@@ -285,10 +285,6 @@ The original visual built a point cloud, sent it through a Geometry COMP and dis
 The screenshot is that project: noise and a feedback loop feeding a point transform, then geo1 and render1 into a Null TOP, with an OSC In CHOP wired in for the divergence score. The wiring looks complete, but the viewer holds only a thin ring, not a cloud of points. I never found the cause. Later notes for the rebuilt project record that the old project's clouds never rendered through a Point Sprite MAT.
 The practical effect was that I couldn't test any link between the personas and the visuals, because there were no visuals to drive.
 
-### What I built instead, and why
-On 6 October I started a new project, persona_cloud.1.toe, using POPs, the point operators in TouchDesigner 2025. A Sphere POP feeds a Noise POP inside a Geometry COMP, with a camera, light and Render TOP on a black background. Each persona is its own Base COMP, and the two are combined with an Add TOP and an Over TOP. I added one piece at a time and checked the render after each step, so a failure could only come from the last thing I changed.
-This route needed no downloaded packages, which kept my file system tidy and let me understand every node. By 8 October the clouds were rendering, and by the end of that day they were driven live by the divergence score from the Python pipeline. The project went through 24 saved versions, which are kept in the visuals folder and its Backup subfolder.
-
 ### What I learned
 • Failure with no error is hard to debug. A blank Render TOP gave no message, so I couldn't tell which node was at fault. Building up one node at a time, checking the output each step, was what finally worked.
 
@@ -298,6 +294,65 @@ This route needed no downloaded packages, which kept my file system tidy and let
 
 • Save versions often. A very large Frequency value froze TouchDesigner once, and the numbered backups let me go back.
 
-## current visuals
+## current visuals (6th to 8th October)
+After my first attempts failed I rebuilt the visual from scratch on 6 October and aadded one piece at a time, checking the render each step.
+
+I stated with a single cloud. A Sphere POP (Geodesic, Point Primitives, Frequency 70) goes into. Noise POP, inside a Geometry COMP with a camera, a light and a Render TOP on a black background. I animated the noise by moving it along Z over time (absTime.seconds*0.2), so the cloud slowly turns instead of sitting still. Then i connected a song to it: an Audio File in Chop into analyse CHOP, so the cloud swells when the music gets louder. I capped that effect so a loud moment can't blow the cloud apart.
+
+Next I turned that into a Base COMP and made a copy for the second doctor, with a different Noise Seed so the clouds have different shapes. Both read one value called conflict (0 to 1) that sets their colour and how wild the noise is. Dr. Hedges' cloud goes blue to red and Dr. Sure's goes green to orange, so calm looks cool and a disagreement looks hot. 
+
+To show both at once i moved them left and right with Transform TOPs, scaled them down to 0.7, added them together with an Add TOP, and puth them over a black Constant TOP with an Over TOP. That last step fixed the see-through checkerboard edges the Transform TOPs left behind. over1 is the final output.
+
+At conflict 0 the clouds are cool and calm, and at 1 they turn red and chaotic. I tested both ends by typing values in before connecting anything to the Python script.
 
 
+<p>
+  <img src="visuals/merging.png"/>
+  <img src="visuals/conflict.png"/>  
+</p>
+
+The last piece on 8 October was the live link, which is what the rest of this recap covers. This screenshot is the final network (version 18): the two clouds, the two Transform TOPs, add1, over1 and constant1, with oscin1 and master feeing the conflict value. The clouds are pink and orange here because the score was 0.8.
+
+<p>
+  <img src="visuals/separate-conflict.png"/>  
+</p>
+
+### What i did, step by step
+
+1. Black background
+The clouds had see-through edges, so the viewer showed a checkerboard. I added a black Constant TOP and an Over TOP, so the clouds now sit on solid black. over1 is my final picture from now on.
+
+<p>
+  <img src="visuals/separate-conflict.png"/>  
+</p>
+
+2. Full-screen window
+I added a Window COMP, pointed it at over1, and pressed Open. Esc closes it. This is what I screen record.
+
+<p>
+  <img src="visuals/separate-conflict-2.png"/>  
+</p>
+
+3. Safe fallback
+I changed master to op('lag1')['divergence'] or 0. If no score has arrived yet, it reads 0 and the clouds stay calm, with no red errors.
+
+<img width="1500" height="911" alt="image" src="https://github.com/user-attachments/assets/98e4bca4-867d-45eb-be32-8e4a0107986c" />
+
+4. Colour check with typed values
+I sent values from Terminal (0.1, 0.5, 0.8, 1) while screen recording. The clouds go blue and green when calm, purple and olive in the middle, then red and orange at the top.
+
+<img width="1500" height="975" alt="image" src="https://github.com/user-attachments/assets/6bc66dee-03c9-4e69-99ae-7c7f36827f8f" />
+
+5. Real run with Anthropic
+I ran python3 run_experiment.py --turns 3 with the visuals open. The clouds reacted to the real divergence score (0.37 at the end, so calm purple and green).
+
+<img width="1500" height="974" alt="image" src="https://github.com/user-attachments/assets/25cbd967-ed62-469a-b25b-a0252adc72d3" />
+
+6. Cap and smoothing
+To stop the clouds ballooning, I capped the song's effect on the noise. Amplitude is now 0.1 + min(op('analyze1')['chan1']*10, 0.5) + op('conflict')['conflict']*0.2 in both base1 and base2. To stop jumps between scores, I added a Lag CHOP (lag1, about 1.5 seconds) between oscin1 and master. Both worked first time.
+
+### What went wrong, and how I fixed it
+
+The VS Code error that confused me. Nothing was actually broken, I just ran the wrong file.
+
+ <img width="1500" height="974" alt="image" src="https://github.com/user-attachments/assets/04e0cb11-071f-429d-b5e8-bbc187d15091" />
