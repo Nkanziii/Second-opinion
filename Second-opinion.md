@@ -291,6 +291,9 @@ This route needed no downloaded packages, which kept my file system tidy and let
 
 ### What I learned
 • Failure with no error is hard to debug. A blank Render TOP gave no message, so I couldn't tell which node was at fault. Building up one node at a time, checking the output each step, was what finally worked.
+
 • Tutorials can carry hidden dependencies. The closest-looking tutorials needed downloaded packages. Avoiding them cost time, but I understood the final network completely.
+
 • Rebuilding was faster than repairing. After several failed fixes, starting again was quicker than finding the original fault.
+
 • Save versions often. A very large Frequency value froze TouchDesigner once, and the numbered backups let me go back.
