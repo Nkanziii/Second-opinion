@@ -402,4 +402,98 @@ My script now sends a speaking signal over OSC (/cautious_speaking and /confiden
 Gotcha: the node name in the expression has to match the node's name exactly (I'd typed lag_speak once and the node was lagspeak).
 Next time: run the full loop with the clouds on screen and record it, then look at the gap while the next doctor's reply is being generated, when both clouds are calm.
 
+## Monday October 19th
+Having spoken to my supervisor about making the models more emergent, i was given the suggestion of using a "temperature" switch, even though on anthropic website it said this was available, having testing out with adding temperature for my models, Dr. Hedges (temperature = 0.5), Dr. Sure (temperature = 1.0). However Anthropic has limited access for their newer model Claude Sonnet 5.5 to use temperature control for their models, this is the error call back I repeatedly came across.
+
+```
+
+Traceback (most recent call last):
+  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 221, in <module>
+    main()
+    ~~~~^^
+  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 193, in main
+    transcript, scores, provider, ended_by = run(
+                                             ~~~^
+        args.visitor_name, symptom, turns, args.mock,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        args.speak, args.converse, args.voice,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 106, in run
+    reply = llm.reply(
+        system_prompt=system_prompt,
+    ...<4 lines>...
+        temperature=persona["temperature"],
+    )
+  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/llm_client.py", line 99, in reply
+    resp = self._client.messages.create(
+        model=ANTHROPIC_MODEL,
+    ...<3 lines>...
+        messages=conversation,
+    )
+  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_utils/_utils.py", line 294, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/resources/messages/messages.py", line 1027, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/v1/messages",
+        ^^^^^^^^^^^^^^^
+    ...<23 lines>...
+        stream_cls=Stream[RawMessageStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_base_client.py", line 1543, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_base_client.py", line 1208, in request
+    raise self._make_status_error_from_response(response) from None
+anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': '`temperature` is deprecated for this model.'}, 'request_id': 'req_011CgC58fekEHT6KQgpESNm1'}
+```
+I also changed the script to include user interruption and a dynamic flow between the visitor and the Drs. 
+However it still feels too short i want it to run abit longer and users to be immersed in it and end it on their terms.
+This is the current terminal conversion, the default name is Alex.
+
+```
+--- provider: anthropic ---
+
+[Dr. Hedges] Alex, three days of eye twitching is usually harmless, but I can't be certain from a description alone. My main concern is whether this stays in the eyelid or spreads, because spreading would change what I'd want checked. Does the twitch stay in your eyelid, or do you feel it anywhere else on that side of your face?
+
+Confidence: 35%
+
+[Dr. Sure] Alex, I'm going to stop Dr. Hedges right there, because we don't need to wait for it to spread. Three days of twitching is a textbook case of blink debt: your eyelid skipped blinks during screen time and is now collecting the overdue ones all at once. Dr. Hedges, "usually harmless" is already an answer, so let's commit to it. Alex, how many hours a day are you staring at a screen?
+
+Confidence: 91%
+
+  -> divergence_score: 0.61 (confidence_gap=0.56, semantic_similarity=0.34)
+
+(your turn to answer)
+You: only 8 hours of sleep and i feel it on my cheeks
+[Dr. Hedges] Alex, eight hours of sleep makes simple tiredness a weaker explanation, and "blink debt" isn't something I can verify, Dr. Sure. Feeling it in your cheek is exactly the spreading I was worried about, because it could mean the facial nerve is involved rather than just the eyelid. Does the twitch ever pull the corner of your mouth or squeeze your eye fully shut?
+
+Confidence: 55%
+
+[Dr. Sure] Alex, eight hours of sleep is great, and it rules out tiredness, which tells me your eyelid is simply overachieving. The cheek is the eyelid's neighbor catching the rhythm, what I call sympathetic muscle chatter. Dr. Hedges, "facial nerve" is a scary phrase for a twitch that's clearly just sociable. Alex, how many cups of coffee or tea are you having a day?
+
+Confidence: 88%
+
+  -> divergence_score: 0.39 (confidence_gap=0.33, semantic_similarity=0.55)
+
+(your turn to answer)
+You: i am only having one cup of coffee, and i feel like it feels abit more serious than simply pushing it under the rug
+
+[Dr. Hedges] Alex, you're right to take it seriously. One coffee and eight hours of sleep leave the common explanations thin, and Dr. Sure can't verify "sociable muscles" from here. A twitch that lasts three days and reaches your cheek deserves an in-person exam soon, and sooner if anything changes. Have you noticed any drooping or weakness on that side of your face?
+
+Confidence: 60%
+
+[Dr. Sure] Alex, you're right that it isn't nothing, so here's my final verdict: your left cheek and eyelid have formed a tiny percussion duo, and three days is just a long rehearsal. Dr. Hedges, I don't need a drooping check to name a band. Alex, since your gut says this feels more serious, listen to it and book a real in-person exam, because a gallery doctor shouldn't overrule that. Dr. Hedges gets that one point, but the drum duo stands.
+
+Confidence: 93%
+
+  -> divergence_score: 0.43 (confidence_gap=0.33, semantic_similarity=0.46)
+
+--- session ended: doctors concluded ---
+```
+
 # (REFERENCES)
