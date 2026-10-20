@@ -496,4 +496,58 @@ Confidence: 93%
 --- session ended: doctors concluded ---
 ```
 
+## Tuesday 20th October
+I am changing the structure of the models and making changes to how they respond and introduce themselves and also greet visitors. In my current experiments the Drs they don't say hello or greet the visitors and introduce themselves, I want there to be a build of between of the communication in this exhibition, in a professional manner perhaps the user would feel more heard and responsive which can affect the trust between the user and the Drs. A real introduction is crucial, and asking the user for their names and addressing them by their name and each concern directly, can keep the users more engaged. I adjusted and tweaked the code in the personas file, which deals with how the AI personas would engage with their questions they ask and how they approach each round, for example asking the user questions and how they would conclude the conversation, which i ultimately want the visitors to conclude, but the models ask them if they are satisfied or would like further assistance first.
+
+**personas.py changes**
+
+```
+CONVERSE_INSTRUCTION = (
+    " After you and the other clinician have both spoken, the visitor answers "
+    "out loud, and their answer appears in the conversation as [visitor]. "
+    "Respond to what they actually said, never repeat a question they have "
+    "already answered, and talk to them directly like a real consultation. "
+    "Each round, ask the visitor at most one short, direct question."
+    "Visitor decides when it is over."
+)
+
+QUESTION_INSTRUCTION = (
+    " End every reply with exactly one short, direct question for the visitor."
+)
+
+CHECKIN_INSTRUCTION = (
+    " It is time to check in. Briefly respond to what the visitor said, then"
+    "ask whether they are satisfied with the advice or have any one the questions."
+)
+
+FAREWELL_INSTRUCTION = (
+    " The visitor is leaving. Say a short goodbye in character, in one or two"
+    "sentences, and do not as a question."
+)
+```
+This is the flow of the conversation and how i want the models to approach and ask the visitors questions as well as conclusion.
+
+Additionally:
+
+```
+def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
+                        max_rounds: int, phase: str = "consult") -> str:
+    """The persona's system prompt plus the conversation-mode instructions."""
+    base = persona["system_prompt"]
+    if base.endswith(CONFIDENCE_LINE_INSTRUCTION):
+        base = base[: -len(CONFIDENCE_LINE_INSTRUCTION)]
+    extra = CONVERSE_INSTRUCTION
+    if turn_index == 0:
+        extra += (" This is the start of the consultation, so you have only "
+                  "heard the visitor's opening description.")
+    if phase == "consult":
+        extra += QUESTION_INSTRUCTION
+    elif phase == "check_in":
+        extra += CHECKIN_INSTRUCTION
+    elif phase == "farewell":
+        extra += FAREWELL_INSTRUCTION
+    return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)
+```
+This block of code is responsible for the number of rounds there are, the idea is after every round that both the models speak, they check in with the visitor and ask them questions, and then at the end the "Farewell" prompt is used to end the conversation.
+
 # (REFERENCES)
