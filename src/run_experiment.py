@@ -31,8 +31,8 @@ With no ANTHROPIC_API_KEY or OPENAI_API_KEY set, it falls back to Ollama
 import argparse
 import json
 import os
-import re
 from datetime import datetime, timezone
+import re
 
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider
@@ -42,12 +42,15 @@ from speech import speak_reply
 
 # Phrases that let the visitor end the session early.
 STOP_PHRASES = ("goodbye", "bye bye", "end the session", "i have to go",
-                "i need to go", "that's all", "thats all")
+                "i need to go", "that's all", "thats all", "bye")
+CHECKIN_AFTER = 3 #consult rounds before the doctors check in
+MAX_ROUNDS = 12  # safety limit for one session
+DONE_WORDS = {"no", "nope", "nothing", "satisfied", "thanks", "thank", "fine", "good"}
 
-# Dr. Sure's "Final verdict: yes/no" line (see personas.build_system_prompt).
-VERDICT_PATTERN = re.compile(r"^[ \t]*Final verdict:\s*(yes|no)[ \t]*\n?",
-                             re.IGNORECASE | re.MULTILINE)
-
+def is_done(text: str) -> bool:
+    """A shhort 'no thanks / I'm good' answer to the doctors' check-in."""
+    words = re.findall(r"[a-z]+", text.lower())
+    return len(words) <= 6 and any(w in DONE_WORDS for w in words)
 
 def build_messages_for(persona_id: str, transcript: list) -> list: # the function that determins what each persona sees of the convo so far
     messages = []
@@ -57,14 +60,6 @@ def build_messages_for(persona_id: str, transcript: list) -> list: # the functio
         else:
             messages.append({"role": "user", "content": f"[{turn['speaker']}] {turn['text']}"})
     return messages
-
-
-def split_verdict(reply: str):
-    """Remove the 'Final verdict' line from a reply. Returns (clean reply,
-    True if the doctor said yes, i.e. is concluding the consultation)."""
-    match = VERDICT_PATTERN.search(reply)
-    concluding = bool(match and match.group(1).lower() == "yes")
-    return VERDICT_PATTERN.sub("", reply).strip(), concluding
 
 
 def wants_to_stop(text: str) -> bool:
@@ -82,6 +77,66 @@ def get_visitor_reply(use_voice: bool) -> str:
     except EOFError:
         return ""
 
+# introduction + vistor name inclusion
+
+NAME_LEADS = ("my name is", "my name's", "i am", "i'm", "im", "it's", "its", "call me", "this is")
+
+LABELS = {"cautious": CAUTIOUS_PERSONA["label"], "confident": CONFIDENT_PERSONA["label"]}
+DEFAULT_SYMPTOM = "I've had a weird twitch in my eye for the past three days."
+
+def say_line(persona_id: str, text: str, speak: bool):
+    """Print a fixed line from a doctor and, with --speak, say it aloud."""
+    print(f"[{LABELS[persona_id]}] {text}\n")
+    if speak:
+        send_speaking(persona_id, 1.0)
+        try: 
+            speak_reply(persona_id, text)
+        finally:
+            send_speaking(persona_id, 0.0)
+
+def extract_name(text: str) -> str:
+    """Pick the name out of 'my name is Niki' or just 'Niki'."""
+    cleaned = text.strip().strip(".!?,").lower()
+    for lead in NAME_LEADS:
+        if cleaned.startswith(lead):
+            cleaned = cleaned[len(lead):].strip()
+            break
+    words = cleaned.split()[:1]
+    return " ".join(w.capitalize() for w in words) if words else "friend"
+
+def greet(speak: bool, use_voice: bool):
+    """Both doctors say hello, ask for the visitor's name, then what brings them in."""
+    say_line('cautious', "Hello, and welcome. I'm Dr. Hedges, and I like to be careful.", speak)
+    say_line('confident', "And I'm Dr. Sure, and I like answers. What's your name?", speak)
+    print("(your turn: say your name)")
+    name = extract_name(get_visitor_reply(use_voice))
+    say_line("cautious", f"Nice to meet you, {name}. What brings you in today?", speak)
+    print("(your turn: describe your symptom)")
+    symptom = get_visitor_reply(use_voice)
+    return name, symptom
+
+def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse):
+    """Both doctors speak once, in order. Returns {persona_id: reply}."""
+    turn_responses = {}
+    for persona in (CAUTIOUS_PERSONA, CONFIDENT_PERSONA):
+        if converse:
+            system_prompt = build_system_prompt(persona, visitor_name, turn_index, turns, phase)
+
+        else:
+            system_prompt = persona["system_prompt"].format(visitor_name=visitor_name)
+        messages = build_messages_for(persona["id"], transcript)
+        reply = llm.reply(
+            system_prompt=system_prompt,
+            conversation=messages,
+            persona_id=persona["id"],
+            visitor_name=visitor_name,
+            turn_index=turn_index,
+        )
+        transcript.append({"speaker": persona["id"], "text": reply})
+        turn_responses[persona["id"]] = reply
+        say_line(persona["id"], reply, speak)
+    return turn_responses
+
 
 def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
         speak: bool = False, converse: bool = False, use_voice: bool = False):
@@ -92,35 +147,15 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
     transcript = [{"speaker": "visitor", "text": symptom}]
     scores = []
     silent_in_a_row = 0
+    rounds_since_checkin = 0
     ended_by = "round limit"
 
+    def say_goodbye(turn_index):
+        doctors_round(llm, transcript, visitor_name, turn_index + 1, turns, "farewell", speak, converse)
+
     for turn_index in range(turns):
-        turn_responses = {}
-        concluding = False
-        for persona in (CAUTIOUS_PERSONA, CONFIDENT_PERSONA):
-            if converse:
-                system_prompt = build_system_prompt(persona, visitor_name, turn_index, turns)
-            else:
-                system_prompt = persona["system_prompt"].format(visitor_name=visitor_name)
-            messages = build_messages_for(persona["id"], transcript)
-            reply = llm.reply(
-                system_prompt=system_prompt,
-                conversation=messages,
-                persona_id=persona["id"],
-                visitor_name=visitor_name,
-                turn_index=turn_index,
-            )
-            if converse and persona["id"] == "confident":
-                reply, concluding = split_verdict(reply)
-            transcript.append({"speaker": persona["id"], "text": reply})
-            turn_responses[persona["id"]] = reply
-            print(f"[{persona['label']}] {reply}\n")
-            if speak:
-                send_speaking(persona["id"], 1.0)
-                try:
-                    speak_reply(persona["id"], reply)
-                finally:
-                    send_speaking(persona["id"], 0.0)
+        phase = "check_in" if converse and rounds_since_checkin >= CHECKIN_AFTER else "consult"
+        turn_responses = doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse)
 
         score = divergence_score(turn_responses["cautious"], turn_responses["confident"])
         send_divergence(score)
@@ -132,27 +167,28 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
 
         if not converse:
             continue
-        if concluding:
-            ended_by = "doctors concluded"
-            break
-        if turn_index == turns - 1:
-            break  # round limit reached: the final verdict was just given
+        rounds_since_checkin = 0 if phase == "check_in" else rounds_since_checkin + 1
 
-        # Visitor's turn to answer.
-        print("(your turn to answer)")
+        if turn_index == turns - 1:
+            say_goodbye(turn_index)  # safety limit reached
+            break
+
+        print("(Your turn to answer)")
         answer = get_visitor_reply(use_voice)
         if not answer:
             silent_in_a_row += 1
             if silent_in_a_row >= 2:
                 ended_by = "visitor went quiet"
+                say_goodbye(turn_index)
                 break
             answer = "(the visitor stayed silent)"
             print(f"[You] {answer}\n")
         else:
             silent_in_a_row = 0
-            if wants_to_stop(answer):
+            if wants_to_stop(answer) or (phase == "check_in" and is_done(answer)):
                 transcript.append({"speaker": "visitor", "text": answer})
                 ended_by = "visitor ended it"
+                say_goodbye(turn_index)
                 break
         transcript.append({"speaker": "visitor", "text": answer})
 
@@ -161,36 +197,44 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
 
 def main():
     parser = argparse.ArgumentParser(description="Second Opinion — persona experiment")
-    parser.add_argument("--visitor-name", default="Alex")
+    parser.add_argument("--visitor-name", default=None, help="number of rounds (default 3, or 12 with --converse)")
     parser.add_argument(
         "--symptom",
-        default="I've had a weird twitch in my eye for the past three days.",
     )
     parser.add_argument("--turns", type=int, default=None,
-                        help="number of rounds (default 3, or 5 with --converse)")
+                        help="number of rounds (default 3, or 12 with --converse)")
     parser.add_argument("--mock", action="store_true", help="force mock mode")
     parser.add_argument("--voice", action="store_true",
                         help="speak the symptom (and your answers, with --converse) into the microphone")
     parser.add_argument("--speak", action="store_true",
                         help="have each doctor speak their reply out loud (macOS)")
     parser.add_argument("--converse", action="store_true",
-                        help="after each round the visitor answers, and the doctors decide when to wrap up")
+                        help="after each round the visitor answers, until they say goodbye")
     parser.add_argument("--listen-seconds", type=int, default=20,
                         help="longest your opening statement can be in --voice mode")
     args = parser.parse_args()
 
-    turns = args.turns if args.turns is not None else (5 if args.converse else 3)
+    turns = args.turns if args.turns is not None else (MAX_ROUNDS if args.converse else 3)
 
-    symptom = args.symptom
-    if args.voice:
-        from voice_input import listen_until_silence
-        symptom = listen_until_silence(max_seconds=args.listen_seconds)
+
+    if args.converse and args.symptom is None:
+        visitor_name, symptom = greet(args.speak, args.voice)
         if not symptom:
             print("Did not catch anything. Try again, a bit closer to the mic.")
             return
 
+    else:
+        visitor_name = args.visitor_name or "Alex"
+        symptom = args.symptom or DEFAULT_SYMPTOM
+        if args.voice:
+            from voice_input import listen_until_silence
+            symptom = listen_until_silence(max_seconds=args.listen_seconds)
+            if not symptom:
+                print("Did not catch anything. Try again, a bit closer to the mic.")
+                return
+
     transcript, scores, provider, ended_by = run(
-        args.visitor_name, symptom, turns, args.mock,
+        visitor_name, symptom, turns, args.mock,
         args.speak, args.converse, args.voice,
     )
     print(f"--- session ended: {ended_by} ---")
@@ -202,7 +246,6 @@ def main():
         json.dump(
             {
                 "provider": provider,
-                "visitor_name": args.visitor_name,
                 "symptom": symptom,
                 "turns": turns,
                 "converse": args.converse,

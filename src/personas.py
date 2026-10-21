@@ -80,34 +80,39 @@ CONVERSE_INSTRUCTION = (
     "out loud, and their answer appears in the conversation as [visitor]. "
     "Respond to what they actually said, never repeat a question they have "
     "already answered, and talk to them directly like a real consultation. "
-    "Each round, ask the visitor at most one short, direct question."
+    "Never end or wrap up the consultation yourself: the visitor decides "
+    "when it is over."
 )
 
-VERDICT_INSTRUCTION = (
-    " On the line just before your Confidence line, write exactly "
-    "Final verdict: yes if you are now delivering your final absurd verdict "
-    "and ending the consultation, otherwise write Final verdict: no. Only "
-    "say yes once you have heard at least two answers from the visitor."
+QUESTION_INSTRUCTION = (
+    " End every reply with exactly one short, direct question for the visitor."
+)
+
+CHECKIN_INSTRUCTION = (
+    " It is time to check in. Briefly respond to what the visitor said, then "
+    "ask whether they are satisfied with the advice or have any other questions."
+)
+
+FAREWELL_INSTRUCTION = (
+    " The visitor is leaving. Say a short goodbye in character, in one or two "
+    "sentences, and do not ask a question."
 )
 
 
 def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
-                        max_rounds: int) -> str:
+                        max_rounds: int, phase: str = "consult") -> str:
     """The persona's system prompt plus the conversation-mode instructions."""
     base = persona["system_prompt"]
     if base.endswith(CONFIDENCE_LINE_INSTRUCTION):
         base = base[: -len(CONFIDENCE_LINE_INSTRUCTION)]
     extra = CONVERSE_INSTRUCTION
-    final_round = turn_index == max_rounds - 1
     if turn_index == 0:
         extra += (" This is the start of the consultation, so you have only "
                   "heard the visitor's opening description.")
-    if final_round:
-        extra += (" This is the final round: Dr. Hedges gives one brief "
-                  "closing remark, then Dr. Sure delivers his absurd final "
-                  "verdict. Do not ask the visitor any further questions.")
-    if persona["id"] == "confident":
-        extra += VERDICT_INSTRUCTION
-        if final_round:
-            extra += " Because this is the final round, you must write Final verdict: yes."
+    if phase == "consult":
+        extra += QUESTION_INSTRUCTION
+    elif phase == "check_in":
+        extra += CHECKIN_INSTRUCTION
+    elif phase == "farewell":
+        extra += FAREWELL_INSTRUCTION
     return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)
