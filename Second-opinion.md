@@ -402,58 +402,33 @@ My script now sends a speaking signal over OSC (/cautious_speaking and /confiden
 Gotcha: the node name in the expression has to match the node's name exactly (I'd typed lag_speak once and the node was lagspeak).
 Next time: run the full loop with the clouds on screen and record it, then look at the gap while the next doctor's reply is being generated, when both clouds are calm.
 
-## Monday October 19th
-Having spoken to my supervisor about making the models more emergent, i was given the suggestion of using a "temperature" switch, even though on anthropic website it said this was available, having testing out with adding temperature for my models, Dr. Hedges (temperature = 0.5), Dr. Sure (temperature = 1.0). However Anthropic has limited access for their newer model Claude Sonnet 5.5 to use temperature control for their models, this is the error call back I repeatedly came across.
+## 13 Oct: four new ideas
+
+I had four ideas for the next version. They go on top of what's already left to do.
+1. One continuous conversation, and I can interrupt
+The visitor should be able to talk back after the doctors and also cut in while a doctor is still talking. The doctors then reply to what I said, in the same session, until it ends. Right now I can only answer after both doctors have finished. The hard part is that the microphone also hears the doctors through the speakers, so it can mistake them for me interrupting. The fix is probably a close or directional microphone, or only counting loud speech as an interruption while a doctor is talking.
+2. Send sound into TouchDesigner with BlackHole
+BlackHole is a free Mac audio driver that sends sound from one app into another. I want the clouds to follow real sound instead of only a speaking on/off signal. BlackHole is for the doctors' voices, because it can carry what the computer plays into TouchDesigner. My own voice can go straight in from the microphone with an Audio Device In CHOP, without BlackHole.
+3. Save transcripts as research data
+Each session should save what the visitor said and what the doctors said, with timestamps and the scores, to answer my research question. My run logs already save the transcript and scores, but they also save the visitor's name and symptom as typed. Before I collect from real visitors I need to check this against my approved ethics application, which said first names are used only in the session and not stored.
+4. Temperature for emergence
+Temperature runs from 0 to 1, and higher gives more random, surprising wording. My code never sets it, so Anthropic's default of 1.0 is already in use and I can't raise it further. What I can do is set it on purpose, for example a lower temperature for Dr. Hedges and 1.0 for Dr. Sure, and log it with every run so it counts as a variable in my research.
+Update: I tried this on 19 Oct and the model rejects the setting, so the plan changed to a random "mood" per doctor. See the 19 Oct section.
+
+## 19 Oct: temperature, and a more dynamic conversation
+My supervisor suggested adding a "temperature" setting to make the doctors more emergent, meaning their wording would vary more from session to session. I had read that Anthropic's models support it, so I tried it: Dr. Hedges at 0.5 and Dr. Sure at 1.0, stored in each persona's settings and passed through llm.reply() to the API.
+It did not work, and it failed in two stages. First, the Anthropic Python library (version 1.9.0) refused the argument with a TypeError, because messages.create() has no temperature parameter in that version. When I sent it around the library with extra_body, the API itself rejected the request, so the limit is on the model and not only the library: claude-sonnet-5-5 does not accept temperature. This is the error I kept getting (trimmed to the relevant lines):
 
 ```
-
-Traceback (most recent call last):
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 221, in <module>
-    main()
-    ~~~~^^
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 193, in main
-    transcript, scores, provider, ended_by = run(
-                                             ~~~^
-        args.visitor_name, symptom, turns, args.mock,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        args.speak, args.converse, args.voice,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 106, in run
-    reply = llm.reply(
-        system_prompt=system_prompt,
-    ...<4 lines>...
-        temperature=persona["temperature"],
-    )
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/llm_client.py", line 99, in reply
-    resp = self._client.messages.create(
-        model=ANTHROPIC_MODEL,
-    ...<3 lines>...
-        messages=conversation,
-    )
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_utils/_utils.py", line 294, in wrapper
-    return func(*args, **kwargs)
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/resources/messages/messages.py", line 1027, in create
-    return self._post(
-           ~~~~~~~~~~^
-        "/v1/messages",
-        ^^^^^^^^^^^^^^^
-    ...<23 lines>...
-        stream_cls=Stream[RawMessageStreamEvent],
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_base_client.py", line 1543, in post
-    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
-                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_base_client.py", line 1208, in request
-    raise self._make_status_error_from_response(response) from None
-anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': '`temperature` is deprecated for this model.'}, 'request_id': 'req_011CgC58fekEHT6KQgpESNm1'}
+File ".../src/run_experiment.py", line 106, in run
+    reply = llm.reply(... temperature=persona["temperature"])
+File ".../src/llm_client.py", line 99, in reply
+    resp = self._client.messages.create(model=ANTHROPIC_MODEL, ...)
+anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': '`temperature` is deprecated for this model.'}}
 ```
-I also changed the script to include user interruption and a dynamic flow between the visitor and the Drs. 
-However it still feels too short i want it to run abit longer and users to be immersed in it and end it on their terms.
-This is the current terminal conversion, the default name is Alex.
+
+I removed all the temperature code. Instead, each doctor will get a random "mood" at the start of each session, saved in the log, so I can still study how variation changes the conversation. This is not built yet.
+The second change was to the flow. I changed the script so the conversation goes back and forth (--converse): after both doctors have spoken, the visitor answers, typed or spoken with --voice, and the doctors respond to what they said. The visitor can only answer once both doctors have finished a round, so interrupting a doctor mid-sentence is still to build. It still felt too short. At this point the doctors decided to end the session themselves after three rounds ("session ended: doctors concluded"), and I want visitors to be immersed and to end it on their own terms. This is a terminal run from that day, with typed answers and the default name Alex:
 
 ```
 --- provider: anthropic ---
@@ -495,6 +470,8 @@ Confidence: 93%
 
 --- session ended: doctors concluded ---
 ```
+This run shows what I wanted to change: the doctors never say hello or ask the visitor's name, and in the third round Dr. Sure gives a "final verdict" and the session ends without the visitor choosing to end it.
+
 
 ## Tuesday 20th October
 I am changing the structure of the models and making changes to how they respond and introduce themselves and also greet visitors. In my current experiments the Drs they don't say hello or greet the visitors and introduce themselves, I want there to be a build of between of the communication in this exhibition, in a professional manner perhaps the user would feel more heard and responsive which can affect the trust between the user and the Drs. A real introduction is crucial, and asking the user for their names and addressing them by their name and each concern directly, can keep the users more engaged. I adjusted and tweaked the code in the personas file, which deals with how the AI personas would engage with their questions they ask and how they approach each round, for example asking the user questions and how they would conclude the conversation, which i ultimately want the visitors to conclude, but the models ask them if they are satisfied or would like further assistance first. However, the first issue that i addressed is that the flow concludes too early and the doctors need to ask questions and not end it too soon yet.
