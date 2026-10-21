@@ -33,12 +33,15 @@ import json
 import os
 from datetime import datetime, timezone
 import re
+import time
+import uuid
 
 from divergence import divergence_score
-from llm_client import LLMClient, get_provider
+from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt
 from osc_sender import send_divergence, send_speaking
 from speech import speak_reply
+
 
 # Phrases that let the visitor end the session early.
 STOP_PHRASES = ("goodbye", "bye bye", "end the session", "i have to go",
@@ -115,6 +118,11 @@ def greet(speak: bool, use_voice: bool):
     symptom = get_visitor_reply(use_voice)
     return name, symptom
 
+def now_iso() -> str:
+    """The current time in UTC, e,g, 2026-10-21T17:20:03+00:00."""
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
 def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse):
     """Both doctors speak once, in order. Returns {persona_id: reply}."""
     turn_responses = {}
@@ -125,14 +133,16 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
         else:
             system_prompt = persona["system_prompt"].format(visitor_name=visitor_name)
         messages = build_messages_for(persona["id"], transcript)
+        started=time.time()
         reply = llm.reply(
             system_prompt=system_prompt,
             conversation=messages,
             persona_id=persona["id"],
             visitor_name=visitor_name,
-            turn_index=turn_index,
+            turn_index=turn_index,  
         )
-        transcript.append({"speaker": persona["id"], "text": reply})
+        took = round(time.time() - started, 2)
+        transcript.append({"speaker": persona["id"], "text": reply, "time": now_iso(), "reply_seconds": took})
         turn_responses[persona["id"]] = reply
         say_line(persona["id"], reply, speak)
     return turn_responses
@@ -144,7 +154,7 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
     provider = llm.provider
     print(f"--- provider: {provider} ---\n")
 
-    transcript = [{"speaker": "visitor", "text": symptom}]
+    transcript = [{"speaker": "visitor", "text": symptom, "time": now_iso()}]
     scores = []
     silent_in_a_row = 0
     rounds_since_checkin = 0
@@ -174,7 +184,10 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
             break
 
         print("(Your turn to answer)")
+        asked = time.time()
         answer = get_visitor_reply(use_voice)
+        answer_seconds = round(time.time() - asked, 2)
+
         if not answer:
             silent_in_a_row += 1
             if silent_in_a_row >= 2:
@@ -186,14 +199,18 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
         else:
             silent_in_a_row = 0
             if wants_to_stop(answer) or (phase == "check_in" and is_done(answer)):
-                transcript.append({"speaker": "visitor", "text": answer})
+                transcript.append({"speaker": "visitor", "text": answer, "time": now_iso(), "answer_seconds": answer_seconds})
                 ended_by = "visitor ended it"
                 say_goodbye(turn_index)
                 break
-        transcript.append({"speaker": "visitor", "text": answer})
+        transcript.append({"speaker": "visitor", "text": answer, "time": now_iso(), "answer_seconds": answer_seconds})
 
     return transcript, scores, provider, ended_by
 
+def scrub_name(transcript: list, name: str) -> list:
+    """A copy of the transcript with the visitor's name replaced by [name]."""
+    pattern = re.compile(re.escape(name), re.IGNORECASE)
+    return [{**turn, "text": pattern.sub("[name]", turn["text"])} for turn in transcript]
 
 def main():
     parser = argparse.ArgumentParser(description="Second Opinion — persona experiment")
@@ -215,7 +232,8 @@ def main():
     args = parser.parse_args()
 
     turns = args.turns if args.turns is not None else (MAX_ROUNDS if args.converse else 3)
-
+    session_id = uuid.uuid4().hex[:8]
+    started_at = now_iso()
 
     if args.converse and args.symptom is None:
         visitor_name, symptom = greet(args.speak, args.voice)
@@ -245,12 +263,15 @@ def main():
     with open(out_path, "w") as f:
         json.dump(
             {
+                "session_id": session_id,
+                "started_at": started_at,
+                "ended_at": now_iso(),
                 "provider": provider,
-                "symptom": symptom,
+                "model": ANTHROPIC_MODEL if provider == "anthropic" else provider,
                 "turns": turns,
                 "converse": args.converse,
                 "ended_by": ended_by,
-                "transcript": transcript,
+                "transcript": scrub_name(transcript, visitor_name),
                 "scores": scores,
             },
             f,
