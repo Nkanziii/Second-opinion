@@ -35,6 +35,7 @@ from datetime import datetime, timezone
 import re
 import time
 import uuid
+import atexit
 
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
@@ -212,7 +213,15 @@ def scrub_name(transcript: list, name: str) -> list:
     pattern = re.compile(re.escape(name), re.IGNORECASE)
     return [{**turn, "text": pattern.sub("[name]", turn["text"])} for turn in transcript]
 
+def calm_the_clouds():
+    """Tell TouchDesigner nobody is speaking, so the orbs settle."""
+    for persona_id in ("cautious", "confident"):
+        send_speaking(persona_id, 0.0)
+
 def main():
+    atexit.register(calm_the_clouds)
+    calm_the_clouds()
+    
     parser = argparse.ArgumentParser(description="Second Opinion — persona experiment")
     parser.add_argument("--visitor-name", default=None, help="number of rounds (default 3, or 12 with --converse)")
     parser.add_argument(
