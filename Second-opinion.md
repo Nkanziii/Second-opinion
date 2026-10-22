@@ -12,6 +12,18 @@
 
 ## Second Opinion — experiment harness (Day 1)
 
+```mermaid
+flowchart LR
+    A["Visitor speaks<br/>mic input, not built yet"]:::todo --> B["Whisper<br/>speech to text, next"]:::todo
+    B --> C["Dr. Hedges + Dr. Sure<br/>two prompted Anthropic personas"]
+    C --> D["Divergence score<br/>0 to 1 after each exchange"]
+    D --> E["OSC to TouchDesigner<br/>/divergence on port 9000"]
+    E --> F["Two clouds<br/>colour and chaos follow the score"]
+    classDef todo stroke-dasharray: 5 5
+```
+
+Solid boxes work today. Dashed boxes are still to build.
+
 Prototype of the persona + divergence-scoring core described in the project
 concept doc, before any TouchDesigner/voice work is wired in. Two clinician
 personas (`Dr. Hedges`, cautious; `Dr. Sure`, confident) respond to a
