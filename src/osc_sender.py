@@ -12,3 +12,7 @@ def send_speaking(persona_id: str, is_speaking: float):
     """Tell TouchDesigner whether a doctor is talking right now (1.0 or 0.0).
     Arrives as the channel 'cautious_speaking' or 'confident_speaking'."""
     client.send_message(f"/{persona_id}_speaking", float(is_speaking))
+
+def send_level(persona_id: str, level: float):
+    """How loud a doctor is right now, 0 to 1. Arrives as 'cautious_level' / 'confident_level'."""
+    client.send_message(f"/{persona_id}_level", float(level))
