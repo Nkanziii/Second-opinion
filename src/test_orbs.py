@@ -9,9 +9,11 @@ Stop it any time with Ctrl+C; the orbs settle back to calm.
 Run from the src folder:   python3 test_orbs.py
 """
 
+import math
+import random
 import time
 
-from osc_sender import send_divergence, send_speaking
+from osc_sender import send_divergence, send_speaking, send_level
 
 SPEAK_SECONDS = 4
 PAUSE_SECONDS = 2
@@ -21,9 +23,19 @@ SCORES = [0.30, 0.45, 0.60, 0.70, 0.60, 0.40]
 
 
 def calm():
-    send_speaking("cautious", 0.0)
-    send_speaking("confident", 0.0)
+    for persona_id in ("cautious", "confident"):
+        send_speaking(persona_id, 0.0)
+        send_level(persona_id, 0.0)
 
+def fake_voice(persona_id, seconds):
+    """Pretend to talk: a loudness that rises and falls like words."""
+    start = time.time()
+    while time.time() - start < seconds:
+        t = time.time() - start
+        level = 0.5 + 0.5 * math.sin(t * 9) * random.uniform(0.6, 1.0)
+        send_level(persona_id, max(0.0, min(1.0, level)))
+        time.sleep(1 / 30)
+    send_level(persona_id, 0.0)
 
 try:
     for score in SCORES:
@@ -31,7 +43,7 @@ try:
         for persona_id in ("cautious", "confident"):
             print(f"score {score:.2f}: {persona_id} speaking")
             send_speaking(persona_id, 1.0)
-            time.sleep(SPEAK_SECONDS)
+            fake_voice(persona_id, SPEAK_SECONDS)
             send_speaking(persona_id, 0.0)
             time.sleep(PAUSE_SECONDS)
 finally:
