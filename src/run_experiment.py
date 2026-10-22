@@ -40,7 +40,7 @@ import atexit
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
-from osc_sender import send_divergence, send_speaking
+from osc_sender import send_divergence, send_speaking, send_level
 from speech import speak_reply
 
 
@@ -214,9 +214,12 @@ def scrub_name(transcript: list, name: str) -> list:
     return [{**turn, "text": pattern.sub("[name]", turn["text"])} for turn in transcript]
 
 def calm_the_clouds():
-    """Tell TouchDesigner nobody is speaking, so the orbs settle."""
+    """Tell TouchDesigner nobody is speaking and the doctors agree, so the orbs
+    settle and go back to their original colours."""
     for persona_id in ("cautious", "confident"):
         send_speaking(persona_id, 0.0)
+        send_level(persona_id, 0.0)
+    send_divergence({"divergence_score": 0.30})  # below 0.35 = no conflict colour
 
 def main():
     atexit.register(calm_the_clouds)
