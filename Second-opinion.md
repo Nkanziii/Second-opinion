@@ -272,7 +272,11 @@ Another thing I was amused by is the semantic_similarity score, which just basic
 
 For a couple days now I have been working on my visuals and how I wanted it to look, I was going through several tutorials on youtube however the tutorials that resembled what i wanted the visuals too look like, had pre-made packages i had to download which i did not want to do as i felt it made my file system very cluttered and it was not what i wanted to do. I had several failed attempts. The journey originially started with building with Claude but it then didn't work out as there was a problem with the render TOP not displaying any visuals that were connected to it. I then left that project and created some from a tutorial which also didn't work I don't understand what was going wrong but every effort was a fail.
 
+---
+
 # (moodboard wat i want it to look like)
+
+---
 
 ### Tutorials and methods I tried
 
@@ -548,7 +552,11 @@ I also wrote src/test_orbs.py, which tests the visuals without doctors, a microp
 ## Fixing the exploding noise and tuning the swell
 My main concern with the visuals was that when a doctor spoke, the orb didn't swell, it exploded into a crumpled foil shape, and turning the amplitude down only made a smaller explosion. We worked out that the amplitude wasn't the real problem. The noise itself was too fine-grained: layers of tiny bumps as strong as the big ones push every point in a random direction and the sphere shape is lost. I changed three settings on noise1 inside both base1 and base2:
 
-TABLE
+| Setting | Before | After | Why |
+| --- | --- | --- | --- |
+| Period | 1 | 2 | broader, slower waves |
+| Harmonics | 3 | 2 | fewer layers of fine detail |
+| Harmonic Gain | 1 | 0.4 | fine layers much weaker than the big swells |
 
 <img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/8468f5c1-ac70-4ce6-ba34-98c3786d41c8" />
 
