@@ -98,9 +98,34 @@ FAREWELL_INSTRUCTION = (
     "sentences, and do not ask a question."
 )
 
+import random
+
+MOODS = {
+    "cautious": {
+        "anxious": "You are anxious today: you worry out loud and see risks everywhere.",
+        "gentle": "You are gentle today: soft-spoken and reassuring, though still careful.",
+        "tired": "You are tired today, at the end of a long shift: slow, with the odd sigh.",
+        "fussy": "You are fussy today: you care about exact wording and small details.",
+    },
+    "confident": {
+        "smug": "You are smug today: very pleased with yourself.",
+        "impatient": "You are impatient today: hurried and clipped, keen to move on.",
+        "warm": "You are warm today: jovial, with a big friendly bedside manner.",
+        "theatrical": "You are theatrical today: dramatic, with grand pronouncements.",
+    },
+}
+
+
+def pick_moods() -> dict:
+    """Choose a random mood for each doctor, once per session."""
+    return {persona_id: random.choice(list(options)) for persona_id, options in MOODS.items()}
+
+
+def mood_instruction(persona_id: str, mood: str) -> str:
+    return f" {MOODS[persona_id][mood]} Let it colour how you speak, but stay in character and keep to your length limit."
 
 def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
-                        max_rounds: int, phase: str = "consult") -> str:
+                        max_rounds: int, phase: str = "consult", mood: str = None) -> str:
     """The persona's system prompt plus the conversation-mode instructions."""
     base = persona["system_prompt"]
     if base.endswith(CONFIDENCE_LINE_INSTRUCTION):
@@ -115,4 +140,6 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
         extra += CHECKIN_INSTRUCTION
     elif phase == "farewell":
         extra += FAREWELL_INSTRUCTION
+    if mood: 
+        extra += mood_instruction(persona["id"], mood)
     return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)

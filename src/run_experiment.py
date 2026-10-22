@@ -39,7 +39,7 @@ import atexit
 
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
-from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt
+from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
 from osc_sender import send_divergence, send_speaking
 from speech import speak_reply
 
@@ -124,12 +124,12 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse):
+def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse, moods=None):
     """Both doctors speak once, in order. Returns {persona_id: reply}."""
     turn_responses = {}
     for persona in (CAUTIOUS_PERSONA, CONFIDENT_PERSONA):
         if converse:
-            system_prompt = build_system_prompt(persona, visitor_name, turn_index, turns, phase)
+            system_prompt = build_system_prompt(persona, visitor_name, turn_index, turns, phase, (moods or {}).get(persona["id"]))
 
         else:
             system_prompt = persona["system_prompt"].format(visitor_name=visitor_name)
@@ -150,7 +150,7 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
 
 
 def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
-        speak: bool = False, converse: bool = False, use_voice: bool = False):
+        speak: bool = False, converse: bool = False, use_voice: bool = False, moods: dict = None):
     llm = LLMClient(force_mock=force_mock)
     provider = llm.provider
     print(f"--- provider: {provider} ---\n")
@@ -162,11 +162,11 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
     ended_by = "round limit"
 
     def say_goodbye(turn_index):
-        doctors_round(llm, transcript, visitor_name, turn_index + 1, turns, "farewell", speak, converse)
+        doctors_round(llm, transcript, visitor_name, turn_index + 1, turns, "farewell", speak, converse, moods)
 
     for turn_index in range(turns):
         phase = "check_in" if converse and rounds_since_checkin >= CHECKIN_AFTER else "consult"
-        turn_responses = doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse)
+        turn_responses = doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak, converse, moods)
 
         score = divergence_score(turn_responses["cautious"], turn_responses["confident"])
         send_divergence(score)
@@ -221,7 +221,7 @@ def calm_the_clouds():
 def main():
     atexit.register(calm_the_clouds)
     calm_the_clouds()
-    
+
     parser = argparse.ArgumentParser(description="Second Opinion — persona experiment")
     parser.add_argument("--visitor-name", default=None, help="number of rounds (default 3, or 12 with --converse)")
     parser.add_argument(
@@ -244,6 +244,10 @@ def main():
     session_id = uuid.uuid4().hex[:8]
     started_at = now_iso()
 
+    moods = pick_moods() if args.converse else None
+    if moods:
+        print(f"Moods today: Dr. Hedges is {moods['cautious']}, Dr. Sure is {moods['confident']}\n")
+
     if args.converse and args.symptom is None:
         visitor_name, symptom = greet(args.speak, args.voice)
         if not symptom:
@@ -262,7 +266,7 @@ def main():
 
     transcript, scores, provider, ended_by = run(
         visitor_name, symptom, turns, args.mock,
-        args.speak, args.converse, args.voice,
+        args.speak, args.converse, args.voice, moods,
     )
     print(f"--- session ended: {ended_by} ---")
 
@@ -279,6 +283,7 @@ def main():
                 "model": ANTHROPIC_MODEL if provider == "anthropic" else provider,
                 "turns": turns,
                 "converse": args.converse,
+                "moods": moods,
                 "ended_by": ended_by,
                 "transcript": scrub_name(transcript, visitor_name),
                 "scores": scores,
