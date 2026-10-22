@@ -605,6 +605,38 @@ Late that night I quit TouchDesigner in the middle of a test, choosing "save and
  
 <img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/af757610-8b20-4602-9ddb-7a22a2eef0ea" />
 
+## The visuals from calm to conflict (stills from my recording)
+
+I recorded `test_orbs.py` playing a fake conversation and took these stills from the video, which are saved in `visuals/process/`. The blue orb is Dr. Hedges and the green orb is Dr. Sure. The score goes from 0.30 (calm) up to 0.70 (conflict) and back down.
+
+![Both orbs at rest, in blue and yellow-green](visuals/process/orbs-1-calm.png)
+
+Calm: both orbs at rest.
+
+![Dr. Hedges speaking while the doctors agree: his orb stretches and swells](visuals/process/orbs-2-hedges-speaking-calm.png)
+
+Dr. Hedges speaking when the doctors agree.
+
+![Dr. Sure speaking while the doctors agree: his orb swells and turns yellow-green](visuals/process/orbs-3-sure-speaking-calm.png)
+
+Dr. Sure speaking when the doctors agree.
+
+![Dr. Hedges speaking as the disagreement grows: purple and pink shading](visuals/process/orbs-4-hedges-speaking-conflict-rising.png)
+
+Dr. Hedges speaking as the disagreement grows, now purple, with Dr. Sure's orb already orange.
+
+![Dr. Sure speaking at high conflict: red and orange, stretched out](visuals/process/orbs-5-sure-speaking-conflict-high.png)
+
+Dr. Sure speaking at high conflict.
+
+![Dr. Sure speaking at the peak of the disagreement](visuals/process/orbs-6-sure-speaking-conflict-peak.png)
+
+Dr. Sure speaking at the peak of the disagreement.
+
+![Both orbs back at rest after the argument](visuals/process/orbs-7-calm-at-rest.png)
+
+Calm again after the argument.
+
 
 
 
