@@ -637,6 +637,16 @@ Dr. Sure speaking at the peak of the disagreement.
 
 Calm again after the argument.
 
+### Current visual spreadsheet
+
+
+![Contact sheet of the whole test_orbs recording, calm to conflict and back](visuals/_recording_review/sheet_test_orbs.jpg)
+
+![Candidate moments with their timestamps in seconds, from calm to peak conflict](visuals/_recording_review/cand_sheet.png)
+
+![Screens from the recording showing both orbs from calm to conflict](visuals/_recording_review/check_screens.png)
+
+![Both orbs every 2 seconds across the recording, 0 to 48 seconds](visuals/_recording_review/dense.png)
 
 
 
