@@ -272,7 +272,11 @@ Another thing I was amused by is the semantic_similarity score, which just basic
 
 For a couple days now I have been working on my visuals and how I wanted it to look, I was going through several tutorials on youtube however the tutorials that resembled what i wanted the visuals too look like, had pre-made packages i had to download which i did not want to do as i felt it made my file system very cluttered and it was not what i wanted to do. I had several failed attempts. The journey originially started with building with Claude but it then didn't work out as there was a problem with the render TOP not displaying any visuals that were connected to it. I then left that project and created some from a tutorial which also didn't work I don't understand what was going wrong but every effort was a fail.
 
+---
+
 # (moodboard wat i want it to look like)
+
+---
 
 ### Tutorials and methods I tried
 
@@ -402,58 +406,33 @@ My script now sends a speaking signal over OSC (/cautious_speaking and /confiden
 Gotcha: the node name in the expression has to match the node's name exactly (I'd typed lag_speak once and the node was lagspeak).
 Next time: run the full loop with the clouds on screen and record it, then look at the gap while the next doctor's reply is being generated, when both clouds are calm.
 
-## Monday October 19th
-Having spoken to my supervisor about making the models more emergent, i was given the suggestion of using a "temperature" switch, even though on anthropic website it said this was available, having testing out with adding temperature for my models, Dr. Hedges (temperature = 0.5), Dr. Sure (temperature = 1.0). However Anthropic has limited access for their newer model Claude Sonnet 5.5 to use temperature control for their models, this is the error call back I repeatedly came across.
+## 13 Oct: four new ideas
+
+I had four ideas for the next version. They go on top of what's already left to do.
+1. One continuous conversation, and I can interrupt
+The visitor should be able to talk back after the doctors and also cut in while a doctor is still talking. The doctors then reply to what I said, in the same session, until it ends. Right now I can only answer after both doctors have finished. The hard part is that the microphone also hears the doctors through the speakers, so it can mistake them for me interrupting. The fix is probably a close or directional microphone, or only counting loud speech as an interruption while a doctor is talking.
+2. Send sound into TouchDesigner with BlackHole
+BlackHole is a free Mac audio driver that sends sound from one app into another. I want the clouds to follow real sound instead of only a speaking on/off signal. BlackHole is for the doctors' voices, because it can carry what the computer plays into TouchDesigner. My own voice can go straight in from the microphone with an Audio Device In CHOP, without BlackHole.
+3. Save transcripts as research data
+Each session should save what the visitor said and what the doctors said, with timestamps and the scores, to answer my research question. My run logs already save the transcript and scores, but they also save the visitor's name and symptom as typed. Before I collect from real visitors I need to check this against my approved ethics application, which said first names are used only in the session and not stored.
+4. Temperature for emergence
+Temperature runs from 0 to 1, and higher gives more random, surprising wording. My code never sets it, so Anthropic's default of 1.0 is already in use and I can't raise it further. What I can do is set it on purpose, for example a lower temperature for Dr. Hedges and 1.0 for Dr. Sure, and log it with every run so it counts as a variable in my research.
+Update: I tried this on 19 Oct and the model rejects the setting, so the plan changed to a random "mood" per doctor. See the 19 Oct section.
+
+## 19 Oct: temperature, and a more dynamic conversation
+My supervisor suggested adding a "temperature" setting to make the doctors more emergent, meaning their wording would vary more from session to session. I had read that Anthropic's models support it, so I tried it: Dr. Hedges at 0.5 and Dr. Sure at 1.0, stored in each persona's settings and passed through llm.reply() to the API.
+It did not work, and it failed in two stages. First, the Anthropic Python library (version 1.9.0) refused the argument with a TypeError, because messages.create() has no temperature parameter in that version. When I sent it around the library with extra_body, the API itself rejected the request, so the limit is on the model and not only the library: claude-sonnet-5-5 does not accept temperature. This is the error I kept getting (trimmed to the relevant lines):
 
 ```
-
-Traceback (most recent call last):
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 221, in <module>
-    main()
-    ~~~~^^
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 193, in main
-    transcript, scores, provider, ended_by = run(
-                                             ~~~^
-        args.visitor_name, symptom, turns, args.mock,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        args.speak, args.converse, args.voice,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/run_experiment.py", line 106, in run
-    reply = llm.reply(
-        system_prompt=system_prompt,
-    ...<4 lines>...
-        temperature=persona["temperature"],
-    )
-  File "/Users/nikikhanezai/Documents/thesis/second-opinion-day1/src/llm_client.py", line 99, in reply
-    resp = self._client.messages.create(
-        model=ANTHROPIC_MODEL,
-    ...<3 lines>...
-        messages=conversation,
-    )
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_utils/_utils.py", line 294, in wrapper
-    return func(*args, **kwargs)
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/resources/messages/messages.py", line 1027, in create
-    return self._post(
-           ~~~~~~~~~~^
-        "/v1/messages",
-        ^^^^^^^^^^^^^^^
-    ...<23 lines>...
-        stream_cls=Stream[RawMessageStreamEvent],
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_base_client.py", line 1543, in post
-    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
-                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/nikikhanezai/miniconda3/lib/python3.13/site-packages/anthropic/_base_client.py", line 1208, in request
-    raise self._make_status_error_from_response(response) from None
-anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': '`temperature` is deprecated for this model.'}, 'request_id': 'req_011CgC58fekEHT6KQgpESNm1'}
+File ".../src/run_experiment.py", line 106, in run
+    reply = llm.reply(... temperature=persona["temperature"])
+File ".../src/llm_client.py", line 99, in reply
+    resp = self._client.messages.create(model=ANTHROPIC_MODEL, ...)
+anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': '`temperature` is deprecated for this model.'}}
 ```
-I also changed the script to include user interruption and a dynamic flow between the visitor and the Drs. 
-However it still feels too short i want it to run abit longer and users to be immersed in it and end it on their terms.
-This is the current terminal conversion, the default name is Alex.
+
+I removed all the temperature code. Instead, each doctor will get a random "mood" at the start of each session, saved in the log, so I can still study how variation changes the conversation. This is not built yet.
+The second change was to the flow. I changed the script so the conversation goes back and forth (--converse): after both doctors have spoken, the visitor answers, typed or spoken with --voice, and the doctors respond to what they said. The visitor can only answer once both doctors have finished a round, so interrupting a doctor mid-sentence is still to build. It still felt too short. At this point the doctors decided to end the session themselves after three rounds ("session ended: doctors concluded"), and I want visitors to be immersed and to end it on their own terms. This is a terminal run from that day, with typed answers and the default name Alex:
 
 ```
 --- provider: anthropic ---
@@ -495,11 +474,17 @@ Confidence: 93%
 
 --- session ended: doctors concluded ---
 ```
+This run shows what I wanted to change: the doctors never say hello or ask the visitor's name, and in the third round Dr. Sure gives a "final verdict" and the session ends without the visitor choosing to end it.
 
-## Tuesday 20th October
-I am changing the structure of the models and making changes to how they respond and introduce themselves and also greet visitors. In my current experiments the Drs they don't say hello or greet the visitors and introduce themselves, I want there to be a build of between of the communication in this exhibition, in a professional manner perhaps the user would feel more heard and responsive which can affect the trust between the user and the Drs. A real introduction is crucial, and asking the user for their names and addressing them by their name and each concern directly, can keep the users more engaged. I adjusted and tweaked the code in the personas file, which deals with how the AI personas would engage with their questions they ask and how they approach each round, for example asking the user questions and how they would conclude the conversation, which i ultimately want the visitors to conclude, but the models ask them if they are satisfied or would like further assistance first. However, the first issue that i addressed is that the flow concludes too early and the doctors need to ask questions and not end it too soon yet.
-
-**personas.py changes**
+## 20 to 21 Oct: greeting, check-in and goodbye
+This was the day the conversation started to feel like a real consultation. I wrote most of the new code myself, which helped me understand it.
+In my earlier experiments the doctors never said hello or introduced themselves. I wanted more of a build-up between the doctors and the visitor, in a professional manner, because a visitor who feels heard may respond differently, and that can affect how much they trust the doctors. A proper introduction matters, and asking for the visitor's name and using it, along with each of their concerns, in every reply should keep them more engaged. So I changed how the personas greet people and talk, in personas.py and run_experiment.py. The first problem I fixed was that the session ended too early. The doctors have to keep asking questions, and it is the visitor who ends it, after the doctors have asked whether they are satisfied. (The temperature attempt that came first is in the 19 Oct section.)
+The doctors greet you
+The doctors now introduce themselves, ask for my name, then ask what brings me in. The greeting lines are fixed text, so they're instant. I only keep the first name, and it's not saved in the log file.
+Check-in and goodbye
+Every doctor reply now ends with a question. After 3 rounds both doctors check in and ask if I'm satisfied or have other questions. If I say "no thanks" or "bye", they say goodbye in character and the session ends. Two silences in a row also end it, and a safety limit of 12 rounds stops a session running forever.
+How the instructions are built (personas.py)
+The conversation rules are short pieces of text added to each doctor's system prompt, depending on the phase of the consultation. This is the current version:
 
 ```
 CONVERSE_INSTRUCTION = (
@@ -507,8 +492,8 @@ CONVERSE_INSTRUCTION = (
     "out loud, and their answer appears in the conversation as [visitor]. "
     "Respond to what they actually said, never repeat a question they have "
     "already answered, and talk to them directly like a real consultation. "
-    "Each round, ask the visitor at most one short, direct question."
-    "Visitor decides when it is over."
+    "Never end or wrap up the consultation yourself: the visitor decides "
+    "when it is over."
 )
 
 QUESTION_INSTRUCTION = (
@@ -516,18 +501,16 @@ QUESTION_INSTRUCTION = (
 )
 
 CHECKIN_INSTRUCTION = (
-    " It is time to check in. Briefly respond to what the visitor said, then"
-    "ask whether they are satisfied with the advice or have any one the questions."
+    " It is time to check in. Briefly respond to what the visitor said, then "
+    "ask whether they are satisfied with the advice or have any other questions."
 )
 
 FAREWELL_INSTRUCTION = (
-    " The visitor is leaving. Say a short goodbye in character, in one or two"
-    "sentences, and do not as a question."
+    " The visitor is leaving. Say a short goodbye in character, in one or two "
+    "sentences, and do not ask a question."
 )
 ```
-This is the flow of the conversation and how i want the models to approach and ask the visitors questions as well as conclusion.
-
-Additionally:
+Python joins neighbouring strings with no space, so my first version had pieces like "then" and "ask" that ran together as "thenask", and a typo that said "do not as a question". Every piece now ends with a space, and the last sentence of CONVERSE_INSTRUCTION was strengthened so the doctors cannot wrap up the session themselves.
 
 ```
 def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
@@ -548,6 +531,82 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
         extra += FAREWELL_INSTRUCTION
     return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)
 ```
-This block of code is responsible for the number of rounds there are, the idea is after every round that both the models speak, they check in with the visitor and ask them questions, and then at the end the "Farewell" prompt is used to end the conversation.
+build_system_prompt does not decide how many rounds there are. It builds the prompt for the phase it is given: "consult" (every reply ends with one question), "check_in" (ask if they are satisfied or have other questions) or "farewell" (say goodbye, no question). The loop in run() in run_experiment.py chooses the phase each round and decides when the session ends, as described under "Check-in and goodbye" above. The max_rounds argument is passed in but not used yet. The confidence line is removed from the end of the base prompt and added back last, so it is always the final instruction.
+Colours finally changed
+The clouds barely changed colour because the real scores only sit between about 0.4 and 0.6. I rescaled the score in TouchDesigner, in the master node: max(0, min(1, ((op('lag1')['divergence'] or 0) - 0.35) / 0.30)). My raw scores in the logs stay unchanged. In the voice test the colours moved a lot and the clouds went red.
+With my voice and the doctors speaking out loud, the whole thing worked, from the greeting to the check-in.
+
+## 21 Oct: logging for the research data
+Today I made every session save as proper research data, and then made the visuals more impressive. I started with logging, because every test run after that gets saved in a usable form. All of it is in src/run_experiment.py.
+Each saved log in src/logs now has a random session_id (8 characters, not the visitor's name), started_at and ended_at, the model, and ended_by (for example "visitor ended it"). Every line of the transcript has a time, each doctor line has reply_seconds (how long the model took to answer), and each visitor line has answer_seconds (how long they took to speak or type). The greeting and the visitor's spoken name are never written to the log, and in the saved copy the name is replaced by [name] with a case-insensitive replace in scrub_name. The live conversation still uses the real name, so the doctors can say it.
+
+My first real test log lasted 7 minutes 53 seconds, with 8 scored rounds and then the goodbye. I searched the whole file for my name and found nothing. Doctor replies took about 2 to 10 seconds and my answers 3 to 8 seconds. The timestamps also showed two things to fix later: after I finish speaking there are 3 to 10 seconds of silence before the first doctor starts (a good place for a "thinking" visual), and Dr. Sure starts 15 to 20 seconds after Dr. Hedges, because his reply is only requested once Hedges has finished speaking out loud.
+Stopping mid-sentence, and a way to test the orbs
+While tuning, I stopped a run in the middle of one of Dr. Sure's sentences, and his orb stayed wobbling at a high level (the noise amplitude was stuck at 0.5983). The reason is that TouchDesigner remembers the last value it was sent. The program had told it "Dr. Sure is speaking" (1) but died before it could send "stopped" (0).
+
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/f19f5068-9bd0-452d-bd9a-d74b7f68d77a" />
+
+The fix is a function calm_the_clouds() in run_experiment.py that sends 0 for both doctors. It is registered with atexit, so it runs when the program ends (even on Ctrl+C), and it also runs at the start of every session so each one starts calm. It does not run if I close the terminal window or force-quit, so the exhibition will need a proper reset loop later.
+I also wrote src/test_orbs.py, which tests the visuals without doctors, a microphone or API calls. It plays a fake conversation into TouchDesigner: each doctor "speaks" for 4 seconds in turn while the disagreement score goes 0.30, 0.45, 0.60, 0.70, 0.60, 0.40, then it resets the orbs. I use it for every visual change from here.
+
+## Fixing the exploding noise and tuning the swell
+My main concern with the visuals was that when a doctor spoke, the orb didn't swell, it exploded into a crumpled foil shape, and turning the amplitude down only made a smaller explosion. We worked out that the amplitude wasn't the real problem. The noise itself was too fine-grained: layers of tiny bumps as strong as the big ones push every point in a random direction and the sphere shape is lost. I changed three settings on noise1 inside both base1 and base2:
+
+| Setting | Before | After | Why |
+| --- | --- | --- | --- |
+| Period | 1 | 2 | broader, slower waves |
+| Harmonics | 3 | 2 | fewer layers of fine detail |
+| Harmonic Gain | 1 | 0.4 | fine layers much weaker than the big swells |
+
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/8468f5c1-ac70-4ce6-ba34-98c3786d41c8" />
+
+The orb is now smooth at rest. I also removed the song loudness from the amplitude formula, because the clouds will be driven by the doctors' own voices. Each orb now uses only its own doctor's speaking value and the disagreement score conflict. For Dr. Hedges (base1):
+```
+0.05 + (op('/project1/lagspeak')['cautious_speaking'] or 0) * (0.35 + op('conflict')['conflict'] * 0.25)
+```
+Dr. Sure's orb is the same with confident_speaking. That gives about 0.4 when a doctor speaks and they agree, and about 0.65 at full disagreement, so the orbs deform more as the argument grows. I found those numbers by trying bigger and bigger values: 0.11 was too subtle to see from across a room, 0.4 stretched the whole sphere into one lobe, and 0.35 plus the conflict part looked right.
+
+When the orbs didn't move at first, I tested in steps. I sent a fake "speaking" signal from Python and printed lagspeak's channels in TouchDesigner's Textport, which showed cautious_speaking reading 1.0, so the signal was arriving and the formula was simply too small. One mistake to remember: when I copied Dr. Hedges' formula into base2, it still said cautious_speaking, so the green orb would have moved for the wrong doctor.
+
+## Redder disagreement colour, and the glow
+I felt the doctors rarely reached the full red, even though that colour is the whole point of showing an argument. The colour formula in master turned fully red at a divergence score of 0.65, and my real sessions only get there about 10% of the time (the median score is 0.53). I changed the divisor from 0.30 to 0.22:
+
+```
+max(0, min(1, ((op('lag1')['divergence'] or 0) - 0.35) / 0.22))
+```
+Now full red happens at a score of 0.57, so a typical round is almost red and a calm round at 0.37 is still blue and green. The raw scores in the logs stay unchanged, because only the visual mapping is rescaled. The same number also drives the swell size, so a redder orb also deforms a bit more.
+
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/c4587650-a7db-4ba4-8c5f-2f9b08ebb0ef" />
+
+The orbs looked flat, so I added a glow as a post-effect. In project1, add1 now goes into a Blur TOP (blur1) and then a Level TOP (level1), and a second Add TOP (add2) adds that blurred copy on top of the sharp one before over1. Blur Filter Size controls how far the halo spreads and Level Brightness controls how strong it is. I started at 30 and 1.5 and ended on a Filter Size of 100 and Brightness of 3.5. Glow will look different on a projector, because black on a projector is really dark grey, so I will re-tune it on the real setup.
+
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/26eb802a-1167-4faf-aa2c-287a10403a41" />
+
+## Multi-coloured orbs
+My references (soft, glowing spheres) all shift colour across the surface, while each of my orbs was one flat colour set by the disagreement score. So now every point on the sphere gets its own colour from a gradient. It takes five parts inside each base:
+1. A second Noise POP (noise2) that writes a slow number between 0 and 0.5 on every point, called colnoise, without moving the points (Output page: Noise on, Combine Operation None, Seed 7 for the blue orb and 12 for the green one).
+2. A Ramp TOP (ramp1) holding the gradient. Blue orb: blue, cyan, violet, pink, red. Green orb: green, lime, yellow, orange, red. I set each marker's colour with the Hue box, which counts in degrees (red 0, cyan 180, blue 240, violet 270, pink 320).
+3. A Lookup Texture POP (lookuptex1) that reads colnoise for each point, looks it up on the ramp and saves the result as the point's Color. Its first Lookup Index Offset is op('conflict')['conflict'] * 0.5, so the whole palette slides toward the red end as the doctors disagree more.
+4. A new white Constant MAT (constant2) with Apply Point Color on. The old constant1 was tinted by the disagreement score, which would have fought the new colours.
+5. lookuptex1 wired into geo1, with geo1's Material set to constant2.
+
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/194c856e-b7a7-47c2-80f0-5e67755bd470" />
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/5f493ba6-6a9c-4e1c-9e9d-8b6611e61f2f" />
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/698e95d6-7a29-47eb-94f9-f3e7b09a3d6e" />
+
+I did the blue orb first, then rebuilt the same five steps one at a time for the green orb. Copying and pasting all the nodes at once connected them to random things, so doing it step by step was safer. A stray screenshot of mine also dropped into the network as a Movie File In node, and I deleted it.
+
+## Thinner dots, and when the project came back black
+After the colours, the dots were a little too dense. Each orb is a Geodesic sphere with Frequency 90, which is about 80,000 points in a perfectly regular pattern, and that regularity is also what causes the dark wedge I kept seeing on the blue orb. The point count grows with the square of the frequency, so I lowered Frequency on both sphere1 nodes (blue and green) to the same value so the two orbs match. The result is the look I wanted, with a glow, multi-colour shading and a lighter texture.
+
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/a5cff5a6-53de-4240-aed2-f68e7b559721" />
+
+Late that night I quit TouchDesigner in the middle of a test, choosing "save and quit". When I opened the project again the orbs were nearly black: I could see them moving behind, but they were very dark. The colour keys in both ramp1 nodes were still there, and the Textport showed no errors, but the ramp1 thumbnail in the network was black, so every point was picking black from it. It looked like a cooking glitch from the quit and not lost data, and after I saved and reopened the project, the orbs came back. TouchDesigner also keeps numbered copies of every save (persona_cloud.29.toe and so on in the Backup folder), which would have been my fallback. The lesson is to press Cmd+S and close TouchDesigner properly, and not to quit in the middle of a test.
+ 
+<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/af757610-8b20-4602-9ddb-7a22a2eef0ea" />
+
+
+
+
 
 # (REFERENCES)
