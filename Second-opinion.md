@@ -660,6 +660,38 @@ Calm again after the argument.
 
 ![Both orbs every 2 seconds across the recording, 0 to 48 seconds](visuals/_recording_review/dense.png)
 
+## 22 Oct: the orbs follow the doctors' real voices
+
+Until now each orb only received an on/off "speaking" flag, and the song inside TouchDesigner still drove part of the movement. Now each orb swells with the loudness of its own doctor's actual voice, and relaxes in the pauses between words.
+
+```mermaid
+flowchart LR
+    V["Visitor<br/>voice or typing"] --> W["Whisper<br/>speech to text"]
+    W --> P["Dr. Hedges + Dr. Sure<br/>two prompted personas"]
+    P --> D["Divergence score<br/>0 to 1"]
+    D --> O1["OSC /divergence"]
+    P --> S["macOS say<br/>reply saved as WAV"]
+    S --> L["Loudness<br/>30 readings a second"]
+    L --> O2["OSC /cautious_level<br/>/confident_level"]
+    O1 --> T["Two orbs in TouchDesigner<br/>colour follows the score,<br/>swell follows the voice"]
+    O2 --> T
+```
+
+How it works:
+
+1. `speak_reply()` in `speech.py` asks macOS `say` to save the reply as a WAV file (16-bit, 22,050 Hz) instead of speaking it directly.
+2. `loudness_levels()` reads the file with Python's `wave` module and NumPy, cuts it into 1/30 s chunks and takes the RMS loudness of each chunk. Each value is divided by the 95th percentile of that reply and clipped, so it runs from 0 to 1 whatever the voice or volume.
+3. The file plays with `afplay`, and while it plays Python sends one value every 1/30 s as `/cautious_level` or `/confident_level` over OSC (`send_level()` in `osc_sender.py`), timed from the start of playback. It sends 0 when the reply ends, and also if the run is interrupted. The old `/..._speaking` flag is still sent.
+4. In TouchDesigner, `oscin1` receives the new channels and `lagspeak` smooths them (Lag lowered from 0.4 s to 0.12 s so the orb can follow syllables). In `noise1` of each base, the `amp0` expression now reads the level instead of the flag:
+
+```
+0.05 + (op('/project1/lagspeak')['cautious_level'] or 0) * (0.35 + op('conflict')['conflict'] * 0.25)
+```
+
+   `base2` uses `confident_level` instead.
+5. The leftover song nodes, `audiofilein1` and `analyze1`, are deleted from both bases.
+
+`test_orbs.py` now sends a fake voice level (a sine wave with random variation, 30 times a second) so the orbs can still be tested without the doctors. I checked it with that script and with a real spoken conversation, and both orbs move with their doctor's speech.
 
 
 
