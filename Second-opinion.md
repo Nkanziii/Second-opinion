@@ -1,4 +1,4 @@
-# Second Opinionnn
+# Second Opinion
 
 ## This is the complete markdown file for my entire thesis, with dated entries to show real progress and development.
 ---
