@@ -694,5 +694,44 @@ How it works:
 `test_orbs.py` now sends a fake voice level (a sine wave with random variation, 30 times a second) so the orbs can still be tested without the doctors. I checked it with that script and with a real spoken conversation, and both orbs move with their doctor's speech.
 
 
+### A random mood for each doctor
+
+The model I use rejects the `temperature` setting, so I needed another way to make sessions differ. Each doctor now gets a random mood at the start of a session, in `--converse` mode.
+
+| Doctor | Possible moods |
+| --- | --- |
+| Dr. Hedges (cautious) | anxious, gentle, tired, fussy |
+| Dr. Sure (confident) | smug, impatient, warm, theatrical |
+
+`pick_moods()` in `personas.py` chooses one per doctor. `mood_instruction()` turns it into a sentence that is added to the prompt before the confidence line, for example: "You are tired today, at the end of a long shift: slow, with the odd sigh. Let it colour how you speak, but stay in character and keep to your length limit." The mood only changes the tone. Hedges is still careful and Sure is still decisive.
+
+The moods are printed when a session starts and saved in the log as `"moods"`, so I can later compare sessions by mood, for example whether a "smug" Dr. Sure raises the divergence score.
+
+In a first test, a tired Hedges and a smug Sure answered "I'm hungry" with a tired, hesitant reply and a self-satisfied diagnosis ("Acute Gastric Vacancy"), at confidence 40% against 96% and a divergence score of 0.62.
+
+### No spoken stage directions
+
+Tired Hedges wrote `*Sigh.*`. My speech code only removed the asterisks, so the voice would have said the word "Sigh". I fixed it in two places:
+
+1. `mood_instruction()` now tells the doctor: "Show the mood through your choice of words and rhythm. Never write stage directions or actions in asterisks, such as *sigh*."
+2. `clean_for_speech()` in `speech.py` removes anything between asterisks before the text is spoken: `re.sub(r"\*[^*]*\*", "", text)`.
+
+The mood should show in the wording and, later, in the voice itself, not as a spoken stage direction.
+
+### The orbs stayed stuck in conflict colours
+
+After a session the orbs kept the colours of the last disagreement score. `calm_the_clouds()` only reset the speaking flags. It now also sends a voice level of 0 and a divergence score of 0.30, which is below the 0.35 point where the colour starts to change, so the orbs go back to their original blue and green. It runs when a session starts and when it ends.
+
+It does not run if the terminal is force-quit. To reset by hand:
+
+```
+python3 -c "from osc_sender import send_divergence; send_divergence({'divergence_score': 0.3})"
+```
+
+### Next
+
+Less robotic voices, then a reset loop and one-click launcher so the installation can run without the terminal.
+
+
 
 # (REFERENCES)
