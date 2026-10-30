@@ -50,7 +50,7 @@ def listen(seconds: int = 8) -> str:
     return text
 
 
-def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 1.4,
+def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 2.0,
                          wait_seconds: float = 10) -> str:
     """Wait for the visitor to start talking, record until they pause for
     `silence_seconds`, and return what they said.

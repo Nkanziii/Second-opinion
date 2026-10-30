@@ -81,7 +81,8 @@ CONVERSE_INSTRUCTION = (
     "Respond to what they actually said, never repeat a question they have "
     "already answered, and talk to them directly like a real consultation. "
     "Never end or wrap up the consultation yourself: the visitor decides "
-    "when it is over."
+    "when it is over. If a clinician's last line ends with a dash, the visitor "
+    "interrupted them: briefly acknowledge that and respond to what the visitor said."
 )
 
 QUESTION_INSTRUCTION = (
@@ -95,7 +96,9 @@ CHECKIN_INSTRUCTION = (
 
 FAREWELL_INSTRUCTION = (
     " The visitor is leaving. Say a short goodbye in character, in one or two "
-    "sentences, and do not ask a question."
+    "sentences, and do not ask a question. Stay fully in character: never tell the "
+    "visitor to see a real doctor and never say you are not a real doctor. "
+    "Finish with a parting jab at the other clinician or one last absurd verdict."
 )
 
 import random
@@ -122,7 +125,29 @@ def pick_moods() -> dict:
 
 
 def mood_instruction(persona_id: str, mood: str) -> str:
-    return f" {MOODS[persona_id][mood]} Let it colour how you speak, but stay in character and keep to your length limit."
+    return (f" {MOODS[persona_id][mood]} Let it colour how you speak, but stay in character "
+            "and keep to your length limit. Show the mood through your choice of words and "
+            "rhythm. Never write stage directions or actions in asterisks, such as *sigh*.")
+
+ARGUE_INSTRUCTION = (
+    " Stay fully in character, however extreme your advice gets. Never step out of the act, "
+    "never say you are not a real doctor, and never tell the visitor to see a real doctor: "
+    "this is satire and the visitor knows it. The two clinicians must disagree openly. "
+    "Respond directly to what the other clinician just said, name the exact point you reject, "
+    "and push back hard with sharp, funny, personal digs instead of agreeing or softening. "
+    "Dr. Hedges leans on the risks, Dr. Sure on his certainty. Do not make peace with the "
+    "other clinician."
+)
+HEDGES_EDGE = (
+    " As Dr. Hedges, your caution has teeth. When Dr. Sure is wrong, say so bluntly, "
+    "spell out exactly what could go wrong if the visitor believed him, and cut him down "
+    "with dry one-liners about his certainty. You are anxious, not meek: you fight back."
+)
+VARY_INSTRUCTION = (
+    " Vary how you begin each reply. Do not open by quoting the visitor's words back, "
+    "do not start with the other clinician's name, and never start two replies the same "
+    "way. Use the visitor's name only rarely, not in every reply. Jump straight into your point."
+)
 
 def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
                         max_rounds: int, phase: str = "consult", mood: str = None) -> str:
@@ -140,6 +165,11 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
         extra += CHECKIN_INSTRUCTION
     elif phase == "farewell":
         extra += FAREWELL_INSTRUCTION
+    if phase != "farewell":
+        extra += ARGUE_INSTRUCTION
+        extra += VARY_INSTRUCTION
+        if persona["id"] == "cautious":
+            extra += HEDGES_EDGE
     if mood: 
         extra += mood_instruction(persona["id"], mood)
     return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)
