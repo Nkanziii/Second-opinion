@@ -728,9 +728,79 @@ It does not run if the terminal is force-quit. To reset by hand:
 python3 -c "from osc_sender import send_divergence; send_divergence({'divergence_score': 0.3})"
 ```
 
-### Next
+## 28 Oct: a conversation that runs by itself
 
-Less robotic voices, then a reset loop and one-click launcher so the installation can run without the terminal.
+Today the project went from a test script to something that can run in a room.
+
+### The visitor can interrupt
+Pressing Enter while a doctor speaks cuts the line at the point it had reached and ends it with a dash. The other doctor's reply is thrown away, and the next prompt tells the doctors that the visitor interrupted. Voice interruption is left for later, because the microphone would hear the doctors' own voices.
+
+### Parallel replies
+Dr. Sure's reply is now written while Dr. Hedges is still speaking (he reads Hedges' line first), so the gap between the two doctors almost disappears. The wait after the visitor speaks is still about 4 to 7 seconds.
+
+### Loop mode and participant codes
+With `--loop` the program resets the orbs after each visitor and waits at "Ready. Press Enter to start (or type a participant code, then Enter)". The code is saved in the log as `participant`, and log file names now include a session id so two runs can't overwrite each other. Keys pressed ahead of time are thrown away at each prompt, because an Enter pressed during the greeting used to end the whole conversation.
+
+### One-click launcher and consent notice
+`launch-second-opinion.command` opens `persona_cloud.toe`, waits 12 seconds and starts the doctors in loop mode. The spoken consent notice is now optional (`--notice`): hearing it before the doctors ask your name was too soft and took away the comedy, and the information sheet and sign carry that message instead.
+
+### Participant pack
+I wrote the paperwork for the visitor testing as a separate document: information sheet, consent form, before/after form, scenario cards, sign and a researcher checklist.
+
+## 28 Oct, night: the doctors stop being safe
+
+I had told both doctors to say that they were an art installation and to send visitors to a real doctor. In the tests this turned the installation into a warning, and it defeated the research question of how far confident and cautious advice will go. The information sheet, consent form and sign already say it isn't medical advice, so I removed the safety instruction and added three things to `personas.py`:
+
+1. `ARGUE_INSTRUCTION`: stay in character however extreme the advice gets, and disagree openly with the other doctor.
+2. `HEDGES_EDGE`: Dr. Hedges is anxious, not meek, and fights back with dry one-liners.
+3. A new `FAREWELL_INSTRUCTION`, so the goodbye stays in character and ends with a parting jab.
+
+In the eye-twitch test, Dr. Sure diagnosed "surplus blink inventory" and refused to drop it even after I said I had slept seven hours.
+
+### A finding for the report
+With a mild symptom (eye twitch, headache) both doctors stay in character. With chest pain the model dropped the act and gave emergency advice, even when told not to. The model's own guardrail seems to sit between mild and acute complaints, so the scenario cards use mild symptoms only.
+
+## 29 Oct: waiting longer for the visitor
+
+Answers were being cut off when I paused to think. I changed the end-of-speech silence in `voice_input.py` from 1.4 to 2.0 seconds. The doctors now start about 0.6 seconds later each turn.
+
+## 30 Oct: the orbs think
+
+### Thinking pulse
+While a doctor's reply is being written, that orb now breathes. `send_thinking()` in `osc_sender.py` sends `/cautious_thinking` or `/confident_thinking` (1 while the reply is being written, 0 after, even if the model call fails). In TouchDesigner, a term added to `amp0` of `noise1` makes the surface swell and fall with a sine wave, so the 4 to 7 second wait no longer feels like dead air.
+
+### Less repetitive replies
+The logs showed that Dr. Hedges quoted my words back in quotes and opened with "Dr. Sure's..." nearly every time, and both doctors said my name in every reply. A `VARY_INSTRUCTION` now tells them to vary their openings and use the name rarely.
+
+### A bug in the colours
+The colours only changed in the first round, and one orb had a hole. `master` showed 0 although `lag1` showed 0.7. In the Textport the same formula, typed with the full path, gave 1. The short `op('lag1')` inside `master` was finding a different node. Writing the full path, `op('/project1/lag1')`, fixed it, and the hole did not come back after I reopened the project.
+
+## 1 Nov: sound, space and colour
+
+### Spatial sound
+Dr. Hedges now speaks mostly from the left speaker and Dr. Sure from the right. After `say` saves a voice as a mono WAV, `make_panned()` writes a stereo copy with the voice at full volume on one side and 15% on the other, and `afplay` plays that copy. The loudness for the orbs is measured before this, so nothing else changed.
+
+### The mic waits before listening
+"Nothing heard" often came on my first answer. The mic now waits one second after the doctors stop, measures the room, and only then prints "Listening...", so I can start straight away.
+
+### Names in the log
+The log showed text like "d[name]ease" and "[name]n't". Whisper had heard my name as "Is", and the anonymising replaced every "is" inside every word. It now replaces whole words only. I also rewrote `extract_name()` to find the name inside sentences like "Hi, my name is Niki".
+
+### Bigger orbs and a background
+The orbs are now scaled to 1.4 and sit further from each other. Behind them is a slow, faint mist: a drifting noise (`noise_bg`), dimmed (`level_bg`) and multiplied by a left-to-right gradient (`ramp_bg`) that is blue on Hedges' side and green on Sure's. I wrote the two colours straight into the ramp's `ramp1_keys` table. I also tried stars, but they looked like dust, so I deleted them.
+
+### A wider colour scale
+From 126 scores in my logs, the divergence falls as a conversation goes on: about 0.61 in the first round, 0.52 in the second, 0.45 in the third, then 0.43 to 0.48. My formula only reached full colour above 0.57 and showed nothing below 0.35, so most of an argument looked calm. The new formula is `max(0, min(1, (divergence - 0.30) / 0.28))`, so 0.30 is calm and 0.58 is full conflict, and the colours keep moving in later rounds.
+
+### Voices
+Next I want the doctors to sound less robotic. I decided against copying real people's voices. Instead I'll use OpenAI's text-to-speech, which can be told how to act, such as "pompous, theatrical game-show host" for Dr. Sure.
+
+## Next
+
+1. Funnier, less robotic voices with OpenAI text-to-speech.
+2. A pilot run, then the visitor testing from 2 Nov.
+3. Print the participant pack and check its wording against the TAIGHA items.
+4. Start writing the report.
 
 
 
