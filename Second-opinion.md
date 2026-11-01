@@ -828,6 +828,24 @@ I wanted a more cosmic look, so I added stars.
 
 I'm keeping this in the log on purpose. Trying a look, judging it against the installation's purpose and then removing it was part of the design process.
 
+### Voices with character
+The Mac voices sounded robotic, so I tried OpenAI's text-to-speech (`gpt-4o-mini-tts`). Each voice can be given an acting direction in words, so the same voice can sound very different. I didn't want to copy real people's voices, so I made original characters instead.
+
+**Choosing.** I played the same sentence in eight combinations, such as a smug villain, an anxious whisperer, a Shakespearean actor, a sleepy nurse and a calm, slightly unsettling customer-service voice. I shortlisted Sage, Shimmer and Coral for Dr. Hedges and Ballad, Verse and Ash for Dr. Sure, then settled on **Sage for Dr. Hedges and Ballad for Dr. Sure**.
+
+**How it works.**
+- `start_session()` in `speech.py` picks a voice for each doctor at the start of a session, from a short list for each (`VOICE_POOLS`). At the moment each list has one voice, so more can be added later for variety.
+- Each doctor's acting direction is built from their character plus their mood of the day. A "tired" Dr. Hedges is told to speak slowly with long sighs. A "theatrical" Dr. Sure is told to use grand pauses and dramatic pronouncements. The mood now shows in the voice as well as in the words.
+- `synthesize_openai()` saves the line as a WAV file. After that, the loudness for the orbs, the left and right speaker position, and the interruption all work exactly as before, because they only need a sound file.
+- If OpenAI can't be reached, such as with no internet at the venue, it prints a short note and uses the Mac voice instead, so the installation never goes silent.
+- The voices used are saved in the log as `voices`, next to the moods.
+- The API key lives in `.env`, which is kept out of GitHub.
+
+**A cost.** Each reply takes about one to two seconds longer, because the voice has to be made before it plays. If this feels slow in testing, Dr. Sure's voice can be prepared while Dr. Hedges is still speaking.
+
+### Pronouns
+With Sage as Dr. Hedges, I noticed Dr. Sure kept calling her "he". The instructions had never said who was who, so he guessed. I added a line to every prompt saying that Dr. Hedges is a woman (she/her) and Dr. Sure is a man (he/him).
+
 ### Challenges on 1 Nov
 
 - **Wires disconnecting.** Adding a third input to the Add TOP kept replacing one of the existing wires, because a TouchDesigner node with one multi-input connector doesn't always append. I solved it by using an Over TOP, which has two separate inputs.
@@ -839,9 +857,9 @@ I'm keeping this in the log on purpose. Trying a look, judging it against the in
 
 ## Next
 
-1. Funnier, less robotic voices with OpenAI text-to-speech.
-2. A pilot run, then the visitor testing from 2 Nov.
-3. Print the participant pack and check its wording against the TAIGHA items.
+1. Make the background change colour with the conflict, the way the orbs do: calm blue and green when the doctors agree, shifting as they argue.
+2. Fill in and print the participant pack, and check its wording against the TAIGHA items.
+3. A pilot run with a friend, then visitor testing.
 4. Start writing the report.
 
 
