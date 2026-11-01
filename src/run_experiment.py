@@ -43,7 +43,7 @@ from concurrent.futures import ThreadPoolExecutor
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
-from osc_sender import send_divergence, send_speaking, send_level
+from osc_sender import send_divergence, send_speaking, send_level, send_thinking
 from speech import speak_reply, clean_for_speech
 
 
@@ -160,13 +160,17 @@ def generate_reply(llm, persona, transcript, visitor_name, turn_index, turns, ph
         system_prompt = persona["system_prompt"].format(visitor_name=visitor_name)
     messages = build_messages_for(persona["id"], transcript)
     started = time.time()
-    reply = llm.reply(
-        system_prompt=system_prompt,
-        conversation=messages,
-        persona_id=persona["id"],
-        visitor_name=visitor_name,
-        turn_index=turn_index,
-    )
+    send_thinking(persona["id"], 1.0)
+    try:
+        reply = llm.reply(
+            system_prompt=system_prompt,
+            conversation=messages,
+            persona_id=persona["id"],
+            visitor_name=visitor_name,
+            turn_index=turn_index,
+        )
+    finally:
+        send_thinking(persona["id"], 0.0)
     return reply, round(time.time() - started, 2)
 
 
@@ -289,6 +293,7 @@ def calm_the_clouds():
     for persona_id in ("cautious", "confident"):
         send_speaking(persona_id, 0.0)
         send_level(persona_id, 0.0)
+        send_thinking(persona_id, 0.0)
     send_divergence({"divergence_score": 0.30})  # below 0.35 = no conflict colour
 
 def run_session(args, participant):
