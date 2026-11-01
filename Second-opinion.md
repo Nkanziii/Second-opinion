@@ -775,6 +775,21 @@ The logs showed that Dr. Hedges quoted my words back in quotes and opened with "
 ### A bug in the colours
 The colours only changed in the first round, and one orb had a hole. `master` showed 0 although `lag1` showed 0.7. In the Textport the same formula, typed with the full path, gave 1. The short `op('lag1')` inside `master` was finding a different node. Writing the full path, `op('/project1/lag1')`, fixed it, and the hole did not come back after I reopened the project.
 
+### Challenges so far (28 Oct to 1 Nov)
+
+Most of the problems came from the gap between a test that worked once and an installation that has to work every time.
+
+1. **Enter ended the conversation.** I pressed Enter during the greeting and the conversation ended with no log. The program had queued the empty answer and treated it as silence. It now throws away keys pressed ahead of time at every prompt.
+2. **Logs overwriting each other.** Two runs started in the same second got the same file name. File names now include a session id.
+3. **Orbs stuck after a session.** TouchDesigner remembers the last value it received, so after an unfinished run the orbs stayed in the colour of the last argument, and the second orb sometimes had a hole in it. I added `calm_the_clouds()` to reset everything when a run starts and ends. It does not run if the terminal is force-quit, so I wrote a test script (`test_orbs.py`) that ends calm and a manual reset line.
+4. **A formula that read the wrong node.** The colours changed only in the first round, and the hole came back after reopening the project. The formula showed 0 while the node it should read showed 0.7. In the Textport the same formula with the full path gave 1. The short `op('lag1')` was finding a different node, so I now use full paths in the formulas. It took five steps of asking TouchDesigner questions to find, and the lesson is to test an expression where it is evaluated, not where I think it is.
+5. **Stage directions.** The model wrote things like "*sigh*" and the voice read them out. The prompt now bans them, and the speech code strips any that remain.
+6. **Safe, but dull.** My safety instruction made both doctors send visitors to a real doctor, which defeated the point of testing how far the advice would go. I removed it. On chest pain the model's own guardrail still overrode the persona. This is now a finding, not just a problem, and it shapes the scenario cards.
+7. **Answers cut off, and "nothing heard".** The mic stopped listening after 1.4 seconds of quiet, and measured the room's noise while the doctors' voices were still fading. I changed the silence limit to 2.0 seconds and made the mic wait a second before it listens.
+8. **Whisper mishearing.** The small speech model heard "Niki" as "Is", answered a sentence I hadn't said, and caused the anonymiser to damage the log. I fixed the anonymiser, and a larger Whisper model is still an option.
+9. **Terminal text in the data.** At the "Ready" prompt I once pasted terminal text, and it was saved as my participant code. It showed up in the log, which is why the logs are worth reading after every test.
+10. **Merging on GitHub.** A push was rejected when the remote had changes I didn't have. `git pull --no-rebase --no-edit` before `git push` fixed it.
+
 ## 1 Nov: sound, space and colour
 
 ### Spatial sound
