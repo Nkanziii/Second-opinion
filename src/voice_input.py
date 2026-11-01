@@ -11,10 +11,12 @@ Used by run_experiment.py when you pass --voice.
 """
 
 import queue
+import time
 
 import numpy as np
 import sounddevice as sd
 from faster_whisper import WhisperModel
+
 
 SAMPLE_RATE = 16000  # Whisper expects 16 kHz audio
 BLOCK_SECONDS = 0.1
@@ -74,11 +76,12 @@ def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 2.0,
     spoken = 0.0
     loud_blocks = 0
 
-    print("Listening...")
+    time.sleep(1.0)
     with sd.InputStream(samplerate=SAMPLE_RATE, channels=1, dtype="float32",
                         blocksize=block, callback=callback):
         ambient = [_rms(q.get()) for _ in range(5)]
         threshold = max(0.015, 3 * float(np.mean(ambient)))
+        print("Listening...")
         while True:
             b = q.get()
             loud = _rms(b) > threshold

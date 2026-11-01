@@ -26,6 +26,29 @@ VOICES = {
     "confident": "Daniel",    # Dr. Sure
 }
 
+PAN = {
+    "cautious": (1.0, 0.15),   # Dr. Hedges: mostly the left speaker
+    "confident": (0.15, 1.0),  # Dr. Sure: mostly the right speaker
+}
+
+
+def make_panned(path: str, persona_id: str) -> str:
+    """Copy a mono WAV into a stereo WAV with the voice mostly in one speaker."""
+    left, right = PAN.get(persona_id, (1.0, 1.0))
+    with wave.open(path, "rb") as w:
+        rate = w.getframerate()
+        data = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32)
+    stereo = np.empty(len(data) * 2, dtype=np.int16)
+    stereo[0::2] = (data * left).astype(np.int16)
+    stereo[1::2] = (data * right).astype(np.int16)
+    out = path.replace(".wav", "_stereo.wav")
+    with wave.open(out, "wb") as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(rate)
+        w.writeframes(stereo.tobytes())
+    return out
+
 
 def clean_for_speech(text: str) -> str:
     """Drop the trailing 'Confidence: NN%' line (it's data for the score,
@@ -80,6 +103,7 @@ def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False) -> fl
         subprocess.run(["say", spoken])  # could not save the sound: just speak it, no levels
         return 1.0
     levels = loudness_levels(path)
+    path = make_panned(path, persona_id)
     if allow_interrupt:
         _clear_typed_keys()
     player = subprocess.Popen(["afplay", path])

@@ -115,14 +115,17 @@ def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = Fa
     return played
 
 def extract_name(text: str) -> str:
-    """Pick the name out of 'my name is Niki' or just 'Niki'."""
-    cleaned = text.strip().strip(".!?,").lower()
-    for lead in NAME_LEADS:
-        if cleaned.startswith(lead):
-            cleaned = cleaned[len(lead):].strip()
-            break
-    words = cleaned.split()[:1]
-    return " ".join(w.capitalize() for w in words) if words else "friend"
+    """Pick the name out of 'hi, my name is Niki' or just 'Niki'."""
+    cleaned = text.strip().strip(".!?,")
+    match = re.search(r"(?:my name is|my name's|name is|i am|i'm|im|it's|its|call me|this is)\s+([A-Za-z'-]+)",
+                      cleaned, re.IGNORECASE)
+    if match:
+        word = match.group(1)
+    else:
+        fillers = ("hi", "hello", "hey", "um", "uh", "is", "my", "name")
+        words = [w for w in re.findall(r"[A-Za-z'-]+", cleaned) if w.lower() not in fillers]
+        word = words[0] if words else ""
+    return word.capitalize() if word else "friend"
 
 NOTICE = ("Before we begin: we are part of an art installation, not real doctors, so please "
           "don't take anything we say as medical advice. Our conversation is saved without "
@@ -284,7 +287,7 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
 
 def scrub_name(transcript: list, name: str) -> list:
     """A copy of the transcript with the visitor's name replaced by [name]."""
-    pattern = re.compile(re.escape(name), re.IGNORECASE)
+    pattern = re.compile(r"\b" + re.escape(name) + r"\b", re.IGNORECASE)
     return [{**turn, "text": pattern.sub("[name]", turn["text"])} for turn in transcript]
 
 def calm_the_clouds():
