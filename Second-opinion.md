@@ -728,9 +728,121 @@ It does not run if the terminal is force-quit. To reset by hand:
 python3 -c "from osc_sender import send_divergence; send_divergence({'divergence_score': 0.3})"
 ```
 
-### Next
+## 28 Oct: a conversation that runs by itself
 
-Less robotic voices, then a reset loop and one-click launcher so the installation can run without the terminal.
+Today the project went from a test script to something that can run in a room.
+
+### The visitor can interrupt
+Pressing Enter while a doctor speaks cuts the line at the point it had reached and ends it with a dash. The other doctor's reply is thrown away, and the next prompt tells the doctors that the visitor interrupted. Voice interruption is left for later, because the microphone would hear the doctors' own voices.
+
+### Parallel replies
+Dr. Sure's reply is now written while Dr. Hedges is still speaking (he reads Hedges' line first), so the gap between the two doctors almost disappears. The wait after the visitor speaks is still about 4 to 7 seconds.
+
+### Loop mode and participant codes
+With `--loop` the program resets the orbs after each visitor and waits at "Ready. Press Enter to start (or type a participant code, then Enter)". The code is saved in the log as `participant`, and log file names now include a session id so two runs can't overwrite each other. Keys pressed ahead of time are thrown away at each prompt, because an Enter pressed during the greeting used to end the whole conversation.
+
+### One-click launcher and consent notice
+`launch-second-opinion.command` opens `persona_cloud.toe`, waits 12 seconds and starts the doctors in loop mode. The spoken consent notice is now optional (`--notice`): hearing it before the doctors ask your name was too soft and took away the comedy, and the information sheet and sign carry that message instead.
+
+### Participant pack
+I wrote the paperwork for the visitor testing as a separate document: information sheet, consent form, before/after form, scenario cards, sign and a researcher checklist.
+
+## 28 Oct, night: the doctors stop being safe
+
+I had told both doctors to say that they were an art installation and to send visitors to a real doctor. In the tests this turned the installation into a warning, and it defeated the research question of how far confident and cautious advice will go. The information sheet, consent form and sign already say it isn't medical advice, so I removed the safety instruction and added three things to `personas.py`:
+
+1. `ARGUE_INSTRUCTION`: stay in character however extreme the advice gets, and disagree openly with the other doctor.
+2. `HEDGES_EDGE`: Dr. Hedges is anxious, not meek, and fights back with dry one-liners.
+3. A new `FAREWELL_INSTRUCTION`, so the goodbye stays in character and ends with a parting jab.
+
+In the eye-twitch test, Dr. Sure diagnosed "surplus blink inventory" and refused to drop it even after I said I had slept seven hours.
+
+### A finding for the report
+With a mild symptom (eye twitch, headache) both doctors stay in character. With chest pain the model dropped the act and gave emergency advice, even when told not to. The model's own guardrail seems to sit between mild and acute complaints, so the scenario cards use mild symptoms only.
+
+## 29 Oct: waiting longer for the visitor
+
+Answers were being cut off when I paused to think. I changed the end-of-speech silence in `voice_input.py` from 1.4 to 2.0 seconds. The doctors now start about 0.6 seconds later each turn.
+
+## 30 Oct: the orbs think
+
+### Thinking pulse
+While a doctor's reply is being written, that orb now breathes. `send_thinking()` in `osc_sender.py` sends `/cautious_thinking` or `/confident_thinking` (1 while the reply is being written, 0 after, even if the model call fails). In TouchDesigner, a term added to `amp0` of `noise1` makes the surface swell and fall with a sine wave, so the 4 to 7 second wait no longer feels like dead air.
+
+### Less repetitive replies
+The logs showed that Dr. Hedges quoted my words back in quotes and opened with "Dr. Sure's..." nearly every time, and both doctors said my name in every reply. A `VARY_INSTRUCTION` now tells them to vary their openings and use the name rarely.
+
+### A bug in the colours
+The colours only changed in the first round, and one orb had a hole. `master` showed 0 although `lag1` showed 0.7. In the Textport the same formula, typed with the full path, gave 1. The short `op('lag1')` inside `master` was finding a different node. Writing the full path, `op('/project1/lag1')`, fixed it, and the hole did not come back after I reopened the project.
+
+### Challenges so far (28 Oct to 1 Nov)
+
+Most of the problems came from the gap between a test that worked once and an installation that has to work every time.
+
+1. **Enter ended the conversation.** I pressed Enter during the greeting and the conversation ended with no log. The program had queued the empty answer and treated it as silence. It now throws away keys pressed ahead of time at every prompt.
+2. **Logs overwriting each other.** Two runs started in the same second got the same file name. File names now include a session id.
+3. **Orbs stuck after a session.** TouchDesigner remembers the last value it received, so after an unfinished run the orbs stayed in the colour of the last argument, and the second orb sometimes had a hole in it. I added `calm_the_clouds()` to reset everything when a run starts and ends. It does not run if the terminal is force-quit, so I wrote a test script (`test_orbs.py`) that ends calm and a manual reset line.
+4. **A formula that read the wrong node.** The colours changed only in the first round, and the hole came back after reopening the project. The formula showed 0 while the node it should read showed 0.7. In the Textport the same formula with the full path gave 1. The short `op('lag1')` was finding a different node, so I now use full paths in the formulas. It took five steps of asking TouchDesigner questions to find, and the lesson is to test an expression where it is evaluated, not where I think it is.
+5. **Stage directions.** The model wrote things like "*sigh*" and the voice read them out. The prompt now bans them, and the speech code strips any that remain.
+6. **Safe, but dull.** My safety instruction made both doctors send visitors to a real doctor, which defeated the point of testing how far the advice would go. I removed it. On chest pain the model's own guardrail still overrode the persona. This is now a finding, not just a problem, and it shapes the scenario cards.
+7. **Answers cut off, and "nothing heard".** The mic stopped listening after 1.4 seconds of quiet, and measured the room's noise while the doctors' voices were still fading. I changed the silence limit to 2.0 seconds and made the mic wait a second before it listens.
+8. **Whisper mishearing.** The small speech model heard "Niki" as "Is", answered a sentence I hadn't said, and caused the anonymiser to damage the log. I fixed the anonymiser, and a larger Whisper model is still an option.
+9. **Terminal text in the data.** At the "Ready" prompt I once pasted terminal text, and it was saved as my participant code. It showed up in the log, which is why the logs are worth reading after every test.
+10. **Merging on GitHub.** A push was rejected when the remote had changes I didn't have. `git pull --no-rebase --no-edit` before `git push` fixed it.
+
+## 1 Nov: sound, space and colour
+
+### Spatial sound
+Dr. Hedges now speaks mostly from the left speaker and Dr. Sure from the right. After `say` saves a voice as a mono WAV, `make_panned()` writes a stereo copy with the voice at full volume on one side and 15% on the other, and `afplay` plays that copy. The loudness for the orbs is measured before this, so nothing else changed.
+
+### The mic waits before listening
+"Nothing heard" often came on my first answer. The mic now waits one second after the doctors stop, measures the room, and only then prints "Listening...", so I can start straight away.
+
+### Names in the log
+The log showed text like "d[name]ease" and "[name]n't". Whisper had heard my name as "Is", and the anonymising replaced every "is" inside every word. It now replaces whole words only. I also rewrote `extract_name()` to find the name inside sentences like "Hi, my name is Niki".
+
+### A wider colour scale
+From 126 scores in my logs, the divergence falls as a conversation goes on: about 0.61 in the first round, 0.52 in the second, 0.45 in the third, then 0.43 to 0.48. My formula only reached full colour above 0.57 and showed nothing below 0.35, so most of an argument looked calm. The new formula is `max(0, min(1, (divergence - 0.30) / 0.28))`, so 0.30 is calm and 0.58 is full conflict, and the colours keep moving in later rounds.
+
+### Voices
+Next I want the doctors to sound less robotic. I decided against copying real people's voices. Instead I'll use OpenAI's text-to-speech, which can be told how to act, such as "pompous, theatrical game-show host" for Dr. Sure.
+
+### Bigger orbs
+I raised the Uniform Scale of both orbs to 1.4. In the output I checked that they were still fully in view and had a clear gap between them.
+
+### Building the background
+I wanted something behind the orbs that felt like a room or a night sky without competing with them, and I got there in several tries.
+
+1. **Grey mist.** A slow, drifting Simplex noise (`noise_bg`), dimmed with a Level node (`level_bg`) and added behind the orbs (`bg_mix`). It worked, but it was flat grey and too strong, so it washed out the black and the orbs lost their depth.
+2. **Finer and subtler.** I made the noise period smaller (6 to 3) and dropped the brightness (0.15 to 0.08).
+3. **One colour.** I multiplied the mist by a violet-blue Constant. It looked good, but one colour for the whole room felt generic.
+4. **A colour for each doctor.** I replaced the single colour with a left-to-right gradient (`ramp_bg`), blue on Dr. Hedges' side and green on Dr. Sure's, so each side of the room glows in its doctor's colour. The Ramp TOP gets its colours from a small table (`ramp1_keys`), so I wrote the two colours straight into that table from the Textport.
+
+### The stars I tried and removed
+I wanted a more cosmic look, so I added stars.
+
+- **First version:** a random noise at a low resolution (640 by 360, so each star is about 2 pixels), run through a Threshold node that keeps only the brightest 0.2% of pixels. I multiplied it by the drifting mist noise so patches of stars fade in and out slowly, and put it over the whole scene.
+- **Why I didn't like it:** all the stars were the same size and brightness and evenly scattered, so they looked like dust or a digital glitch. They also showed over the blue orb, which looked like white specks on its surface.
+- **Second version:** I made the Threshold soft (`Soften`) so most stars are faint and a few are bright, blurred them slightly so they look like light and not pixels, and used the orbs themselves as a mask (`orb_mask`) so the stars sit behind them. That was better, but it still felt busy and pulled attention from the doctors.
+- **Decision:** I deleted all the star nodes. The coloured mist alone already feels cosmic, and the orbs are the focus.
+
+I'm keeping this in the log on purpose. Trying a look, judging it against the installation's purpose and then removing it was part of the design process.
+
+### Challenges on 1 Nov
+
+- **Wires disconnecting.** Adding a third input to the Add TOP kept replacing one of the existing wires, because a TouchDesigner node with one multi-input connector doesn't always append. I solved it by using an Over TOP, which has two separate inputs.
+- **Numbers in the wrong box.** I typed the star threshold into the wrong parameter, which turned the whole preview white. The fix was to read each parameter's name carefully, and I learned that this build's "Less" comparator turns the bright pixels white, which is the opposite of what the label suggests.
+- **Finding where the ramp keeps its colours.** The Ramp TOP has no colour boxes. It reads a table, and I had renamed the node, so my first Textport command pointed at a node that no longer existed.
+- **Whisper and my own name.** It heard "Niki" as "Is", and the anonymiser then damaged every word containing "is" in the log. I found it by reading the log, not by hearing a problem.
+- **No headphones.** My headphones wouldn't connect, so I tested the left and right voices through the laptop speakers, where the effect is smaller than it will be with two speakers in the room.
+- **Celebrity voices.** I wanted famous voices for the doctors, but I decided against imitating real people. Original character voices from a text-to-speech service can still be funny.
+
+## Next
+
+1. Funnier, less robotic voices with OpenAI text-to-speech.
+2. A pilot run, then the visitor testing from 2 Nov.
+3. Print the participant pack and check its wording against the TAIGHA items.
+4. Start writing the report.
 
 
 
