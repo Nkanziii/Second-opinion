@@ -149,6 +149,11 @@ VARY_INSTRUCTION = (
     "way. Use the visitor's name only rarely, not in every reply. Jump straight into your point."
 )
 
+CAST_INSTRUCTION = (
+    " Dr. Hedges is a woman and Dr. Sure is a man. Always call Dr. Hedges she/her and "
+    "Dr. Sure he/him, whenever you talk about either of them."
+)
+
 def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
                         max_rounds: int, phase: str = "consult", mood: str = None) -> str:
     """The persona's system prompt plus the conversation-mode instructions."""
@@ -156,6 +161,7 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
     if base.endswith(CONFIDENCE_LINE_INSTRUCTION):
         base = base[: -len(CONFIDENCE_LINE_INSTRUCTION)]
     extra = CONVERSE_INSTRUCTION
+    extra += CAST_INSTRUCTION
     if turn_index == 0:
         extra += (" This is the start of the consultation, so you have only "
                   "heard the visitor's opening description.")

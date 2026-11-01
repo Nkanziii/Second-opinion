@@ -44,7 +44,7 @@ from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
 from osc_sender import send_divergence, send_speaking, send_level, send_thinking
-from speech import speak_reply, clean_for_speech
+from speech import speak_reply, clean_for_speech, start_session
 
 
 # Phrases that let the visitor end the session early.
@@ -311,6 +311,9 @@ def run_session(args, participant):
     moods = pick_moods() if args.converse else None
     if moods:
         print(f"Moods today: Dr. Hedges is {moods['cautious']}, Dr. Sure is {moods['confident']}\n")
+    voices = start_session(moods) if args.speak else None
+    if voices:
+        print(f"Voices today: Dr. Hedges is {voices['cautious']}, Dr. Sure is {voices['confident']}\n")
 
     if args.converse and args.symptom is None:
         visitor_name, symptom = greet(args.speak, args.voice, args.notice)
@@ -349,6 +352,7 @@ def run_session(args, participant):
                 "participant": participant,
                 "converse": args.converse,
                 "moods": moods,
+                "voices": voices,
                 "ended_by": ended_by,
                 "transcript": scrub_name(transcript, visitor_name),
                 "scores": scores,

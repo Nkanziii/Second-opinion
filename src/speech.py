@@ -16,6 +16,7 @@ import time
 import wave
 import select
 import sys
+import random
 
 import numpy as np
 
@@ -31,6 +32,67 @@ PAN = {
     "confident": (0.15, 1.0),  # Dr. Sure: mostly the right speaker
 }
 
+VOICE_POOLS = {
+    "cautious": ["sage"],              # Dr. Hedges
+    "confident": ["ballad"],     # Dr. Sure
+}
+
+STYLE_BASE = {
+    "cautious": "You are Dr. Hedges, a nervous, over-cautious doctor in a comedy. Hesitant and worried.",
+    "confident": "You are Dr. Sure, a wildly overconfident doctor in a comedy. Absolute certainty and showmanship.",
+}
+
+MOOD_STYLE = {
+    "cautious": {
+        "anxious": "Today you are extra anxious: quick, breathless, trailing off.",
+        "gentle": "Today you are gentle: soft, kind and reassuring, but still timid.",
+        "tired": "Today you are exhausted: slow, weary, with long sighs between phrases.",
+        "fussy": "Today you are fussy: precise, prim, correcting yourself.",
+    },
+    "confident": {
+        "smug": "Today you are smug: pleased with yourself, savouring your own cleverness.",
+        "impatient": "Today you are impatient: clipped and hurried, as if the visitor wastes your time.",
+        "warm": "Today you are warm: jovial, with a big friendly bedside manner.",
+        "theatrical": "Today you are theatrical: grand pauses and dramatic pronouncements.",
+    },
+}
+
+SESSION_VOICES = {}
+
+
+def start_session(moods=None) -> dict:
+    """Pick a voice for each doctor for this visitor, with an acting direction that follows today's mood."""
+    SESSION_VOICES.clear()
+    for persona_id, pool in VOICE_POOLS.items():
+        mood = (moods or {}).get(persona_id)
+        style = STYLE_BASE[persona_id] + " " + MOOD_STYLE[persona_id].get(mood, "")
+        SESSION_VOICES[persona_id] = {"voice": random.choice(pool), "style": style}
+    return {persona_id: v["voice"] for persona_id, v in SESSION_VOICES.items()}
+
+
+_openai = None
+
+
+def synthesize_openai(persona_id: str, spoken: str, path: str) -> bool:
+    """Save the line with an OpenAI voice. Returns False if it can't, so the caller uses the Mac voice."""
+    global _openai
+    pick = SESSION_VOICES.get(persona_id)
+    if not pick:
+        return False
+    try:
+        if _openai is None:
+            import llm_client  # loads the keys from .env
+            from openai import OpenAI
+            _openai = OpenAI()
+        reply = _openai.audio.speech.create(model="gpt-4o-mini-tts", voice=pick["voice"],
+                                            input=spoken, instructions=pick["style"],
+                                            response_format="wav")
+        with open(path, "wb") as f:
+            f.write(reply.content)
+        return True
+    except Exception as e:
+        print(f"(OpenAI voice failed, using the Mac voice: {e})")
+        return False
 
 def make_panned(path: str, persona_id: str) -> str:
     """Copy a mono WAV into a stereo WAV with the voice mostly in one speaker."""
@@ -95,13 +157,14 @@ def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False) -> fl
     spoken = clean_for_speech(text)
     if not spoken:
         return 1.0
-    voice = VOICES.get(persona_id)
     path = os.path.join(tempfile.gettempdir(), f"second_opinion_{persona_id}.wav")
-    cmd = ["say"] + (["-v", voice] if voice else []) + [
-        "-o", path, "--file-format=WAVE", "--data-format=LEI16@22050", spoken]                                                
-    if subprocess.run(cmd).returncode != 0:
-        subprocess.run(["say", spoken])  # could not save the sound: just speak it, no levels
-        return 1.0
+    if not synthesize_openai(persona_id, spoken, path):
+        voice = VOICES.get(persona_id)
+        cmd = ["say"] + (["-v", voice] if voice else []) + [
+            "-o", path, "--file-format=WAVE", "--data-format=LEI16@22050", spoken]
+        if subprocess.run(cmd).returncode != 0:
+            subprocess.run(["say", spoken])  # could not save the sound: just speak it, no levels
+            return 1.0
     levels = loudness_levels(path)
     path = make_panned(path, persona_id)
     if allow_interrupt:
