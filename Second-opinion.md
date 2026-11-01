@@ -786,14 +786,41 @@ Dr. Hedges now speaks mostly from the left speaker and Dr. Sure from the right. 
 ### Names in the log
 The log showed text like "d[name]ease" and "[name]n't". Whisper had heard my name as "Is", and the anonymising replaced every "is" inside every word. It now replaces whole words only. I also rewrote `extract_name()` to find the name inside sentences like "Hi, my name is Niki".
 
-### Bigger orbs and a background
-The orbs are now scaled to 1.4 and sit further from each other. Behind them is a slow, faint mist: a drifting noise (`noise_bg`), dimmed (`level_bg`) and multiplied by a left-to-right gradient (`ramp_bg`) that is blue on Hedges' side and green on Sure's. I wrote the two colours straight into the ramp's `ramp1_keys` table. I also tried stars, but they looked like dust, so I deleted them.
-
 ### A wider colour scale
 From 126 scores in my logs, the divergence falls as a conversation goes on: about 0.61 in the first round, 0.52 in the second, 0.45 in the third, then 0.43 to 0.48. My formula only reached full colour above 0.57 and showed nothing below 0.35, so most of an argument looked calm. The new formula is `max(0, min(1, (divergence - 0.30) / 0.28))`, so 0.30 is calm and 0.58 is full conflict, and the colours keep moving in later rounds.
 
 ### Voices
 Next I want the doctors to sound less robotic. I decided against copying real people's voices. Instead I'll use OpenAI's text-to-speech, which can be told how to act, such as "pompous, theatrical game-show host" for Dr. Sure.
+
+### Bigger orbs
+I raised the Uniform Scale of both orbs to 1.4. In the output I checked that they were still fully in view and had a clear gap between them.
+
+### Building the background
+I wanted something behind the orbs that felt like a room or a night sky without competing with them, and I got there in several tries.
+
+1. **Grey mist.** A slow, drifting Simplex noise (`noise_bg`), dimmed with a Level node (`level_bg`) and added behind the orbs (`bg_mix`). It worked, but it was flat grey and too strong, so it washed out the black and the orbs lost their depth.
+2. **Finer and subtler.** I made the noise period smaller (6 to 3) and dropped the brightness (0.15 to 0.08).
+3. **One colour.** I multiplied the mist by a violet-blue Constant. It looked good, but one colour for the whole room felt generic.
+4. **A colour for each doctor.** I replaced the single colour with a left-to-right gradient (`ramp_bg`), blue on Dr. Hedges' side and green on Dr. Sure's, so each side of the room glows in its doctor's colour. The Ramp TOP gets its colours from a small table (`ramp1_keys`), so I wrote the two colours straight into that table from the Textport.
+
+### The stars I tried and removed
+I wanted a more cosmic look, so I added stars.
+
+- **First version:** a random noise at a low resolution (640 by 360, so each star is about 2 pixels), run through a Threshold node that keeps only the brightest 0.2% of pixels. I multiplied it by the drifting mist noise so patches of stars fade in and out slowly, and put it over the whole scene.
+- **Why I didn't like it:** all the stars were the same size and brightness and evenly scattered, so they looked like dust or a digital glitch. They also showed over the blue orb, which looked like white specks on its surface.
+- **Second version:** I made the Threshold soft (`Soften`) so most stars are faint and a few are bright, blurred them slightly so they look like light and not pixels, and used the orbs themselves as a mask (`orb_mask`) so the stars sit behind them. That was better, but it still felt busy and pulled attention from the doctors.
+- **Decision:** I deleted all the star nodes. The coloured mist alone already feels cosmic, and the orbs are the focus.
+
+I'm keeping this in the log on purpose. Trying a look, judging it against the installation's purpose and then removing it was part of the design process.
+
+### Challenges on 1 Nov
+
+- **Wires disconnecting.** Adding a third input to the Add TOP kept replacing one of the existing wires, because a TouchDesigner node with one multi-input connector doesn't always append. I solved it by using an Over TOP, which has two separate inputs.
+- **Numbers in the wrong box.** I typed the star threshold into the wrong parameter, which turned the whole preview white. The fix was to read each parameter's name carefully, and I learned that this build's "Less" comparator turns the bright pixels white, which is the opposite of what the label suggests.
+- **Finding where the ramp keeps its colours.** The Ramp TOP has no colour boxes. It reads a table, and I had renamed the node, so my first Textport command pointed at a node that no longer existed.
+- **Whisper and my own name.** It heard "Niki" as "Is", and the anonymiser then damaged every word containing "is" in the log. I found it by reading the log, not by hearing a problem.
+- **No headphones.** My headphones wouldn't connect, so I tested the left and right voices through the laptop speakers, where the effect is smaller than it will be with two speakers in the room.
+- **Celebrity voices.** I wanted famous voices for the doctors, but I decided against imitating real people. Original character voices from a text-to-speech service can still be funny.
 
 ## Next
 
