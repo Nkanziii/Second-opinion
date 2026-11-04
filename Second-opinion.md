@@ -1,7 +1,7 @@
 # Second Opinion
 
 ## This is the complete markdown file for my entire thesis, with dated entries to show real progress and development.
----
+
 # LLM Use Disclaimer
 
 I used an AI assistant, Claude Sonnet 5.5 (Anthropic, 2026), throughout this project, from August to November 2026. I am recording what it did and what I did, as UAL's guidance on generative AI asks, and I have not submitted any AI output as my own unaltered work.
