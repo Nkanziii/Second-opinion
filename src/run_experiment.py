@@ -44,7 +44,7 @@ from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
 from osc_sender import send_divergence, send_speaking, send_level, send_thinking
-from speech import speak_reply, clean_for_speech, start_session
+from speech import speak_reply, prepare_audio, clean_for_speech, start_session
 
 
 # Phrases that let the visitor end the session early.
@@ -101,7 +101,7 @@ NAME_LEADS = ("my name is", "my name's", "i am", "i'm", "im", "it's", "its", "ca
 LABELS = {"cautious": CAUTIOUS_PERSONA["label"], "confident": CONFIDENT_PERSONA["label"]}
 DEFAULT_SYMPTOM = "I've had a weird twitch in my eye for the past three days."
 
-def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = False) -> float:
+def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = False, prepared: dict = None) -> float:
     """Print a line from a doctor and, with --speak, say it aloud.
     Returns how much was spoken, 0 to 1 (less than 1 if the visitor pressed Enter)."""
     print(f"[{LABELS[persona_id]}] {text}\n")
@@ -109,7 +109,7 @@ def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = Fa
     if speak:
         send_speaking(persona_id, 1.0)
         try:
-            played = speak_reply(persona_id, text, allow_interrupt)
+            played = speak_reply(persona_id, text, allow_interrupt, prepared)
         finally:
             send_speaking(persona_id, 0.0)
     return played
@@ -199,9 +199,20 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
     transcript.append(first_entry)
     turn_responses[first["id"]] = reply
 
+    def second_reply_and_audio():
+        # write Dr. Sure's reply, then make his voice too, while Dr. Hedges is still speaking
+        text, took_s = generate_reply(llm, second, transcript, visitor_name, turn_index, turns,
+                                      phase, converse, moods)
+        audio = None
+        if speak:
+            try:
+                audio = prepare_audio(second["id"], text)
+            except Exception as e:
+                print(f"(could not prepare Dr. Sure's voice early: {e})")
+        return text, took_s, audio
+
     pool = ThreadPoolExecutor(max_workers=1)
-    pending = pool.submit(generate_reply, llm, second, transcript, visitor_name, turn_index, turns,
-                          phase, converse, moods)
+    pending = pool.submit(second_reply_and_audio)
     played = say_line(first["id"], reply, speak, allow_interrupt)
     if played < 1.0:
         first_entry["text"] = cut_at(reply, played)
@@ -210,13 +221,13 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
         print("(you interrupted)\n")
         return turn_responses, True
 
-    second_reply, second_took = pending.result()
+    second_reply, second_took, second_audio = pending.result()
     pool.shutdown()
     second_entry = {"speaker": second["id"], "text": second_reply, "time": now_iso(),
                     "reply_seconds": second_took}
     transcript.append(second_entry)
     turn_responses[second["id"]] = second_reply
-    played = say_line(second["id"], second_reply, speak, allow_interrupt)
+    played = say_line(second["id"], second_reply, speak, allow_interrupt, second_audio)
     if played < 1.0:
         second_entry["text"] = cut_at(second_reply, played)
         second_entry["interrupted"] = True

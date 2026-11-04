@@ -152,21 +152,36 @@ def _clear_typed_keys():
         pass
 
 
-def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False) -> float:
-    """Speak one reply, sending its loudness to TouchDesigner as it plays. Returns how much was spoken, 0 to 1 (less than 1 if the visitor passed Enter.)"""
+def prepare_audio(persona_id: str, text: str) -> dict:
+    """Make the sound for one reply (voice, loudness levels, left/right panning) without playing it.
+    Can run in the background while the other doctor is still speaking."""
     spoken = clean_for_speech(text)
     if not spoken:
-        return 1.0
+        return {"kind": "empty"}
     path = os.path.join(tempfile.gettempdir(), f"second_opinion_{persona_id}.wav")
     if not synthesize_openai(persona_id, spoken, path):
         voice = VOICES.get(persona_id)
         cmd = ["say"] + (["-v", voice] if voice else []) + [
             "-o", path, "--file-format=WAVE", "--data-format=LEI16@22050", spoken]
         if subprocess.run(cmd).returncode != 0:
-            subprocess.run(["say", spoken])  # could not save the sound: just speak it, no levels
-            return 1.0
+            return {"kind": "say_only", "spoken": spoken}  # could not save the sound: just speak it, no levels
     levels = loudness_levels(path)
     path = make_panned(path, persona_id)
+    return {"kind": "audio", "path": path, "levels": levels}
+
+
+def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False, prepared: dict = None) -> float:
+    """Speak one reply, sending its loudness to TouchDesigner as it plays. Returns how much was spoken, 0 to 1 (less than 1 if the visitor passed Enter.)
+    If the sound was already made with prepare_audio, pass it as `prepared` so it starts straight away."""
+    if prepared is None:
+        prepared = prepare_audio(persona_id, text)
+    if prepared["kind"] == "empty":
+        return 1.0
+    if prepared["kind"] == "say_only":
+        subprocess.run(["say", prepared["spoken"]])
+        return 1.0
+    path = prepared["path"]
+    levels = prepared["levels"]
     if allow_interrupt:
         _clear_typed_keys()
     player = subprocess.Popen(["afplay", path])
