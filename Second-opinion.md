@@ -10,6 +10,35 @@
 # (all code and visual files)
 # (research)
 
+# LLM Use Disclaimer
+
+I used an AI assistant, Claude Sonnet 5.5 (Anthropic, 2026), throughout this project, from August to November 2026. I am recording what it did and what I did, as UAL's guidance on generative AI asks, and I have not submitted any AI output as my own unaltered work.
+
+**What the AI did**
+
+- Helped me plan the project and the experiment, and explained code and TouchDesigner settings when I was stuck.
+- Wrote and edited much of the Python in `src/` (for example the speech, voice, OSC and logging code) and the TouchDesigner expressions, working from my instructions. I tested and ran every change, and I decided what stayed.
+- Helped draft the participant information sheet, consent form and other paperwork from the UAL template, which I then checked and edited.
+- Drafted weblog entries from our working sessions, which I read and corrected so that they describe what I actually did.
+
+**What I did**
+
+- Decided the concept, research question, design and tone of the installation (for example the two doctors' characters, that they argue, that the safety warning sits in the pack and not in their speech, and when the colour and voices peak).
+- Built, wired and tuned the visuals in TouchDesigner, chose the voices, ran all the tests, and made every decision about what to keep or remove.
+- Ran the visitor testing and I am writing the report and analysis myself.
+
+**AI inside the installation.** This is a separate use from the above. When the installation runs, the two doctors' replies are written by Claude Sonnet 5.5 through Anthropic's API, the voices are made by OpenAI's text-to-speech model, and speech recognition runs on my own laptop with Whisper. Visitors are told this in the participant information sheet.
+
+**Reference (Harvard)**
+
+In-text: (Anthropic, 2026)
+
+Reference list: Anthropic (2026) *Claude Sonnet 5.5* [Large language model]. Available at: https://claude.ai (Accessed: 4 November 2026).
+
+Version: Claude Sonnet 5.5, model ID `claude-sonnet-5-5`.
+
+---
+
 ## Second Opinion — experiment harness (Day 1)
 
 ```mermaid
