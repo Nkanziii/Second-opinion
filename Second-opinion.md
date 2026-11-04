@@ -35,7 +35,51 @@ Version: Claude Sonnet 5.5, model ID `claude-sonnet-5-5`.
 # (technical description) 
 # (demo video)
 # (images of final prototype)
+
+---
+
 # (all code and visual files)
+
+### Code (`src/`)
+
+| File | What it does |
+|---|---|
+| [`run_experiment.py`](src/run_experiment.py) | The main program. Runs the whole conversation: greeting, name, rounds of both doctors, check-in, farewell. Handles voice and speech options, loop mode, interruption, participant codes and saving the anonymised log. |
+| [`personas.py`](src/personas.py) | The two characters, Dr. Hedges (cautious) and Dr. Sure (confident): their prompts, daily moods and the instructions that make them argue, stay in character and vary their replies. |
+| [`divergence.py`](src/divergence.py) | Scores how much the doctors disagree each round, from the confidence gap and the semantic difference between their replies. |
+| [`llm_client.py`](src/llm_client.py) | Connects to the AI model that writes the doctors' replies (Claude Sonnet 5.5 through Anthropic's API, with OpenAI and a mock mode as backups). Loads the keys from `.env`. |
+| [`speech.py`](src/speech.py) | The doctors' voices: OpenAI text-to-speech with an acting direction per mood (Mac voices as a backup), left and right positioning, loudness for the orbs, and voices that get angrier by round. |
+| [`voice_input.py`](src/voice_input.py) | Listens through the microphone and turns speech into text with Whisper ("small" model, running on the laptop). |
+| [`osc_sender.py`](src/osc_sender.py) | Sends the live values to TouchDesigner: disagreement, who is speaking, loudness, thinking and the round number. |
+| [`test_orbs.py`](src/test_orbs.py) | Plays a fake argument into TouchDesigner, with no microphone, doctors or API, to test the visuals. |
+| [`voice_test.py`](src/voice_test.py) | My first microphone test script (Oct 11): records 6 seconds so I could check the mic worked. |
+
+### Project files (repo root)
+
+| File | What it does |
+|---|---|
+| [`launch-second-opinion.command`](launch-second-opinion.command) | One-click launcher: opens the TouchDesigner project, waits, then starts the doctors in loop mode. |
+| [`requirements.txt`](requirements.txt) | Python packages needed. |
+| [`.env.example`](.env.example) | Template for the API keys. The real keys live in `.env`, which is not in the repo. |
+| [`.gitignore`](.gitignore) | Keeps keys, session logs, recordings and backups out of GitHub. |
+| [`README.md`](README.md) | Short project readme. |
+| [`Second-opinion.md`](Second-opinion.md) | This weblog. |
+
+### Visual files (`visuals/`)
+
+| File | What it is |
+|---|---|
+| [`persona_cloud.toe`](visuals/persona_cloud.toe) | The final TouchDesigner project: two orbs, glow, mist background, and the colour that follows the conflict. |
+| [`persona_cloud_comp.tox`](visuals/persona_cloud_comp.tox) | My first single-orb component (Oct 6). |
+| [`second-opinion-exhibit-diagram.png`](visuals/second-opinion-exhibit-diagram.png) | Diagram of the exhibit setup. |
+| [`process/`](visuals/process) | Screenshots from the build, used in the weblog. |
+| [`_recording_review/`](visuals/_recording_review) | Stills taken from my screen recordings of the orbs from calm to conflict. |
+
+### Early material
+[`Assets/`](Assets) holds images from the first weeks (terminal and Ollama tests).
+
+---
+
 # (research)
 
 ---
