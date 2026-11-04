@@ -36,9 +36,7 @@ Version: Claude Sonnet 5.5, model ID `claude-sonnet-5-5`.
 # (demo video)
 # (images of final prototype)
 
----
-
-# (all code and visual files)
+# All code and visual files
 
 ### Code (`src/`)
 
