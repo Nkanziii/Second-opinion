@@ -1,11 +1,16 @@
 """
-Speech output for Second Opinion: each doctor speaks with its own voice,
-using the macOS built-in `say` command (free, offline, no packages).
+Speech output for Second Opinion: each doctor speaks with its own voice.
+
+Voices are made with OpenAI text-to-speech (gpt-4o-mini-tts), with an acting
+direction for each doctor's mood, and the doctors get louder and angrier as the
+argument goes on (see heat_level). If OpenAI can't be reached, it falls back to
+the macOS built-in `say` voices (free, offline). The sound is also analysed for
+loudness (sent to TouchDesigner so the orbs move with the voice) and panned
+left (Dr. Hedges) or right (Dr. Sure).
 
 Used by run_experiment.py when you pass --speak.
-Change the voice names below to taste. In Terminal, `say -v '?'` lists every
-voice installed on your Mac. If a voice isn't installed, it falls back to the
-default system voice instead of crashing.
+Change the voices in VOICE_POOLS, and the Mac fallback names in VOICES. In
+Terminal, `say -v '?'` lists every voice installed on your Mac.
 """
 
 import os

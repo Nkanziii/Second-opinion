@@ -2,3 +2,5 @@ numpy
 anthropic
 openai
 python-osc
+faster-whisper
+sounddevice
