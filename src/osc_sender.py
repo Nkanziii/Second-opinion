@@ -18,3 +18,8 @@ def send_level(persona_id: str, level: float):
 def send_thinking(persona_id: str, is_thinking: float):
     """1.0 while a doctor's reply is being written, 0.0 otherwise. Arrives as 'cautious_thinking' / 'confident_thinking'."""
     client.send_message(f"/{persona_id}_thinking", float(is_thinking))
+
+def send_round(round_number: float):
+    """Which round of the conversation it is (1, 2, 3 ...; 0 = no conversation). Arrives as the channel 'round'.
+    TouchDesigner uses it to let the conflict colour build up round by round."""
+    client.send_message("/round", float(round_number))

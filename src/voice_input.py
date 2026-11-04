@@ -27,7 +27,7 @@ def _get_model():
     # Load the model once, the first time it's needed, then reuse it.
     global _model
     if _model is None:
-        _model = WhisperModel("base", device="cpu", compute_type="int8")
+        _model = WhisperModel("small", device="cpu", compute_type="int8")
     return _model
 
 

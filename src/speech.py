@@ -33,7 +33,7 @@ PAN = {
 }
 
 VOICE_POOLS = {
-    "cautious": ["sage"],              # Dr. Hedges
+    "cautious": ["shimmer"],              # Dr. Hedges
     "confident": ["ballad"],     # Dr. Sure
 }
 
@@ -73,7 +73,24 @@ def start_session(moods=None) -> dict:
 _openai = None
 
 
-def synthesize_openai(persona_id: str, spoken: str, path: str) -> bool:
+# How heated the argument is, by round. Level 0 = normal, 3 = shouting.
+HEAT_STYLE = {
+    0: "",
+    1: " The argument is starting to heat up: a little louder and sharper than before.",
+    2: " The argument is heated now: noticeably louder, faster and more forceful. You are raising your voice.",
+    3: " You are completely fed up and arguing at the top of your voice: very loud, furious, almost shouting.",
+}
+HEAT_VOLUME = {0: 1.0, 1: 1.1, 2: 1.25, 3: 1.4}  # playback volume per level
+
+
+def heat_level(turn_index: int, phase: str = "consult") -> int:
+    """0 to 3: how heated the conversation is. Rounds 1-2 normal, round 3 raised voices, round 4+ shouting."""
+    if phase == "farewell":
+        return 1
+    return 0 if turn_index < 2 else min(3, turn_index)  # round 3 = raised voices, round 4+ = shouting
+
+
+def synthesize_openai(persona_id: str, spoken: str, path: str, intensity: int = 0) -> bool:
     """Save the line with an OpenAI voice. Returns False if it can't, so the caller uses the Mac voice."""
     global _openai
     pick = SESSION_VOICES.get(persona_id)
@@ -85,7 +102,7 @@ def synthesize_openai(persona_id: str, spoken: str, path: str) -> bool:
             from openai import OpenAI
             _openai = OpenAI()
         reply = _openai.audio.speech.create(model="gpt-4o-mini-tts", voice=pick["voice"],
-                                            input=spoken, instructions=pick["style"],
+                                            input=spoken, instructions=pick["style"] + HEAT_STYLE.get(intensity, ""),
                                             response_format="wav")
         with open(path, "wb") as f:
             f.write(reply.content)
@@ -152,14 +169,14 @@ def _clear_typed_keys():
         pass
 
 
-def prepare_audio(persona_id: str, text: str) -> dict:
+def prepare_audio(persona_id: str, text: str, intensity: int = 0) -> dict:
     """Make the sound for one reply (voice, loudness levels, left/right panning) without playing it.
     Can run in the background while the other doctor is still speaking."""
     spoken = clean_for_speech(text)
     if not spoken:
         return {"kind": "empty"}
     path = os.path.join(tempfile.gettempdir(), f"second_opinion_{persona_id}.wav")
-    if not synthesize_openai(persona_id, spoken, path):
+    if not synthesize_openai(persona_id, spoken, path, intensity):
         voice = VOICES.get(persona_id)
         cmd = ["say"] + (["-v", voice] if voice else []) + [
             "-o", path, "--file-format=WAVE", "--data-format=LEI16@22050", spoken]
@@ -167,14 +184,14 @@ def prepare_audio(persona_id: str, text: str) -> dict:
             return {"kind": "say_only", "spoken": spoken}  # could not save the sound: just speak it, no levels
     levels = loudness_levels(path)
     path = make_panned(path, persona_id)
-    return {"kind": "audio", "path": path, "levels": levels}
+    return {"kind": "audio", "path": path, "levels": levels, "volume": HEAT_VOLUME.get(intensity, 1.0)}
 
 
-def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False, prepared: dict = None) -> float:
+def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False, prepared: dict = None, intensity: int = 0) -> float:
     """Speak one reply, sending its loudness to TouchDesigner as it plays. Returns how much was spoken, 0 to 1 (less than 1 if the visitor passed Enter.)
     If the sound was already made with prepare_audio, pass it as `prepared` so it starts straight away."""
     if prepared is None:
-        prepared = prepare_audio(persona_id, text)
+        prepared = prepare_audio(persona_id, text, intensity)
     if prepared["kind"] == "empty":
         return 1.0
     if prepared["kind"] == "say_only":
@@ -184,7 +201,7 @@ def speak_reply(persona_id: str, text: str, allow_interrupt: bool = False, prepa
     levels = prepared["levels"]
     if allow_interrupt:
         _clear_typed_keys()
-    player = subprocess.Popen(["afplay", path])
+    player = subprocess.Popen(["afplay", "-v", str(prepared.get("volume", 1.0)), path])
     start = time.time()
     played = 1.0
     try:

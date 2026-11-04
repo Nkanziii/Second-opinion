@@ -43,8 +43,8 @@ from concurrent.futures import ThreadPoolExecutor
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
-from osc_sender import send_divergence, send_speaking, send_level, send_thinking
-from speech import speak_reply, prepare_audio, clean_for_speech, start_session
+from osc_sender import send_divergence, send_speaking, send_level, send_thinking, send_round
+from speech import speak_reply, prepare_audio, clean_for_speech, start_session, heat_level
 
 
 # Phrases that let the visitor end the session early.
@@ -101,7 +101,7 @@ NAME_LEADS = ("my name is", "my name's", "i am", "i'm", "im", "it's", "its", "ca
 LABELS = {"cautious": CAUTIOUS_PERSONA["label"], "confident": CONFIDENT_PERSONA["label"]}
 DEFAULT_SYMPTOM = "I've had a weird twitch in my eye for the past three days."
 
-def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = False, prepared: dict = None) -> float:
+def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = False, prepared: dict = None, intensity: int = 0) -> float:
     """Print a line from a doctor and, with --speak, say it aloud.
     Returns how much was spoken, 0 to 1 (less than 1 if the visitor pressed Enter)."""
     print(f"[{LABELS[persona_id]}] {text}\n")
@@ -109,7 +109,7 @@ def say_line(persona_id: str, text: str, speak: bool, allow_interrupt: bool = Fa
     if speak:
         send_speaking(persona_id, 1.0)
         try:
-            played = speak_reply(persona_id, text, allow_interrupt, prepared)
+            played = speak_reply(persona_id, text, allow_interrupt, prepared, intensity)
         finally:
             send_speaking(persona_id, 0.0)
     return played
@@ -193,6 +193,8 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
     allow_interrupt = speak and converse and phase != "farewell"
     first, second = CAUTIOUS_PERSONA, CONFIDENT_PERSONA
     turn_responses = {}
+    intensity = heat_level(turn_index, phase)  # louder and angrier as the argument goes on
+    send_round(turn_index + 1)  # TouchDesigner builds the conflict colour round by round
 
     reply, took = generate_reply(llm, first, transcript, visitor_name, turn_index, turns, phase, converse, moods)
     first_entry = {"speaker": first["id"], "text": reply, "time": now_iso(), "reply_seconds": took}
@@ -206,14 +208,14 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
         audio = None
         if speak:
             try:
-                audio = prepare_audio(second["id"], text)
+                audio = prepare_audio(second["id"], text, intensity)
             except Exception as e:
                 print(f"(could not prepare Dr. Sure's voice early: {e})")
         return text, took_s, audio
 
     pool = ThreadPoolExecutor(max_workers=1)
     pending = pool.submit(second_reply_and_audio)
-    played = say_line(first["id"], reply, speak, allow_interrupt)
+    played = say_line(first["id"], reply, speak, allow_interrupt, None, intensity)
     if played < 1.0:
         first_entry["text"] = cut_at(reply, played)
         first_entry["interrupted"] = True
@@ -227,7 +229,7 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
                     "reply_seconds": second_took}
     transcript.append(second_entry)
     turn_responses[second["id"]] = second_reply
-    played = say_line(second["id"], second_reply, speak, allow_interrupt, second_audio)
+    played = say_line(second["id"], second_reply, speak, allow_interrupt, second_audio, intensity)
     if played < 1.0:
         second_entry["text"] = cut_at(second_reply, played)
         second_entry["interrupted"] = True
@@ -309,6 +311,7 @@ def calm_the_clouds():
         send_level(persona_id, 0.0)
         send_thinking(persona_id, 0.0)
     send_divergence({"divergence_score": 0.30})  # below 0.35 = no conflict colour
+    send_round(0)
 
 def run_session(args, participant):
     """One visitor, from the greeting to the saved log. Returns False if nothing was heard."""

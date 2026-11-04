@@ -13,7 +13,7 @@ import math
 import random
 import time
 
-from osc_sender import send_divergence, send_speaking, send_level
+from osc_sender import send_divergence, send_speaking, send_level, send_round
 
 SPEAK_SECONDS = 4
 PAUSE_SECONDS = 2
@@ -23,6 +23,7 @@ SCORES = [0.30, 0.45, 0.60, 0.70, 0.60, 0.40]
 
 
 def calm():
+    send_round(0)
     for persona_id in ("cautious", "confident"):
         send_speaking(persona_id, 0.0)
         send_level(persona_id, 0.0)
@@ -38,7 +39,8 @@ def fake_voice(persona_id, seconds):
     send_level(persona_id, 0.0)
 
 try:
-    for score in SCORES:
+    for round_number, score in enumerate(SCORES, start=1):
+        send_round(round_number)
         send_divergence({"divergence_score": score})
         for persona_id in ("cautious", "confident"):
             print(f"score {score:.2f}: {persona_id} speaking")
