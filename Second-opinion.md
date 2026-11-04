@@ -19,10 +19,10 @@ I used an AI assistant, Claude Sonnet 5.5 (Anthropic, 2026), throughout this pro
 - Helped me plan the project and the experiment, and explained code and TouchDesigner settings when I was stuck.
 - Wrote and edited much of the Python in `src/` (for example the speech, voice, OSC and logging code) and the TouchDesigner expressions, working from my instructions. I tested and ran every change, and I decided what stayed.
 - Helped draft the participant information sheet, consent form and other paperwork from the UAL template, which I then checked and edited.
-- Drafted weblog entries from our working sessions, which I read and corrected so that they describe what I actually did.
 
 **What I did**
 
+- I re-wrote the some of code files instead of pasting everything, and did unrelated studying writing challanging Python scripts completely independently as personal study and improving in python language, I also looked through and took inspiration from my supervisors (Louis Busby) code files. 
 - Decided the concept, research question, design and tone of the installation (for example the two doctors' characters, that they argue, that the safety warning sits in the pack and not in their speech, and when the colour and voices peak).
 - Built, wired and tuned the visuals in TouchDesigner, chose the voices, ran all the tests, and made every decision about what to keep or remove.
 - Ran the visitor testing and I am writing the report and analysis myself.
