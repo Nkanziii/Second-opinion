@@ -855,12 +855,68 @@ With Sage as Dr. Hedges, I noticed Dr. Sure kept calling her "he". The instructi
 - **No headphones.** My headphones wouldn't connect, so I tested the left and right voices through the laptop speakers, where the effect is smaller than it will be with two speakers in the room.
 - **Celebrity voices.** I wanted famous voices for the doctors, but I decided against imitating real people. Original character voices from a text-to-speech service can still be funny.
 
+## 4 Nov: faster replies, recording, a tension that builds, and the paperwork
+
+### Participant pack
+I rebuilt the information sheet and consent form on UAL's participant information and consent template, so the wording and order match what the university expects.
+
+- **Information sheet:** project overview, why they were approached, what they will do (about 15 minutes), risks, benefits, what happens to their data, their rights, and who to contact (me, with my supervisor Louis Busby).
+- **Privacy notice:** what a participant says (as text) and their first name go to Anthropic, which writes the doctors' replies. The doctors' reply text goes to OpenAI, which makes the voices. Speech-to-text runs on my laptop and is not shared. No voice is audio recorded.
+- **Withdrawal and deletion:** participants can withdraw their data up to 20 November 2026. Data is deleted 3 months after the project date (23 November 2026), so by 23 February 2027.
+- **Consent form:** tick boxes for being observed with field notes, the text and first name going to the AI services, and anonymised publication, plus the GDPR statement, signature and date. Participants get a copy.
+
+The warning that the doctors are not real and give no medical advice sits in the pack and on the sign next to the piece, not in what the doctors say. That is the choice I made on 28 Oct.
+
+### Faster replies
+With the OpenAI voices there was a one to two second gap before Dr. Sure started. His reply text was already written while Dr. Hedges spoke, but his voice was only made when it was his turn. I split `speak_reply` in `speech.py` into two steps:
+
+1. `prepare_audio` makes the voice file, the loudness levels for the orbs and the left and right positioning.
+2. `speak_reply` plays a prepared sound (or makes one if it was not given one).
+
+In `run_experiment.py`, Dr. Sure's background task now writes his reply and then calls `prepare_audio` too, while Dr. Hedges is still speaking. When Hedges finishes, his sound is waiting, so he answers straight after her. If the visitor interrupts Hedges, the prepared sound is thrown away, as his text already was. The wait after the visitor finishes speaking is unchanged.
+
+### Recording the doctors with BlackHole
+Screen recordings had no sound from the doctors, because macOS does not record what the computer plays. I installed BlackHole, a virtual audio device (`brew install blackhole-2ch`, then a restart).
+
+1. In Audio MIDI Setup I made a **Multi-Output Device** with BlackHole 2ch and the MacBook speakers. The speakers are the primary device, drift correction is on for BlackHole, and I unticked Microsoft Teams Audio, which can cause crackling.
+2. I set the Mac's output to the Multi-Output Device, so I hear the doctors and BlackHole receives them.
+3. In QuickTime (or Cmd+Shift+5) I set the recording's microphone to BlackHole 2ch.
+
+The recording has the doctors' voices in their left and right positions. It does not have my microphone, so a participant's voice is never in a recording. The volume keys do not work on a Multi-Output Device, so I set the speaker volume first, and I switch the output back to the speakers afterwards.
+
+### The mist follows the argument
+The background mist was a fixed blue and green. I added one HSV Adjust node, `mist_hue`, between `mist_color` and `bg_mix`, and set its Hue Offset to `op('/project1/master')[0] * 140`. `master` is the same 0 to 1 conflict value that drives the orbs, so the mist moves from blue and green toward purple, orange and red as the doctors argue, and back again as they calm. It needs no new Python and no new OSC message.
+
+### Making red feel earned
+I wanted red to arrive at the peak of the argument, with a build-up before it. There were three problems, and each one taught me something.
+
+- **Dr. Sure never turned red.** His ramp (`ramp1` in `base2`) goes green, yellow, orange, so at full conflict he was only orange. I set the last stops of both doctors' ramps to Hue 0 (red).
+- **Red came straight away, then faded.** The score is highest in round 1 and drops as they argue. My last session scored 0.64, 0.51, 0.54, 0.52, 0.53. So the colour peaked in round 1 and drifted back to calm just as the argument got going.
+- **A memory for the colour.** I added a Lag CHOP, `lagheat`, that rises in about 6 seconds and falls over 25 seconds, so the colour holds between rounds and cools slowly. I also made the program send the round number (`/round`, `send_round` in `osc_sender.py`). `master` is now the smaller of two values: the score (`(divergence - 0.30) / 0.16`) and a round limit (`(round - 0.5) / 3.5`). The colour builds through the pretty range in rounds 1 to 3 and can reach full red in round 4. `test_orbs.py` also sends the round now, so the fake argument shows the build-up.
+
+**Design note for the report:** the colour is still driven by the real disagreement score, but the build-up across rounds is staged by me. A weak argument never reaches red, and a strong one cannot reach it before round 4. I am recording this because it changes how "honest" the visual is as a measure, and I need to say so.
+
+### Angrier voices
+The doctors' voices now escalate with the argument. `heat_level` in `speech.py` returns 0 to 3 by round, and `HEAT_STYLE` adds a line to the OpenAI voice instructions: normal in rounds 1 and 2, raised in round 3 ("louder, faster and more forceful, raising your voice"), and near shouting from round 4. The playback volume also goes up in steps from 1.0 to 1.4 with `afplay -v`. The farewell is only slightly raised so the goodbye stays funny and not harsh. The OpenAI voice cannot truly shout, so how strongly it follows the instruction is something I need to hear in testing.
+
+### Better names with Whisper "small"
+Some visitors have accents and unusual names, and the "base" model had already misheard me. I changed `voice_input.py` to use Whisper's "small" model (about 500 MB, downloaded the first time it runs). It makes every transcription a little slower but should be more accurate. Whisper still runs on my laptop, so nothing I say is sent anywhere before the transcript goes to the model.
+
+### Challenges on 4 Nov
+
+- **Orange, not red.** I first widened the colour scale, but Dr. Sure still turned orange. The cause was his ramp, not the scale. I only found it after reading the ramp's colour stops.
+- **The colour fading when it should peak.** This was the score falling as the doctors answer each other's points. The fix needed a second signal (the round number), because no smoothing of a falling score could make it rise.
+- **Long terminal commands.** A long `git add` line wrapped in the terminal and was split into two commands, so half the files were not added. I now use short commands one at a time.
+- **Session logs on GitHub.** I committed the whole `src` folder, and 46 session logs went up with it. I undid the commit, added `src/logs/` and `.DS_Store` to `.gitignore`, and force-pushed with `--force-with-lease`. The 15 older logs in the history only use the placeholder name "Alex". Session files must never be uploaded, because the participant pack promises it, so I check `git status` before every commit now.
+- **Whisper and "Dr. Sure".** In one test it heard "Dr. Sure" as "Dr. Shaw", and the doctors went along with it. Bigger model first, and I will watch for it in testing.
+
 ## Next
 
-1. Make the background change colour with the conflict, the way the orbs do: calm blue and green when the doctors agree, shifting as they argue.
-2. Fill in and print the participant pack, and check its wording against the TAIGHA items.
-3. A pilot run with a friend, then visitor testing.
-4. Start writing the report.
+1. A full voice test with everything together, then a pilot run with a friend using the printed pack.
+2. Visitor testing with 5 to 10 people, using the participant code on each consent form.
+3. Print the participant pack, and add the missing early images to `visuals/process`.
+4. Optional: make Dr. Hedges fully red at the peak, as Dr. Sure now is.
+5. Start writing the report (outline first, then about 600 words a day).
 
 
 
