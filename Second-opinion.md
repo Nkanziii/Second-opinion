@@ -2,14 +2,6 @@
 
 ## This is the complete markdown file for my entire thesis, with dated entries to show real progress and development.
 ---
-# (LLM Use Disclaimer)
-# (project description)
-# (technical description) 
-# (demo video)
-# (images of final prototype)
-# (all code and visual files)
-# (research)
-
 # LLM Use Disclaimer
 
 I used an AI assistant, Claude Sonnet 5.5 (Anthropic, 2026), throughout this project, from August to November 2026. I am recording what it did and what I did, as UAL's guidance on generative AI asks, and I have not submitted any AI output as my own unaltered work.
@@ -36,6 +28,15 @@ In-text: (Anthropic, 2026)
 Reference list: Anthropic (2026) *Claude Sonnet 5.5* [Large language model]. Available at: https://claude.ai (Accessed: 4 November 2026).
 
 Version: Claude Sonnet 5.5, model ID `claude-sonnet-5-5`.
+
+--- 
+
+# (project description)
+# (technical description) 
+# (demo video)
+# (images of final prototype)
+# (all code and visual files)
+# (research)
 
 ---
 
