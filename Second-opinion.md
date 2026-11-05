@@ -896,6 +896,8 @@ I wanted something behind the orbs that felt like a room or a night sky without 
 3. **One colour.** I multiplied the mist by a violet-blue Constant. It looked good, but one colour for the whole room felt generic.
 4. **A colour for each doctor.** I replaced the single colour with a left-to-right gradient (`ramp_bg`), blue on Dr. Hedges' side and green on Dr. Sure's, so each side of the room glows in its doctor's colour. The Ramp TOP gets its colours from a small table (`ramp1_keys`), so I wrote the two colours straight into that table from the Textport.
 
+![The first coloured mist on 1 Nov: blue behind Dr. Hedges on the left and green behind Dr. Sure on the right](visuals/process/misty-bk.png)
+
 ### The stars I tried and removed
 I wanted a more cosmic look, so I added stars.
 
@@ -903,6 +905,10 @@ I wanted a more cosmic look, so I added stars.
 - **Why I didn't like it:** all the stars were the same size and brightness and evenly scattered, so they looked like dust or a digital glitch. They also showed over the blue orb, which looked like white specks on its surface.
 - **Second version:** I made the Threshold soft (`Soften`) so most stars are faint and a few are bright, blurred them slightly so they look like light and not pixels, and used the orbs themselves as a mask (`orb_mask`) so the stars sit behind them. That was better, but it still felt busy and pulled attention from the doctors.
 - **Decision:** I deleted all the star nodes. The coloured mist alone already feels cosmic, and the orbs are the focus.
+
+![Stars behind the orbs on 1 Nov: small white points scattered over the coloured mist, with Dr. Hedges in pink and violet and Dr. Sure in orange](visuals/process/misty-bk2.png)
+
+![The same stars with Dr. Hedges' orb stretched out while speaking and Dr. Sure's orb yellow-green](visuals/process/misty-bk3.png)
 
 I'm keeping this in the log on purpose. Trying a look, judging it against the installation's purpose and then removing it was part of the design process.
 
@@ -964,6 +970,10 @@ The recording has the doctors' voices in their left and right positions. It does
 
 ### The mist follows the argument
 The background mist was a fixed blue and green. I added one HSV Adjust node, `mist_hue`, between `mist_color` and `bg_mix`, and set its Hue Offset to `op('/project1/master')[0] * 140`. `master` is the same 0 to 1 conflict value that drives the orbs, so the mist moves from blue and green toward purple, orange and red as the doctors argue, and back again as they calm. It needs no new Python and no new OSC message.
+
+![Mist at higher conflict: the room has turned warm and dark red behind a pink and violet orb and an orange orb](visuals/process/misty-bk4.png)
+
+![Mist at lower conflict: a cooler violet and blue room around a blue and violet orb and a yellow-green orb](visuals/process/misty-bk5.png)
 
 ### Making red feel earned
 I wanted red to arrive at the peak of the argument, with a build-up before it. There were three problems, and each one taught me something.
