@@ -381,7 +381,7 @@ The original visual built a point cloud, sent it through a Geometry COMP and dis
 
 <p>
     <img src="visuals/process/09-project-dark.png"/>
-    This was our first attempt, where the render was not showing, however much we tried.
+    This was my first attempt, where the render was not showing, however much I tried.
 </p>
 
 The screenshot is that project: noise and a feedback loop feeding a point transform, then geo1 and render1 into a Null TOP, with an OSC In CHOP wired in for the divergence score. The wiring looks complete, but the viewer holds only a thin ring, not a cloud of points. I never found the cause. Later notes for the rebuilt project record that the old project's clouds never rendered through a Point Sprite MAT.
