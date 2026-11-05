@@ -376,6 +376,12 @@ The original visual built a point cloud, sent it through a Geometry COMP and dis
  
 <p>
   <img src="visuals/process/experimental.png"/>
+    This was from a Youtube Tutorial I started with. 
+</p>
+
+<p>
+    <img src="visuals/process/09-project-dark.png"/>
+    This was the official first project.
 </p>
 
 The screenshot is that project: noise and a feedback loop feeding a point transform, then geo1 and render1 into a Null TOP, with an OSC In CHOP wired in for the divergence score. The wiring looks complete, but the viewer holds only a thin ring, not a cloud of points. I never found the cause. Later notes for the rebuilt project record that the old project's clouds never rendered through a Point Sprite MAT.
@@ -404,6 +410,7 @@ At conflict 0 the clouds are cool and calm, and at 1 they turn red and chaotic. 
 
 <p>
   <img src="visuals/process/merging.png"/>
+    <img src="visuals/process/merging-2.png"/>
   <img src="visuals/process/conflict.png"/>  
 </p>
 
@@ -419,14 +426,14 @@ The last piece on 8 October was the live link, which is what the rest of this re
 The clouds had see-through edges, so the viewer showed a checkerboard. I added a black Constant TOP and an Over TOP, so the clouds now sit on solid black. over1 is my final picture from now on.
 
 <p>
-  <img src="visuals/process/10-constant1-over1.jpeg"/>  
+  <img src="visuals/process/separate-conflict.png"/>  
 </p>
 
 2. Full-screen window
 I added a Window COMP, pointed it at over1, and pressed Open. Esc closes it. This is what I screen record.
 
 <p>
-  <img src="visuals/process/11-window-output.jpeg"/>  
+  <img src="visuals/process/separate-conflict-2.png"/>  
 </p>
 
 3. Safe fallback
@@ -687,7 +694,6 @@ After the colours, the dots were a little too dense. Each orb is a Geodesic sphe
 
 Late that night I quit TouchDesigner in the middle of a test, choosing "save and quit". When I opened the project again the orbs were nearly black: I could see them moving behind, but they were very dark. The colour keys in both ramp1 nodes were still there, and the Textport showed no errors, but the ramp1 thumbnail in the network was black, so every point was picking black from it. It looked like a cooking glitch from the quit and not lost data, and after I saved and reopened the project, the orbs came back. TouchDesigner also keeps numbered copies of every save (persona_cloud.29.toe and so on in the Backup folder), which would have been my fallback. The lesson is to press Cmd+S and close TouchDesigner properly, and not to quit in the middle of a test.
  
-![The project reopened with the orbs nearly black](visuals/process/09-project-dark.png)
 
 ## The visuals from calm to conflict (stills from my recording)
 
