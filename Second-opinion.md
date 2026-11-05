@@ -375,7 +375,13 @@ For a couple days now I have been working on my visuals and how I wanted it to l
 The original visual built a point cloud, sent it through a Geometry COMP and displayed it with a Render TOP, but the render stayed black. Nothing connected to the Render TOP appeared in its output, even though the nodes were wired up.
  
 <p>
-  <img src="visuals/experimental.png"/>
+  <img src="visuals/process/experimental.png"/>
+    This was from a Youtube Tutorial I started with. 
+</p>
+
+<p>
+    <img src="visuals/process/09-project-dark.png"/>
+    This was the official first project.
 </p>
 
 The screenshot is that project: noise and a feedback loop feeding a point transform, then geo1 and render1 into a Null TOP, with an OSC In CHOP wired in for the divergence score. The wiring looks complete, but the viewer holds only a thin ring, not a cloud of points. I never found the cause. Later notes for the rebuilt project record that the old project's clouds never rendered through a Point Sprite MAT.
@@ -403,14 +409,15 @@ At conflict 0 the clouds are cool and calm, and at 1 they turn red and chaotic. 
 
 
 <p>
-  <img src="visuals/merging.png"/>
-  <img src="visuals/conflict.png"/>  
+  <img src="visuals/process/merging.png"/>
+    <img src="visuals/process/merging-2.png"/>
+  <img src="visuals/process/conflict.png"/>  
 </p>
 
 The last piece on 8 October was the live link, which is what the rest of this recap covers. This screenshot is the final network (version 18): the two clouds, the two Transform TOPs, add1, over1 and constant1, with oscin1 and master feeing the conflict value. The clouds are pink and orange here because the score was 0.8.
 
 <p>
-  <img src="visuals/separate-conflict.png"/>  
+  <img src="visuals/process/separate-conflict.png"/>  
 </p>
 
 ### What i did, step by step
@@ -419,14 +426,14 @@ The last piece on 8 October was the live link, which is what the rest of this re
 The clouds had see-through edges, so the viewer showed a checkerboard. I added a black Constant TOP and an Over TOP, so the clouds now sit on solid black. over1 is my final picture from now on.
 
 <p>
-  <img src="visuals/separate-conflict.png"/>  
+  <img src="visuals/process/separate-conflict.png"/>  
 </p>
 
 2. Full-screen window
 I added a Window COMP, pointed it at over1, and pressed Open. Esc closes it. This is what I screen record.
 
 <p>
-  <img src="visuals/separate-conflict-2.png"/>  
+  <img src="visuals/process/separate-conflict-2.png"/>  
 </p>
 
 3. Safe fallback
