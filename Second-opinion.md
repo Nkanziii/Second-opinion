@@ -379,6 +379,11 @@ The original visual built a point cloud, sent it through a Geometry COMP and dis
     This was from a Youtube Tutorial I started with. 
 </p>
 
+<p>
+    <img src="visuals/process/09-project-dark.png"/>
+    This was our first attempt, where the render was not showing, however much we tried.
+</p>
+
 The screenshot is that project: noise and a feedback loop feeding a point transform, then geo1 and render1 into a Null TOP, with an OSC In CHOP wired in for the divergence score. The wiring looks complete, but the viewer holds only a thin ring, not a cloud of points. I never found the cause. Later notes for the rebuilt project record that the old project's clouds never rendered through a Point Sprite MAT.
 The practical effect was that I couldn't test any link between the personas and the visuals, because there were no visuals to drive.
 
@@ -690,8 +695,6 @@ After the colours, the dots were a little too dense. Each orb is a Geodesic sphe
 ![Both orbs with thinner dots](visuals/process/08-final-both-orbs.png)
 
 Late that night I quit TouchDesigner in the middle of a test, choosing "save and quit". When I opened the project again the orbs were nearly black: I could see them moving behind, but they were very dark. The colour keys in both ramp1 nodes were still there, and the Textport showed no errors, but the ramp1 thumbnail in the network was black, so every point was picking black from it. It looked like a cooking glitch from the quit and not lost data, and after I saved and reopened the project, the orbs came back. TouchDesigner also keeps numbered copies of every save (persona_cloud.29.toe and so on in the Backup folder), which would have been my fallback. The lesson is to press Cmd+S and close TouchDesigner properly, and not to quit in the middle of a test.
-
-![The project reopened with the orbs nearly black](visuals/process/09-project-dark.png)
  
 
 ## The visuals from calm to conflict (stills from my recording)
