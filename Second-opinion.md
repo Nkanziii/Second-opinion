@@ -375,7 +375,7 @@ For a couple days now I have been working on my visuals and how I wanted it to l
 The original visual built a point cloud, sent it through a Geometry COMP and displayed it with a Render TOP, but the render stayed black. Nothing connected to the Render TOP appeared in its output, even though the nodes were wired up.
  
 <p>
-  <img src="visuals/experimental.png"/>
+  <img src="visuals/process/experimental.png"/>
 </p>
 
 The screenshot is that project: noise and a feedback loop feeding a point transform, then geo1 and render1 into a Null TOP, with an OSC In CHOP wired in for the divergence score. The wiring looks complete, but the viewer holds only a thin ring, not a cloud of points. I never found the cause. Later notes for the rebuilt project record that the old project's clouds never rendered through a Point Sprite MAT.
@@ -403,14 +403,14 @@ At conflict 0 the clouds are cool and calm, and at 1 they turn red and chaotic. 
 
 
 <p>
-  <img src="visuals/merging.png"/>
-  <img src="visuals/conflict.png"/>  
+  <img src="visuals/process/merging.png"/>
+  <img src="visuals/process/conflict.png"/>  
 </p>
 
 The last piece on 8 October was the live link, which is what the rest of this recap covers. This screenshot is the final network (version 18): the two clouds, the two Transform TOPs, add1, over1 and constant1, with oscin1 and master feeing the conflict value. The clouds are pink and orange here because the score was 0.8.
 
 <p>
-  <img src="visuals/separate-conflict.png"/>  
+  <img src="visuals/process/separate-conflict.png"/>  
 </p>
 
 ### What i did, step by step
@@ -419,35 +419,35 @@ The last piece on 8 October was the live link, which is what the rest of this re
 The clouds had see-through edges, so the viewer showed a checkerboard. I added a black Constant TOP and an Over TOP, so the clouds now sit on solid black. over1 is my final picture from now on.
 
 <p>
-  <img src="visuals/separate-conflict.png"/>  
+  <img src="visuals/process/10-constant1-over1.jpeg"/>  
 </p>
 
 2. Full-screen window
 I added a Window COMP, pointed it at over1, and pressed Open. Esc closes it. This is what I screen record.
 
 <p>
-  <img src="visuals/separate-conflict-2.png"/>  
+  <img src="visuals/process/11-window-output.jpeg"/>  
 </p>
 
 3. Safe fallback
 I changed master to op('lag1')['divergence'] or 0. If no score has arrived yet, it reads 0 and the clouds stay calm, with no red errors.
 
 <p> 
-  <img width="1500" height="911" alt="image" src="https://github.com/user-attachments/assets/98e4bca4-867d-45eb-be32-8e4a0107986c" />
+  ![The master node with its safe fallback to 0 when no score has arrived](visuals/process/12-master-safe-fallback.jpeg)
 </p>
 
 4. Colour check with typed values
 I sent values from Terminal (0.1, 0.5, 0.8, 1) while screen recording. The clouds go blue and green when calm, purple and olive in the middle, then red and orange at the top.
 
 <p>
-  <img width="1500" height="975" alt="image" src="https://github.com/user-attachments/assets/6bc66dee-03c9-4e69-99ae-7c7f36827f8f" />
+  ![Colour check with typed values from calm blue and green to red and orange](visuals/process/13-colour-check.jpeg)
 </p>
 
 5. Real run with Anthropic
 I ran python3 run_experiment.py --turns 3 with the visuals open. The clouds reacted to the real divergence score (0.37 at the end, so calm purple and green).
 
 <p>
-  <img width="1500" height="974" alt="image" src="https://github.com/user-attachments/assets/25cbd967-ed62-469a-b25b-a0252adc72d3" />
+  ![The first real run with Anthropic, the clouds reacting to the real divergence score](visuals/process/14-real-run-terminal.jpeg)
 </p>
 
 6. Cap and smoothing
@@ -468,7 +468,7 @@ To stop the clouds ballooning, I capped the song's effect on the noise. Amplitud
 The VS Code error that confused me. Nothing was actually broken, I just ran the wrong file.
 
 <p>
-   <img width="1500" height="974" alt="image" src="https://github.com/user-attachments/assets/04e0cb11-071f-429d-b5e8-bbc187d15091" />
+   ![The VS Code error that came from running the wrong file](visuals/process/15-vscode-error.jpeg)
 </p>
 
  One habit that helped: press Cmd+S after every single step, so a freeze never costs me much.
@@ -628,7 +628,7 @@ My first real test log lasted 7 minutes 53 seconds, with 8 scored rounds and the
 Stopping mid-sentence, and a way to test the orbs
 While tuning, I stopped a run in the middle of one of Dr. Sure's sentences, and his orb stayed wobbling at a high level (the noise amplitude was stuck at 0.5983). The reason is that TouchDesigner remembers the last value it was sent. The program had told it "Dr. Sure is speaking" (1) but died before it could send "stopped" (0).
 
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/f19f5068-9bd0-452d-bd9a-d74b7f68d77a" />
+![Dr. Sure's orb stuck wobbling after the run was stopped mid-sentence](visuals/process/02-stuck-amplitude.png)
 
 The fix is a function calm_the_clouds() in run_experiment.py that sends 0 for both doctors. It is registered with atexit, so it runs when the program ends (even on Ctrl+C), and it also runs at the start of every session so each one starts calm. It does not run if I close the terminal window or force-quit, so the exhibition will need a proper reset loop later.
 I also wrote src/test_orbs.py, which tests the visuals without doctors, a microphone or API calls. It plays a fake conversation into TouchDesigner: each doctor "speaks" for 4 seconds in turn while the disagreement score goes 0.30, 0.45, 0.60, 0.70, 0.60, 0.40, then it resets the orbs. I use it for every visual change from here.
@@ -642,7 +642,7 @@ My main concern with the visuals was that when a doctor spoke, the orb didn't sw
 | Harmonics | 3 | 2 | fewer layers of fine detail |
 | Harmonic Gain | 1 | 0.4 | fine layers much weaker than the big swells |
 
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/8468f5c1-ac70-4ce6-ba34-98c3786d41c8" />
+![The Noise POP settings after reducing the harmonics and harmonic gain](visuals/process/01-noise-settings.png)
 
 The orb is now smooth at rest. I also removed the song loudness from the amplitude formula, because the clouds will be driven by the doctors' own voices. Each orb now uses only its own doctor's speaking value and the disagreement score conflict. For Dr. Hedges (base1):
 ```
@@ -660,11 +660,11 @@ max(0, min(1, ((op('lag1')['divergence'] or 0) - 0.35) / 0.22))
 ```
 Now full red happens at a score of 0.57, so a typical round is almost red and a calm round at 0.37 is still blue and green. The raw scores in the logs stay unchanged, because only the visual mapping is rescaled. The same number also drives the swell size, so a redder orb also deforms a bit more.
 
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/c4587650-a7db-4ba4-8c5f-2f9b08ebb0ef" />
+![An orb at full red disagreement colour](visuals/process/03-red-orb.png)
 
 The orbs looked flat, so I added a glow as a post-effect. In project1, add1 now goes into a Blur TOP (blur1) and then a Level TOP (level1), and a second Add TOP (add2) adds that blurred copy on top of the sharp one before over1. Blur Filter Size controls how far the halo spreads and Level Brightness controls how strong it is. I started at 30 and 1.5 and ended on a Filter Size of 100 and Brightness of 3.5. Glow will look different on a projector, because black on a projector is really dark grey, so I will re-tune it on the real setup.
 
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/26eb802a-1167-4faf-aa2c-287a10403a41" />
+![The glow network: add1, blur1, level1 and add2 before over1](visuals/process/04-glow-network.png)
 
 ## Multi-coloured orbs
 My references (soft, glowing spheres) all shift colour across the surface, while each of my orbs was one flat colour set by the disagreement score. So now every point on the sphere gets its own colour from a gradient. It takes five parts inside each base:
@@ -674,20 +674,20 @@ My references (soft, glowing spheres) all shift colour across the surface, while
 4. A new white Constant MAT (constant2) with Apply Point Color on. The old constant1 was tinted by the disagreement score, which would have fought the new colours.
 5. lookuptex1 wired into geo1, with geo1's Material set to constant2.
 
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/194c856e-b7a7-47c2-80f0-5e67755bd470" />
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/5f493ba6-6a9c-4e1c-9e9d-8b6611e61f2f" />
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/698e95d6-7a29-47eb-94f9-f3e7b09a3d6e" />
+![The Ramp TOP gradient bar for the multi-coloured orb](visuals/process/05-ramp-bar.png)
+![The Lookup Texture POP reading colnoise onto the ramp](visuals/process/06-lookup-texture.png)
+![The finished multi-coloured blue orb](visuals/process/07-multicolour-blue.png)
 
 I did the blue orb first, then rebuilt the same five steps one at a time for the green orb. Copying and pasting all the nodes at once connected them to random things, so doing it step by step was safer. A stray screenshot of mine also dropped into the network as a Movie File In node, and I deleted it.
 
 ## Thinner dots, and when the project came back black
 After the colours, the dots were a little too dense. Each orb is a Geodesic sphere with Frequency 90, which is about 80,000 points in a perfectly regular pattern, and that regularity is also what causes the dark wedge I kept seeing on the blue orb. The point count grows with the square of the frequency, so I lowered Frequency on both sphere1 nodes (blue and green) to the same value so the two orbs match. The result is the look I wanted, with a glow, multi-colour shading and a lighter texture.
 
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/a5cff5a6-53de-4240-aed2-f68e7b559721" />
+![Both orbs with thinner dots](visuals/process/08-final-both-orbs.png)
 
 Late that night I quit TouchDesigner in the middle of a test, choosing "save and quit". When I opened the project again the orbs were nearly black: I could see them moving behind, but they were very dark. The colour keys in both ramp1 nodes were still there, and the Textport showed no errors, but the ramp1 thumbnail in the network was black, so every point was picking black from it. It looked like a cooking glitch from the quit and not lost data, and after I saved and reopened the project, the orbs came back. TouchDesigner also keeps numbered copies of every save (persona_cloud.29.toe and so on in the Backup folder), which would have been my fallback. The lesson is to press Cmd+S and close TouchDesigner properly, and not to quit in the middle of a test.
  
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/af757610-8b20-4602-9ddb-7a22a2eef0ea" />
+![The project reopened with the orbs nearly black](visuals/process/09-project-dark.png)
 
 ## The visuals from calm to conflict (stills from my recording)
 
