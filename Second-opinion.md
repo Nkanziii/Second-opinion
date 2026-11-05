@@ -694,7 +694,6 @@ After the colours, the dots were a little too dense. Each orb is a Geodesic sphe
 
 Late that night I quit TouchDesigner in the middle of a test, choosing "save and quit". When I opened the project again the orbs were nearly black: I could see them moving behind, but they were very dark. The colour keys in both ramp1 nodes were still there, and the Textport showed no errors, but the ramp1 thumbnail in the network was black, so every point was picking black from it. It looked like a cooking glitch from the quit and not lost data, and after I saved and reopened the project, the orbs came back. TouchDesigner also keeps numbered copies of every save (persona_cloud.29.toe and so on in the Backup folder), which would have been my fallback. The lesson is to press Cmd+S and close TouchDesigner properly, and not to quit in the middle of a test.
  
-<img width="3024" height="1964" alt="image" src="https://github.com/user-attachments/assets/af757610-8b20-4602-9ddb-7a22a2eef0ea" />
 
 ## The visuals from calm to conflict (stills from my recording)
 
