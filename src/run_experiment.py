@@ -50,7 +50,7 @@ from speech import speak_reply, prepare_audio, clean_for_speech, start_session, 
 # Phrases that let the visitor end the session early.
 STOP_PHRASES = ("goodbye", "bye bye", "end the session", "i have to go",
                 "i need to go", "that's all", "thats all", "bye")
-CHECKIN_AFTER = 3 #consult rounds before the doctors check in
+CHECKIN_AFTER = 4 #consult rounds before the doctors check in (so the check-in is round 5)
 MAX_ROUNDS = 12  # safety limit for one session
 DONE_WORDS = {"no", "nope", "nothing", "satisfied", "thanks", "thank", "fine", "good"}
 
@@ -248,6 +248,7 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
     scores = []
     silent_in_a_row = 0
     rounds_since_checkin = 0
+    last_sent = None  # the last score the orbs were shown
     ended_by = "round limit"
 
     def say_goodbye(turn_index):
@@ -259,7 +260,14 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
 
         if "confident" in turn_responses:  # both doctors replied (Dr. Hedges was not cut off first)
             score = divergence_score(turn_responses["cautious"], turn_responses["confident"])
-            send_divergence(score)
+            if phase == "check_in" and last_sent is not None:
+                # The check-in is not an argument round (both doctors ask the same thing),
+                # so the orbs keep the last argument score. The raw score is still logged.
+                send_divergence({"divergence_score": last_sent})
+                score["held_for_visuals"] = last_sent
+            else:
+                send_divergence(score)
+                last_sent = score["divergence_score"]
             score["turn"] = turn_index
             scores.append(score)
             print(f"  -> divergence_score: {score['divergence_score']:.2f} "
@@ -310,7 +318,7 @@ def calm_the_clouds():
         send_speaking(persona_id, 0.0)
         send_level(persona_id, 0.0)
         send_thinking(persona_id, 0.0)
-    send_divergence({"divergence_score": 0.30})  # below 0.35 = no conflict colour
+    send_divergence({"divergence_score": 0.0})  # calm, no conflict colour
     send_round(0)
 
 def run_session(args, participant):

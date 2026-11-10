@@ -38,27 +38,27 @@ PAN = {
 }
 
 VOICE_POOLS = {
-    "cautious": ["shimmer"],              # Dr. Hedges
-    "confident": ["ballad"],     # Dr. Sure
+    "cautious": ["coral"],              # Dr. Hedges
+    "confident": ["echo"],     # Dr. Sure
 }
 
 STYLE_BASE = {
-    "cautious": "You are Dr. Hedges, a nervous, over-cautious doctor in a comedy. Hesitant and worried.",
-    "confident": "You are Dr. Sure, a wildly overconfident doctor in a comedy. Absolute certainty and showmanship.",
+    "cautious": "You are Dr. Hedges, a serious doctor who is completely convinced the visitor is in danger. Firm, urgent and authoritative, never timid and never comic.",
+    "confident": "You are Dr. Sure, a serious, commanding doctor with total certainty about the diagnosis. Calm authority, never comic and never theatrical.",
 }
 
 MOOD_STYLE = {
     "cautious": {
-        "anxious": "Today you are extra anxious: quick, breathless, trailing off.",
-        "gentle": "Today you are gentle: soft, kind and reassuring, but still timid.",
-        "tired": "Today you are exhausted: slow, weary, with long sighs between phrases.",
-        "fussy": "Today you are fussy: precise, prim, correcting yourself.",
+        "anxious": "Today you are tense: quick and urgent, never trailing off.",
+        "gentle": "Today you are calm and kind, but completely unwavering.",
+        "tired": "Today you are weary, but firm and sure of yourself.",
+        "fussy": "Today you are precise and exact, correcting any loose wording.",
     },
     "confident": {
         "smug": "Today you are smug: pleased with yourself, savouring your own cleverness.",
         "impatient": "Today you are impatient: clipped and hurried, as if the visitor wastes your time.",
         "warm": "Today you are warm: jovial, with a big friendly bedside manner.",
-        "theatrical": "Today you are theatrical: grand pauses and dramatic pronouncements.",
+        "theatrical": "Today you are commanding: slow, weighty pronouncements.",
     },
 }
 
@@ -81,18 +81,20 @@ _openai = None
 # How heated the argument is, by round. Level 0 = normal, 3 = shouting.
 HEAT_STYLE = {
     0: "",
-    1: " The argument is starting to heat up: a little louder and sharper than before.",
-    2: " The argument is heated now: noticeably louder, faster and more forceful. You are raising your voice.",
-    3: " You are completely fed up and arguing at the top of your voice: very loud, furious, almost shouting.",
+    1: " The argument is heating up: you are irritated and sharper, a clear step louder than before, with a clipped delivery.",
+    2: " The argument is heated: you are raising your voice. Much louder, fast, forceful and angry, hitting the stressed words hard.",
+    3: " You are SHOUTING at the top of your voice, furious and desperate to be believed: maximum volume and intensity, loud, harsh and breathless, hammering every stressed word. Never calm down.",
 }
-HEAT_VOLUME = {0: 1.0, 1: 1.1, 2: 1.25, 3: 1.4}  # playback volume per level
+HEAT_VOLUME = {0: 1.0, 1: 1.15, 2: 1.35, 3: 1.6}  # playback volume per level (lower these if it distorts)
 
 
 def heat_level(turn_index: int, phase: str = "consult") -> int:
-    """0 to 3: how heated the conversation is. Rounds 1-2 normal, round 3 raised voices, round 4+ shouting."""
+    """0 to 3: how heated the conversation is. Round 1 normal, round 2 irritated, round 3 raised voices, round 4+ shouting."""
     if phase == "farewell":
         return 1
-    return 0 if turn_index < 2 else min(3, turn_index)  # round 3 = raised voices, round 4+ = shouting
+    if phase == "check_in":
+        return 1  # the voices settle for the check-in
+    return min(3, turn_index)  # round 2 = irritated, round 3 = raised voices, round 4+ = shouting
 
 
 def synthesize_openai(persona_id: str, spoken: str, path: str, intensity: int = 0) -> bool:

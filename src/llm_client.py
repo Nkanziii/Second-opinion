@@ -96,15 +96,36 @@ class LLMClient:
             return _mock_reply(persona_id, visitor_name, turn_index)
 
         if self.provider == "anthropic":
-            resp = self._client.messages.create(
-                model=ANTHROPIC_MODEL,
-                max_tokens=1024,
-                system=system_prompt,
-                messages=conversation,
-            )
-            for item in resp.content:
-                if item.type == "text":
-                    return item.text
+            import anthropic
+            text = ""
+            # Sonnet 5.5 thinks before it answers by default, and that thinking counts toward
+            # max_tokens, so a short reply could be cut off. These settings turn off the up-front
+            # thinking and give plenty of room. If the API refuses them, the defaults are used.
+            extras = {"output_config": {"effort": "medium"}, "thinking": {"type": "between_tools"}}
+            for attempt in range(3):
+                try:
+                    resp = self._client.messages.create(
+                        model=ANTHROPIC_MODEL,
+                        max_tokens=4096,
+                        system=system_prompt,
+                        messages=conversation,
+                        extra_body=extras,
+                    )
+                except anthropic.BadRequestError as e:
+                    print(f"(the thinking settings were not accepted, using the defaults: {e})")
+                    extras = {}
+                    resp = self._client.messages.create(
+                        model=ANTHROPIC_MODEL,
+                        max_tokens=4096,
+                        system=system_prompt,
+                        messages=conversation,
+                    )
+                # join every text block: keeping only the first one cut some replies off mid-sentence
+                text = "".join(item.text for item in resp.content if item.type == "text")
+                if "Confidence:" in text:
+                    return text
+                print(f"(a reply came back cut off, stop_reason={resp.stop_reason}; asking again)")
+            return text
 
         if self.provider in ("openai", "ollama"):
             messages = [{"role": "system", "content": system_prompt}] + conversation
