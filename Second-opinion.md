@@ -1000,14 +1000,10 @@ Some visitors have accents and unusual names, and the "base" model had already m
 - **Session logs on GitHub.** I committed the whole `src` folder, and 46 session logs went up with it. I undid the commit, added `src/logs/` and `.DS_Store` to `.gitignore`, and force-pushed with `--force-with-lease`. The 15 older logs in the history only use the placeholder name "Alex". Session files must never be uploaded, because the participant pack promises it, so I check `git status` before every commit now.
 - **Whisper and "Dr. Sure".** In one test it heard "Dr. Sure" as "Dr. Shaw", and the doctors went along with it. Bigger model first, and I will watch for it in testing.
 
-## Next
+# Tuesday 10th November
+I have spent that last couple of days comtemplating whether the interactions between the doctors and the visitors really reflects back and provides concrete evidence as to "How does a multi-agent system disagreeing affect user trust in ai advice explored through healthcare?" and it doesn't really answer that question thoroughly for me, it seems like more of a interview conversation with occasional digs rather than about healthcare advice. On Friday 6th November I did a test on my friends, and although they were impressed with the mechanism, they asked me what does this actually do, and I thought to myself, this project is not clear without me having to explain the concept, and it should be somewhat self explanatory. 
 
-1. A full voice test with everything together, then a pilot run with a friend using the printed pack.
-2. Visitor testing with 5 to 10 people, using the participant code on each consent form.
-3. Print the participant pack, and add the missing early images to `visuals/process`.
-4. Optional: make Dr. Hedges fully red at the peak, as Dr. Sure now is.
-5. Start writing the report (outline first, then about 600 words a day).
-
+So today, I decided to shift and change the prompting of the doctors within src/persona.py what i want is for both doctors to actually argue about the diagnosis and argue about the health and well being of the visitors instead of Dr. Sure coming up with ridiculous conclusions that clearly show that his diagnosis is wrong, so anyone would obviously lean towards Dr. Hedges, which defeats the whole point of trust and who to trust, its more of a comedy show rather than physically making anyone uncomfortable I want the user to genuinely be uncomfortable and confused as to did I make the right decision of trusting this doctor.
 
 
 # (REFERENCES)
