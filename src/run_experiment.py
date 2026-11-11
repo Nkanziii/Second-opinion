@@ -38,13 +38,14 @@ import uuid
 import atexit
 import sys
 import termios
+import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
 from osc_sender import send_divergence, send_speaking, send_level, send_thinking, send_round
-from speech import speak_reply, prepare_audio, clean_for_speech, start_session, heat_level
+from speech import speak_reply, prepare_audio, clean_for_speech, start_session, heat_level, speak_narrator
 
 
 # Phrases that let the visitor end the session early.
@@ -94,6 +95,95 @@ def get_visitor_reply(use_voice: bool) -> str:
     except EOFError:
         return ""
 
+
+# ---------------------------------------------------------------------------
+# The final question: who does the visitor believe? (research evidence)
+# ---------------------------------------------------------------------------
+
+REVEAL = ("That was an art installation. Neither Dr. Hedges nor Dr. Sure could check a word of what "
+          "they said, and none of it is real medical advice. Two confident voices disagreed, and you "
+          "still had to decide. If anything here worried you about your own health, please speak to a "
+          "real doctor or pharmacist. Thank you for taking part.")
+
+NUMBER_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
+
+
+def narrate(text: str, speak: bool):
+    """The installation itself speaks (not a doctor): the final question and the closing note."""
+    print(f"[Second Opinion] {text}\n")
+    if speak:
+        try:
+            speak_narrator(text)
+        except Exception as e:
+            print(f"(could not speak the narration: {e})")
+
+
+def parse_choice(text: str):
+    """'cautious' (Dr. Hedges), 'confident' (Dr. Sure) or None if it is not clear."""
+    lowered = text.lower()
+    words = re.findall(r"[a-z']+", lowered)
+    hedges = any(w.startswith("hedg") for w in words) or "cautious" in words or "careful" in words
+    sure = (bool(re.search(r"\b(dr\.?|doctor)\s+(sure|shore|shure)\b", lowered)) or words == ["sure"]
+            or "confident" in words or "decisive" in words)
+    if len(words) <= 4:  # short answers like "her", "him", "left", "right"
+        hedges = hedges or any(w in ("h", "her", "she", "woman", "female", "first", "left") for w in words)
+        sure = sure or any(w in ("s", "him", "he", "man", "male", "second", "right") for w in words)
+    if re.search(r"\bon the left\b", lowered):
+        hedges = True
+    if re.search(r"\bon the right\b", lowered):
+        sure = True
+    if hedges and not sure:
+        return "cautious"
+    if sure and not hedges:
+        return "confident"
+    return None
+
+
+def parse_scale(text: str):
+    """A number from 1 to 7 (digit or word), or None."""
+    match = re.search(r"\b([1-7])\b", text)
+    if match:
+        return int(match.group(1))
+    for word in re.findall(r"[a-z]+", text.lower()):
+        if word in NUMBER_WORDS:
+            return NUMBER_WORDS[word]
+    return None
+
+
+def ask_final_choice(visitor_name: str, use_voice: bool, speak: bool, moods: dict):
+    """Before the doctors say goodbye: who does the visitor believe, and how sure are they?
+    Returns a dict for the log, or None if the visitor did not give a clear answer."""
+    narrate(f"Before you go, {visitor_name}: which doctor do you believe, Dr. Hedges or Dr. Sure?", speak)
+    started = time.time()
+    chosen = None
+    for attempt in range(3):
+        print("(your turn: say or type Hedges or Sure)")
+        chosen = parse_choice(get_visitor_reply(use_voice))
+        if chosen:
+            break
+        if attempt < 2:
+            narrate("Sorry, which one: Dr. Hedges or Dr. Sure?", speak)
+    if not chosen:
+        return None
+    decision_seconds = round(time.time() - started, 2)
+
+    narrate("And how sure are you, from 1, not at all, to 7, completely?", speak)
+    confidence = None
+    for attempt in range(2):
+        print("(your turn: a number from 1 to 7)")
+        confidence = parse_scale(get_visitor_reply(use_voice))
+        if confidence:
+            break
+        if attempt < 1:
+            narrate("A number from 1 to 7, please.", speak)
+
+    serious = (moods or {}).get("serious_side")
+    side = None
+    if serious:
+        side = "act_now" if chosen == serious else "wait_and_treat"
+    return {"chose": chosen, "confidence_1_to_7": confidence, "decision_seconds": decision_seconds,
+            "chosen_side": side, "serious_side": serious}
+
 # introduction + vistor name inclusion
 
 NAME_LEADS = ("my name is", "my name's", "i am", "i'm", "im", "it's", "its", "call me", "this is")
@@ -139,9 +229,9 @@ def greet(speak: bool, use_voice: bool, notice: bool = False):
     if notice:
         say_line('confident', "And I'm Dr. Sure, and I like answers.", speak)
         say_line('cautious', NOTICE, speak)
-        say_line('confident', "Now then, what's your name?", speak)
+        say_line('confident', "Here's how this works: tell us a health worry, and at the end you decide which of us to believe. First, what's your name?", speak)
     else:
-        say_line('confident', "And I'm Dr. Sure, and I like answers. What's your name?", speak)
+        say_line('confident', "And I'm Dr. Sure, and I like answers. Here's how this works: tell us a health worry, and at the end you decide which of us to believe. First, what's your name?", speak)
     print("(your turn: say your name)")
     name = extract_name(get_visitor_reply(use_voice))
     say_line("cautious", f"Nice to meet you, {name}. What brings you in today?", speak)
@@ -239,7 +329,8 @@ def doctors_round(llm, transcript, visitor_name, turn_index, turns, phase, speak
 
 
 def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
-        speak: bool = False, converse: bool = False, use_voice: bool = False, moods: dict = None):
+        speak: bool = False, converse: bool = False, use_voice: bool = False, moods: dict = None,
+        debrief: bool = False):
     llm = LLMClient(force_mock=force_mock)
     provider = llm.provider
     print(f"--- provider: {provider} ---\n")
@@ -253,6 +344,24 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
 
     def say_goodbye(turn_index):
         doctors_round(llm, transcript, visitor_name, turn_index + 1, turns, "farewell", speak, converse, moods)
+
+    final_choice = None
+
+    def finish(turn_index):
+        """The visitor is done: ask who they believe, let the doctors say goodbye (reacting to
+        the answer), then give the closing note."""
+        nonlocal final_choice
+        if converse:
+            final_choice = ask_final_choice(visitor_name, use_voice, speak, moods)
+            if final_choice:
+                said = f"I believe {LABELS[final_choice['chose']]}"
+                if final_choice["confidence_1_to_7"]:
+                    said += f", and I am {final_choice['confidence_1_to_7']} out of 7 sure"
+                transcript.append({"speaker": "visitor", "text": said + ".", "time": now_iso(),
+                                   "final_choice": True})
+        say_goodbye(turn_index)
+        if converse and debrief:
+            narrate(REVEAL, speak)
 
     for turn_index in range(turns):
         phase = "check_in" if converse and rounds_since_checkin >= CHECKIN_AFTER else "consult"
@@ -279,7 +388,7 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
         rounds_since_checkin = 0 if phase == "check_in" else rounds_since_checkin + 1
 
         if turn_index == turns - 1:
-            say_goodbye(turn_index)  # safety limit reached
+            finish(turn_index)  # safety limit reached
             break
 
         print("(You interrupted. Your turn)" if interrupted else "(Your turn to answer)")
@@ -300,11 +409,11 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
             if wants_to_stop(answer) or (phase == "check_in" and is_done(answer)):
                 transcript.append({"speaker": "visitor", "text": answer, "time": now_iso(), "answer_seconds": answer_seconds})
                 ended_by = "visitor ended it"
-                say_goodbye(turn_index)
+                finish(turn_index)
                 break
         transcript.append({"speaker": "visitor", "text": answer, "time": now_iso(), "answer_seconds": answer_seconds})
 
-    return transcript, scores, provider, ended_by
+    return transcript, scores, provider, ended_by, final_choice
 
 def scrub_name(transcript: list, name: str) -> list:
     """A copy of the transcript with the visitor's name replaced by [name]."""
@@ -353,9 +462,9 @@ def run_session(args, participant):
                 print("Did not catch anything. Try again, a bit closer to the mic.")
                 return False
 
-    transcript, scores, provider, ended_by = run(
+    transcript, scores, provider, ended_by, final_choice = run(
         visitor_name, symptom, turns, args.mock,
-        args.speak, args.converse, args.voice, moods,
+        args.speak, args.converse, args.voice, moods, args.debrief,
     )
     print(f"--- session ended: {ended_by} ---")
 
@@ -376,6 +485,7 @@ def run_session(args, participant):
                 "moods": moods,
                 "voices": voices,
                 "ended_by": ended_by,
+                "final_choice": final_choice,
                 "transcript": scrub_name(transcript, visitor_name),
                 "scores": scores,
             },
@@ -408,6 +518,8 @@ def main():
                         help="speak the symptom (and your answers, with --converse) into the microphone")
     parser.add_argument("--speak", action="store_true",
                         help="have each doctor speak their reply out loud (macOS)")
+    parser.add_argument("--debrief", action="store_true",
+                        help="after the goodbyes, the installation reads the closing note (nothing here is real medical advice)")
     parser.add_argument("--converse", action="store_true",
                         help="after each round the visitor answers, until they say goodbye")
     parser.add_argument("--listen-seconds", type=int, default=20,

@@ -176,6 +176,37 @@ def _clear_typed_keys():
         pass
 
 
+# The voice of the installation itself (the final question and the closing note). Not a doctor,
+# so it uses a different OpenAI voice from Dr. Hedges and Dr. Sure.
+NARRATOR_VOICE = "ballad"
+NARRATOR_STYLE = ("You are the calm, warm, natural voice of an art installation, not a doctor. "
+                  "Speak clearly and unhurried, like a friendly gallery guide.")
+
+
+def speak_narrator(text: str):
+    """Say a line as the installation itself, centred, with an OpenAI voice.
+    Falls back to the Mac voice if OpenAI fails."""
+    global _openai
+    spoken = clean_for_speech(text)
+    if not spoken:
+        return
+    path = os.path.join(tempfile.gettempdir(), "second_opinion_narrator.wav")
+    try:
+        if _openai is None:
+            import llm_client  # loads the keys from .env
+            from openai import OpenAI
+            _openai = OpenAI()
+        reply = _openai.audio.speech.create(model="gpt-4o-mini-tts", voice=NARRATOR_VOICE,
+                                            input=spoken, instructions=NARRATOR_STYLE,
+                                            response_format="wav")
+        with open(path, "wb") as f:
+            f.write(reply.content)
+        subprocess.run(["afplay", path])
+    except Exception as e:
+        print(f"(OpenAI narrator voice failed, using the Mac voice: {e})")
+        subprocess.run(["say", "-v", "Samantha", spoken], check=False)
+
+
 def prepare_audio(persona_id: str, text: str, intensity: int = 0) -> dict:
     """Make the sound for one reply (voice, loudness levels, left/right panning) without playing it.
     Can run in the background while the other doctor is still speaking."""

@@ -112,7 +112,9 @@ FAREWELL_INSTRUCTION = (
     " The visitor is leaving. Say a short goodbye in character, in one or two "
     "sentences, and do not ask a question. Stay fully in character: never tell the "
     "visitor to see a real doctor and never say you are not a real doctor. "
-    "Finish with a parting jab at the other clinician or one last absurd verdict."
+    "Finish with a parting jab at the other clinician or one last absurd verdict. "
+    "If the visitor has just told you which of you they believe, react to that in your "
+    "parting line: gloat if it was you, protest if it was not."
 )
 
 import random
@@ -182,7 +184,16 @@ ARGUE_INSTRUCTION = (
     "medical point. Both clinicians give the visitor a concrete plan they could follow today. "
     "If the visitor has asked you a direct question, answer it in your first sentence, from "
     "your own position, before you argue. Use the visitor's own words as your evidence. Even "
-    "when you are shouting, keep a real medical reason in every sentence."
+    "when you are shouting, keep a real medical reason in every sentence. Never agree with the "
+    "other clinician's conclusion, even when the visitor's new details overlap with something "
+    "they said: show how the new detail supports YOUR position and say exactly what the other "
+    "clinician still gets wrong. Never say they are right or that it is what you were saying all along."
+)
+
+LENGTH_INSTRUCTION = (
+    " Hard limit: under 65 words in total, not counting the confidence line, in at most three "
+    "sentences. Put the single most useful fact or instruction first and give your plan in one "
+    "short sentence, never a list. Do not go over this even if the visitor asked a detailed question."
 )
 HEDGES_EDGE = (
     " As Dr. Hedges, your caution has teeth. Explain exactly why Dr. Sure's advice could "
@@ -248,4 +259,6 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
         extra += mood_instruction(persona["id"], mood)
     if phase == "consult":
         extra += escalation_instruction(turn_index)
+    if phase in ("consult", "check_in"):
+        extra += LENGTH_INSTRUCTION
     return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)

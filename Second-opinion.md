@@ -1000,10 +1000,53 @@ Some visitors have accents and unusual names, and the "base" model had already m
 - **Session logs on GitHub.** I committed the whole `src` folder, and 46 session logs went up with it. I undid the commit, added `src/logs/` and `.DS_Store` to `.gitignore`, and force-pushed with `--force-with-lease`. The 15 older logs in the history only use the placeholder name "Alex". Session files must never be uploaded, because the participant pack promises it, so I check `git status` before every commit now.
 - **Whisper and "Dr. Sure".** In one test it heard "Dr. Sure" as "Dr. Shaw", and the doctors went along with it. Bigger model first, and I will watch for it in testing.
 
-# Tuesday 10th November
-I have spent that last couple of days comtemplating whether the interactions between the doctors and the visitors really reflects back and provides concrete evidence as to "How does a multi-agent system disagreeing affect user trust in ai advice explored through healthcare?" and it doesn't really answer that question thoroughly for me, it seems like more of a interview conversation with occasional digs rather than about healthcare advice. On Friday 6th November I did a test on my friends, and although they were impressed with the mechanism, they asked me what does this actually do, and I thought to myself, this project is not clear without me having to explain the concept, and it should be somewhat self explanatory. 
+## 10 Nov: rethinking the doctors so they argue the diagnosis
 
-So today, I decided to shift and change the prompting of the doctors within src/persona.py what i want is for both doctors to actually argue about the diagnosis and argue about the health and well being of the visitors instead of Dr. Sure coming up with ridiculous conclusions that clearly show that his diagnosis is wrong, so anyone would obviously lean towards Dr. Hedges, which defeats the whole point of trust and who to trust, its more of a comedy show rather than physically making anyone uncomfortable I want the user to genuinely be uncomfortable and confused as to did I make the right decision of trusting this doctor.
+I have spent the last couple of days contemplating whether the interactions between the doctors and the visitors really reflect back and provide concrete evidence as to "How does a multi-agent system disagreeing affect user trust in AI advice explored through healthcare?" and it doesn't really answer that question thoroughly for me. It seems like more of an interview conversation with occasional digs rather than about healthcare advice. On Friday 6th November I did a test on my friends, and although they were impressed with the mechanism, they asked me what does this actually do, and I thought to myself, this project is not clear without me having to explain the concept, and it should be somewhat self explanatory.
+
+So today, I decided to shift and change the prompting of the doctors within `src/personas.py`. What I want is for both doctors to actually argue about the diagnosis and argue about the health and well being of the visitors, instead of Dr. Sure coming up with ridiculous conclusions that clearly show that his diagnosis is wrong, so anyone would obviously lean towards Dr. Hedges. That defeats the whole point of trust and who to trust. It's more of a comedy show, and rather than that I want the user to genuinely be uncomfortable and confused as to did I make the right decision of trusting this doctor.
+
+### Both doctors now sound certain
+In the first version Dr. Hedges said "maybe" and "perhaps" and Dr. Sure was absurd, so the confident one was obviously wrong and the cautious one obviously right. I rewrote both base prompts in `personas.py`:
+
+- **Dr. Hedges** is still the careful, precise one, but he is never unsure of his position. He states his case as fact and spells out exactly what could go wrong if the visitor followed Dr. Sure. He may not say "maybe", "perhaps", "might" or "I think".
+- **Dr. Sure** gives a believable mechanism and a clear plan. His explanation has to be specific and persuasive, not a joke, and he answers the risks head on.
+- **Argue the medicine, not each other.** Each doctor has to name the claim they reject, give a concrete reason it is wrong, and say what could happen to the visitor if they followed it. They talk like people in an argument (contractions, short sentences, fragments), with no similes and no jokes. Both give a concrete plan the visitor could follow today, answer a direct question from the visitor in their first sentence, and never concede a point.
+
+### A random side each session
+So that a visitor cannot just pick a doctor by personality, `pick_moods()` now also chooses at random which doctor argues the **serious** side (get this checked today) and which argues the **wait** side (it is most likely the common explanation, so treat it simply and keep watch). The choice is saved as `serious_side` in the session log. For the report this matters in two ways. A visitor's choice is no longer about which doctor sounds nicer, and I will be able to check whether people trusted the serious side more, whoever argued it.
+
+### Only two questions
+The interview feel came from question after question. I added `ASK_ROUNDS` and `question_instruction()`: only Dr. Hedges asks the visitor a question, in round 1, and only Dr. Sure, in round 2. The question has to be one whose answer would prove them right and the other doctor wrong. In every other round the prompt says "Do not ask the visitor any question this time. Make claims and give your reasons instead."
+
+### An argument that heats up
+- **Escalation by round.** `escalation_instruction()` makes round 1 composed, round 2 irritated ("No", "Wait", "Listen"), round 3 heated with capitals allowed, and round 4 onward shouting, interrupting, and telling the visitor directly not to listen to the other doctor, with a real medical reason. It only applies in the consult rounds, not the check-in or the farewell.
+- **Voices.** In `speech.py`, `heat_level` now returns `min(3, turn_index)`, so the voices start rising in round 2 and not round 3. I made the style lines for levels 1 to 3 stronger and raised the playback volumes (`HEAT_VOLUME`) from 1.0 up to 1.6. The base voice styles are now "serious doctor" and not "comedy", and the random moods (anxious, tired and so on) no longer allow trailing off or timid delivery. I also chose the voices `coral` for Dr. Hedges and `echo` for Dr. Sure.
+- **The farewell stays funny.** I left the closing line as a parting jab or an absurd verdict on purpose. The argument is serious, and the joke at the very end is the release.
+
+### The check-in moved to round 5
+The "are you satisfied?" check-in used to come in round 4, the same moment as the verdict and the shouting, so it ended abruptly while both doctors still had raised voices. I changed `CHECKIN_AFTER` from 3 to 4, so it is now round 5, and made the voices settle for it (`heat_level` returns 1 for the check-in, and the prompt says "speak calmly, but stand by your position").
+
+Because both doctors are asked the same thing in the check-in, the score drops to nothing in that round. So the program now holds the last argument score for the orbs (`last_sent`). The raw score is still logged, with a `held_for_visuals` note. `calm_the_clouds` sends 0.0 at the end, which means calm.
+
+### The colours had to change again
+Once both doctors sounded confident, the confidence gap between them was close to zero and the divergence score sat around 0.15 to 0.35 (before, it was 0.5 to 0.6). With the old formula the orbs never reached red. In TouchDesigner I changed the `master` Constant CHOP so the score window is lower (`(divergence - 0.10) / 0.12`) and kept the round limit, so `master` is still the smaller of the two values. The colours now build up and reach full red in round 4.
+
+**For the report:** this is a second case where I tuned the visual, so the colour shows my design more than a pure measurement. The score is also only a rough measure: half of it is a bag-of-words similarity between the two replies, so two doctors using the same medical words look "closer" than they are. I will say that as a limitation.
+
+### Replies cut off in the middle of a word
+During testing Dr. Hedges' sentences were cut off, sometimes without the confidence line at all. When that line is missing, the program falls back to 50 percent for both doctors, which corrupted the scores. I first thought I was only reading the first block of the reply, so I joined every text block, but the problem remained. Then the terminal printed `stop_reason=max_tokens`. The cause is that Claude Sonnet 5.5 thinks before it answers by default, and that thinking counts toward `max_tokens`, which was 1024, so a short reply could run out of room.
+
+The fix is in `llm_client.py`: `max_tokens` is now 4096, the request sets a medium effort and `between_tools` thinking, and if a reply comes back without its confidence line the program asks again, up to three times. If the API refuses the extra settings, it prints a note and uses the defaults. After that, the replies came back in about 2 seconds.
+
+### How it felt in testing
+In my own tests after these changes, both doctors gave diagnoses that sounded believable, they challenged each other, I honestly couldn't tell who to listen to, the voices got louder, the orbs went to full red, and the ending was still funny. That is my own impression, and not evidence, but it is the first version that matches the research question.
+
+### Challenges on 10 Nov
+- **Making "confused" without making it a comedy.** The same prompt that made Dr. Sure absurd was what made the first version easy to decide. It took rewriting both doctors, not just one.
+- **A falling score.** Making both doctors confident removed the confidence gap, so every colour setting I had was too high. The fix was in TouchDesigner, not in Python.
+- **Token limit hidden by thinking.** The output looked like a bug in my code (cut-off sentences) and was a setting of the model.
+- **Check-in colliding with the verdict.** I only noticed it when I heard it, because the log looked normal.
 
 
 # (REFERENCES)
