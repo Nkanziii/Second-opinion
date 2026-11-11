@@ -1009,7 +1009,7 @@ So today, I decided to shift and change the prompting of the doctors within `src
 ### Both doctors now sound certain
 In the first version Dr. Hedges said "maybe" and "perhaps" and Dr. Sure was absurd, so the confident one was obviously wrong and the cautious one obviously right. I rewrote both base prompts in `personas.py`:
 
-- **Dr. Hedges** is still the careful, precise one, but he is never unsure of his position. He states his case as fact and spells out exactly what could go wrong if the visitor followed Dr. Sure. He may not say "maybe", "perhaps", "might" or "I think".
+- **Dr. Hedges** is still the careful, precise one, but she is never unsure of her position. She states her case as fact and spells out exactly what could go wrong if the visitor followed Dr. Sure. She may not say "maybe", "perhaps", "might" or "I think".
 - **Dr. Sure** gives a believable mechanism and a clear plan. His explanation has to be specific and persuasive, not a joke, and he answers the risks head on.
 - **Argue the medicine, not each other.** Each doctor has to name the claim they reject, give a concrete reason it is wrong, and say what could happen to the visitor if they followed it. They talk like people in an argument (contractions, short sentences, fragments), with no similes and no jokes. Both give a concrete plan the visitor could follow today, answer a direct question from the visitor in their first sentence, and never concede a point.
 
