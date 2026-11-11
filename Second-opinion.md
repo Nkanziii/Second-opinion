@@ -1049,4 +1049,44 @@ In my own tests after these changes, both doctors gave diagnoses that sounded be
 - **Check-in colliding with the verdict.** I only noticed it when I heard it, because the log looked normal.
 
 
+## 11 Nov: planning the physical installation
+
+### The problem: starting it without my laptop
+So far I start the installation myself, by running a command in the terminal. That is fine for testing, but in a room a visitor cannot use a terminal, and I do not want to be standing at my laptop for every person. The piece should start when the visitor does something physical, with nobody touching the laptop. `--loop` mode already waits for the Enter key before each visitor, so all I need is a device that sends one Enter press. The main program does not have to change for this.
+
+### Options I looked at
+- **A button, foot pedal or Makey Makey.** These are simple, but they send the key again and again while it is held down. An Enter press during the doctors' speech counts as an interruption in my program, so a held button would cut them off.
+- **A motion sensor.** There are two kinds. A PIR sensor is cheap but fires for anyone walking past, so it would start the piece for people who did not mean to take part. An ultrasonic distance sensor (HC-SR04) is better, because the program can wait until someone has stood about 60 to 80 cm in front of it for two seconds, and it can notice when they walk away.
+- **A pressure mat.** The visitor steps onto a marked spot.
+
+I chose the pressure mat. The main reason is consent. Stepping onto a mat is a deliberate act, so the visitor has chosen to start. A sensor would start the voices and the microphone as soon as someone stands near it. If I had used a sensor I would have needed a sign saying "Stand here to begin" and a label saying "Distance sensor, not a camera. Nothing is filmed." The mat is also a better moment for the demo video, because I can film the step and the orbs waking up.
+
+### How the mat works
+It is a foil and foam switch. Two boards are separated by punched foam, each with a sheet of foil facing the other. When someone steps on it, the foil touches through the holes and the circuit closes.
+
+![Plan for the pressure mat: the four layers, the mat empty and stepped on, and how it connects to the laptop](visuals/process/16-pressure-mat-plan.png)
+
+1. **Layers, from top to bottom:** a rug or vinyl cover, a top board with foil on its underside (wire A), foam with holes punched in it, and a bottom board with foil on its top (wire B). About 40 by 40 cm is enough for one pair of feet.
+2. **The board:** an Arduino Leonardo. It can act as a USB keyboard, which an ordinary Uno cannot do. Wire A goes to pin 2 and wire B goes to GND.
+3. **The program** (`hardware/mat_leonardo/mat_leonardo.ino`): it reads pin 2 with the internal pull-up, ignores flicker for 60 ms, and sends one Enter when the mat closes. After that it ignores the mat for 10 seconds, and it only re-arms once the mat has been empty for 1.5 seconds. That means shifting feet should not interrupt the doctors.
+4. **Wiring:** one to two metres of thin two-core wire between the mat and the board, and male jumper wires plugged straight into the Leonardo's sockets. No breadboard is needed.
+5. **Test before I build:** I will touch a wire from pin 2 to GND with a text document open. If a new line appears, the program works, and the mat is just a bigger version of that wire touch.
+
+I have written the program but not tested it on a real board yet.
+
+**A risk I already know about.** If a visitor steps off and back on more than 10 seconds into a session, the mat sends another Enter, and that interrupts the doctors. If this happens in testing, I will change the main program to ignore Enter during a session, or to end the session when the visitor steps off.
+
+### Making it look finished
+I want the mat to look like part of the piece and not like a pile of foil. The plan is to cover the top with a thin rug or vinyl in a clinic colour (teal or white), add a pair of footprints and the words "Step here for a second opinion", and hide the foil, foam and wires under a slightly raised border.
+
+I also sketched ideas for housing a sensor, before I decided on the mat: a small box with two "eyes", a white clinic check-in pillar with an LED ring, and a framed certificate with the sensor behind it. I may still use the clinic idea to hide the board and give it a status light.
+
+![Three ideas for housing a sensor: robot eyes on a stand, a clinic check-in pillar with an LED ring and footprints, and a framed certificate](visuals/process/17-installation-housing-ideas.png)
+
+### Materials and plan
+I can borrow the Arduino Leonardo, a micro-USB data cable, jumper wires and the long wire from uni. I have foil and cardboard, and I will look for foam or order it. The plan is to get the board on Thursday morning and build the mat before Monday, then run one day of user testing next week. If I cannot get the board by Friday, I will start the installation with a plain USB button or by pressing Enter myself, so the mat cannot hold up the rest of the project.
+
+**For the report:** the start gesture is part of the design, not just a way to turn the piece on. I chose a mat over a sensor because it makes the visitor's decision to take part a physical, deliberate act.
+
+
 # (REFERENCES)
