@@ -212,19 +212,24 @@ CAST_INSTRUCTION = (
 )
 
 def escalation_instruction(turn_index: int) -> str:
-    """How heated the argument is. Matches heat_level() in speech.py: the voices
-    start to rise from the third round (turn_index 2)."""
+    """How heated the argument is (4 rounds). Matches heat_level() in speech.py:
+    round 1 composed, round 2 heated, round 3 shouting (the peak), round 4 still shouting
+    but wrapping up."""
     if turn_index <= 0:
         return (" The argument is just starting: disagree firmly, but keep your composure.")
     if turn_index == 1:
-        return (" The argument is heating up and you are visibly irritated. Cut in with "
-                "words like 'No', 'Wait' and 'Listen', and be blunter than before.")
-    if turn_index == 2:
-        return (" The argument is now heated and your voice is rising. Use one or two short "
-                "sentences, blunt and urgent. Repeat the key word you are fighting over. You may "
-                "put one or two words in capitals for emphasis. No politeness. Turn to the "
-                "visitor and tell them straight why they should trust you and not the other "
-                "clinician.")
+        return (" The argument is now heated and your voice is rising. Cut in with words like "
+                "'No', 'Wait' and 'Listen'. Use one or two short sentences, blunt and urgent. "
+                "Repeat the key word you are fighting over. You may put one or two words in "
+                "capitals for emphasis. No politeness. Turn to the visitor and tell them "
+                "straight why they should trust you and not the other clinician.")
+    if turn_index >= 3:
+        return (" You are still shouting at full volume, but this is the final round, so wrap "
+                "up. Give your closing statement in one or two very short sentences: the one "
+                "thing the visitor must remember, what to do today, and one last reason not to "
+                "follow the other clinician. Capitalise the words you stress. Make it sound like "
+                "your last word before the visitor decides. Do not ask a question and do not "
+                "bring up anything new.")
     return (" You are now shouting. One or two very short sentences. Capitalise the words you "
             "stress, use exclamation marks, interrupt, repeat yourself. Forget manners. Your "
             "usual mood no longer matters: you are furious the visitor might believe the other "

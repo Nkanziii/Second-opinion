@@ -89,12 +89,12 @@ HEAT_VOLUME = {0: 1.0, 1: 1.15, 2: 1.35, 3: 1.6}  # playback volume per level (l
 
 
 def heat_level(turn_index: int, phase: str = "consult") -> int:
-    """0 to 3: how heated the conversation is. Round 1 normal, round 2 irritated, round 3 raised voices, round 4+ shouting."""
+    """0 to 3: how heated the conversation is. Round 1 normal, round 2 raised voices, round 3 and 4 shouting."""
     if phase == "farewell":
         return 1
     if phase == "check_in":
         return 1  # the voices settle for the check-in
-    return min(3, turn_index)  # round 2 = irritated, round 3 = raised voices, round 4+ = shouting
+    return {0: 0, 1: 2}.get(turn_index, 3)  # round 2 = raised voices, round 3 = shouting, round 4 = still shouting
 
 
 def synthesize_openai(persona_id: str, spoken: str, path: str, intensity: int = 0) -> bool:

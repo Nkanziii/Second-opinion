@@ -11,6 +11,7 @@ Used by run_experiment.py when you pass --voice.
 """
 
 import queue
+import subprocess
 import time
 
 import numpy as np
@@ -21,6 +22,26 @@ from faster_whisper import WhisperModel
 SAMPLE_RATE = 16000  # Whisper expects 16 kHz audio
 BLOCK_SECONDS = 0.1
 _model = None
+
+CHIME = "/System/Library/Sounds/Tink.aiff"  # a short, soft sound when the mic opens
+CHIME_SECONDS = 0.4  # ignore the mic this long after the chime so it is not heard as speech
+
+
+def _set_listening(on: bool):
+    """Tell TouchDesigner whether the mic is open, so it can show 'Speak now'."""
+    try:
+        from osc_sender import send_listening
+        send_listening(1.0 if on else 0.0)
+    except Exception:
+        pass
+
+
+def _chime():
+    """Play the chime without waiting for it to finish."""
+    try:
+        subprocess.Popen(["afplay", CHIME], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
 
 
 def _get_model():
@@ -59,8 +80,9 @@ def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 2.0,
 
     - Gives up and returns "" if nobody starts talking within `wait_seconds`.
     - Never records more than `max_seconds` of actual speech.
-    - Measures the room's background noise for the first half second, so don't
-      talk the instant it says Listening.
+    - Measures the room's background noise first. 'Listening' (the chime, and the
+      'Speak now' sign in TouchDesigner) only comes after that, so speaking as soon as
+      it appears is safe.
     """
     q = queue.Queue()
 
@@ -82,9 +104,14 @@ def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 2.0,
         ambient = [_rms(q.get()) for _ in range(5)]
         threshold = max(0.015, 3 * float(np.mean(ambient)))
         print("Listening...")
+        _set_listening(True)
+        _chime()
+        open_seconds = 0.0
         while True:
             b = q.get()
-            loud = _rms(b) > threshold
+            open_seconds += BLOCK_SECONDS
+            # the first moments are ignored so the chime itself is never mistaken for speech
+            loud = _rms(b) > threshold and open_seconds > CHIME_SECONDS
             if not started:
                 recent.append(b)
                 recent = recent[-3:]
@@ -102,6 +129,8 @@ def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 2.0,
                 quiet_run = 0 if loud else quiet_run + 1
                 if quiet_run * BLOCK_SECONDS >= silence_seconds or spoken >= max_seconds:
                     break
+
+    _set_listening(False)  # the mic is closed: hide the 'Speak now' sign
 
     if loud_blocks < 2:   # a single click or cough, not speech (a short 'yes' still counts)
         print("(nothing heard)\n")

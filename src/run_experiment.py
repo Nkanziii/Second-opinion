@@ -44,15 +44,16 @@ from concurrent.futures import ThreadPoolExecutor
 from divergence import divergence_score
 from llm_client import LLMClient, get_provider, ANTHROPIC_MODEL
 from personas import CAUTIOUS_PERSONA, CONFIDENT_PERSONA, build_system_prompt, pick_moods
-from osc_sender import send_divergence, send_speaking, send_level, send_thinking, send_round
+from osc_sender import send_divergence, send_speaking, send_level, send_thinking, send_round, send_listening
 from speech import speak_reply, prepare_audio, clean_for_speech, start_session, heat_level, speak_narrator
 
 
 # Phrases that let the visitor end the session early.
 STOP_PHRASES = ("goodbye", "bye bye", "end the session", "i have to go",
                 "i need to go", "that's all", "thats all", "bye")
-CHECKIN_AFTER = 4 #consult rounds before the doctors check in (so the check-in is round 5)
-MAX_ROUNDS = 12  # safety limit for one session
+CHECKIN_AFTER = 4 #consult rounds before the doctors check in. With MAX_ROUNDS = 4 the session ends
+                 # first, so there is no 'are you satisfied?' round any more. Raise MAX_ROUNDS to 6 or more to bring it back.
+MAX_ROUNDS = 4  # the argument is 4 rounds long (round 4 is the loudest), then the final question
 DONE_WORDS = {"no", "nope", "nothing", "satisfied", "thanks", "thank", "fine", "good"}
 
 def is_done(text: str) -> bool:
@@ -84,12 +85,20 @@ def discard_typed_ahead():
         pass
 
 
-def get_visitor_reply(use_voice: bool) -> str:
-    """The visitor's answer: spoken into the mic, or typed in the terminal."""
+def get_visitor_reply(use_voice: bool, retry_speak=None) -> str:
+    """The visitor's answer: spoken into the mic, or typed in the terminal.
+
+    If retry_speak is given (True or False) and nothing was heard, the installation says
+    it did not catch that and listens once more (spoken out loud when retry_speak is True).
+    Only the opening questions use this, so silence in the middle of the argument still counts as silence."""
     discard_typed_ahead()
     if use_voice:
         from voice_input import listen_until_silence
-        return listen_until_silence()
+        heard = listen_until_silence()
+        if not heard and retry_speak is not None:
+            narrate("Sorry, I didn't catch that. Please say it again.", retry_speak)
+            heard = listen_until_silence()
+        return heard
     try:
         return input("You: ").strip()
     except EOFError:
@@ -233,10 +242,10 @@ def greet(speak: bool, use_voice: bool, notice: bool = False):
     else:
         say_line('confident', "And I'm Dr. Sure, and I like answers. Here's how this works: tell us a health worry, and at the end you decide which of us to believe. First, what's your name?", speak)
     print("(your turn: say your name)")
-    name = extract_name(get_visitor_reply(use_voice))
+    name = extract_name(get_visitor_reply(use_voice, retry_speak=speak))
     say_line("cautious", f"Nice to meet you, {name}. What brings you in today?", speak)
     print("(your turn: describe your symptom)")
-    symptom = get_visitor_reply(use_voice)
+    symptom = get_visitor_reply(use_voice, retry_speak=speak)
     return name, symptom
 
 def now_iso() -> str:
@@ -429,6 +438,7 @@ def calm_the_clouds():
         send_thinking(persona_id, 0.0)
     send_divergence({"divergence_score": 0.0})  # calm, no conflict colour
     send_round(0)
+    send_listening(0.0)  # the mic is not open: no 'Speak now' sign
 
 def run_session(args, participant):
     """One visitor, from the greeting to the saved log. Returns False if nothing was heard."""
@@ -501,12 +511,12 @@ def main():
     calm_the_clouds()
 
     parser = argparse.ArgumentParser(description="Second Opinion — persona experiment")
-    parser.add_argument("--visitor-name", default=None, help="number of rounds (default 3, or 12 with --converse)")
+    parser.add_argument("--visitor-name", default=None, help="number of rounds (default 3, or MAX_ROUNDS with --converse)")
     parser.add_argument(
         "--symptom",
     )
     parser.add_argument("--turns", type=int, default=None,
-                        help="number of rounds (default 3, or 12 with --converse)")
+                        help="number of rounds (default 3, or MAX_ROUNDS with --converse)")
     parser.add_argument("--mock", action="store_true", help="force mock mode")
     parser.add_argument("--notice", action="store_true",
                         help="the doctors say the 'art installation, not medical advice' notice in the greeting")
