@@ -1155,52 +1155,52 @@ Still to do: cut the foam spacer, attach the red and black wires, assemble the l
 
 ## 18 Nov: building the pressure mat
 
-Today I built the pressure mat that will start the installation. When a visitor steps on it, the Leonardo sends an Enter key press to the laptop, and that starts the doctors. I chose a mat over a motion sensor because it is clearer for consent: someone has to choose to step on it, and they can step off to stop.
+Today I built the pressure mat that starts the installation. When a visitor steps on it, the Leonardo sends an Enter key press to the laptop, and that starts the doctors. I picked a mat over a motion sensor because it is clearer for consent. A person has to choose to step on it, and they can step off to stop.
 
 ### How it is built
 
-The mat is a switch made of layers. It has a bottom board, a foam spacer and a top board.
+The mat is a switch made of three layers: a bottom board, a foam layer and a top board.
 
-- **Boards.** The two foil-covered cardboard boards (about 30 by 40 cm) are the ones I made on 17 Nov, above. The foil faces inwards, towards the foam.
-- **Foam spacer.** I used two 2 mm craft foam sheets stacked together, about 4 to 5 mm thick. I cut 12 holes, about 5 cm across, through both sheets together so they line up. The holes are what let the two foil layers touch when someone steps on the mat. The foam keeps them apart when nobody is on it.
+- **Boards.** These are the two cardboard boards covered in foil that I made on 17 Nov, above (about 30 x 40 cm). The foil sides face each other, with the foam in between.
+- **Foam.** I used two thin craft foam sheets (2 mm each) stacked together, so about 4 to 5 mm thick. I cut 12 holes, about 5 cm wide, through both sheets at the same time so they line up. When nobody is on the mat, the foam keeps the two foil sides apart. When someone steps on it, the top board pushes down through the holes and the two foil sides touch.
 
-![The two foam sheets with the 12 holes cut through them](visuals/process/22-mat-foam-holes.jpg)
+<img src="visuals/process/22-mat-foam-holes.jpg" alt="The two foam sheets with the 12 holes cut through them" width="400">
 
-- **Wires.** I used thin red and black hook-up wire, about 3 m of each, so the mat can sit well away from the laptop. I stripped about 1 cm from the end of each wire and laid the bare end on the foil. I covered it with copper tape and then clear and masking tape to hold it down. The red wire is on the bottom board and the black wire is on the top board.
+- **Wires.** I used thin red and black wire, about 3 m of each, so the mat can sit far from the laptop. At the end of each wire I took off about 1 cm of plastic and laid the bare metal on the foil. I stuck copper tape over it, then clear and masking tape to hold it down. Red is on the bottom board and black is on the top board.
 
-![The red wire on the bottom board: bare end under copper tape, held down with clear tape](visuals/process/23-mat-red-wire.jpg)
+<img src="visuals/process/23-mat-red-wire.jpg" alt="The red wire on the bottom board, with copper tape over the bare end" width="400">
 
-![The black wire on the top board, done the same way](visuals/process/24-mat-black-wire.jpg)
+<img src="visuals/process/24-mat-black-wire.jpg" alt="The black wire on the top board, done the same way" width="400">
 
-I put the two wires at opposite sides of the mat, and both in the foam border rather than under a hole, so the tape lumps do not press together or sit in a hole.
+I put the two wires on opposite sides, and both in the foam border, not under a hole. That way the lumps of tape do not push against each other or sit inside a hole.
 
-![The two boards side by side, with the wires at opposite sides](visuals/process/25-mat-both-boards.jpg)
+<img src="visuals/process/25-mat-both-boards.jpg" alt="The two boards side by side, with the wires on opposite sides" width="400">
 
-- **Assembly.** I taped the two foam sheets together at the corners with double-sided tape and stuck them to the bottom board.
+- **Putting it together.** I taped the two foam sheets together at the corners with double-sided tape, then stuck them onto the bottom board.
 
-![The stacked foam stuck onto the bottom board, with the foil showing through the holes](visuals/process/26-mat-foam-on-board.jpg)
+<img src="visuals/process/26-mat-foam-on-board.jpg" alt="The foam stuck onto the bottom board, with the foil showing through the holes" width="400">
 
-The top board then lies on the foam with its foil face down. I do not stick it to the foam, because it has to lift again when someone steps off. The plan is to tape only the long edges, like a hinge, and leave the middle and the short ends loose.
+The top board sits on the foam with its foil side facing down. I do not stick it to the foam, because it has to spring back up when someone steps off. My plan is to tape only the long edges, like a hinge, and leave the middle and the short ends free.
 
-![The top board lying on the foam, not yet taped down](visuals/process/27-mat-top-board-on.jpg)
+<img src="visuals/process/27-mat-top-board-on.jpg" alt="The top board lying on the foam, not taped down yet" width="400">
 
 ### Testing
 
-I tested the Leonardo before taping the edges. I plugged the red wire into pin 2 and the black wire into GND and opened TextEdit to see the Enter presses. Pressing the mat did nothing. To find out why, I pressed the two foil faces directly together with no foam in between, and that did nothing either. So the foam is not the problem, because direct foil to foil contact should always complete the circuit. I then touched a short jumper wire between pin 2 and GND, and that worked: the Leonardo sent an Enter. So the board and the program are fine, and the fault is in the wiring between the foil and the pins.
+I tested before taping the edges. I put the red wire in pin 2 and the black wire in GND, and opened TextEdit so I could see the Enter key presses. Pressing the mat did nothing. To find out why, I pushed the two foil sides straight together with no foam in between. That did nothing either, so the foam is not the problem, because foil touching foil should always work. Then I touched a short jumper wire between pin 2 and GND, and that worked: the Leonardo sent an Enter. So the board and the program work fine, and the problem is in the wires between the foil and the pins.
 
-### Challenges
+### Problems
 
-- The Arduino IDE gave an upload error (`butterfly_recv(pgm, &c, 1) failed`) when I tried to upload again. I did not need to upload, because the Leonardo already has the working program from earlier. A failed upload does not erase it.
-- My most likely suspect is a loose connection. Either the bare wire is not gripping the socket at the Leonardo end, or the copper tape is not making firm contact with the foil. I will check the Leonardo end first and use a multimeter on the continuity setting at uni to find which wire is not connecting.
+- The Arduino program showed an upload error (`butterfly_recv(pgm, &c, 1) failed`) when I tried to upload again. I did not need to upload, because the Leonardo already has the working program. A failed upload does not delete it.
+- I think the most likely cause is a loose connection. Either the bare wire is not held tightly in the pin hole on the Leonardo, or the copper tape is not touching the foil properly. I will check the Leonardo end first. At uni I will use a multimeter, which tests whether electricity can pass through a wire, to find which wire is not connecting.
 
 ### Still to decide
 
-- The program fires one Enter when the mat closes, then waits 10 seconds and for the mat to be empty before it can fire again. If a visitor steps off and back on after that during a session, the extra Enter would interrupt the doctors. I need to either ignore the Enter during a session or end the session when they step off.
-- I will add a rug on top of the mat, footprints and a "Step here" label so visitors know what to do.
+- The program sends one Enter when the mat is pressed. It can only send another after 10 seconds, and only once the mat is empty. If a visitor steps off and back on in the middle of a session, the extra Enter could interrupt the doctors. I need to either ignore Enter during a session or end the session when they step off.
+- I will add a rug on top, footprints and a "Step here" label so visitors know what to do.
 
 ### Next
 
-Fix the wire contact, tape the edges, run the mat with the full program, and photograph and film it for the weblog and demo.
+Fix the wire connection, tape the edges, test the mat with the full program, and take photos and video for the weblog and demo.
 
 
 # (REFERENCES)
