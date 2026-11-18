@@ -1089,4 +1089,68 @@ I can borrow the Arduino Leonardo, a micro-USB data cable, jumper wires and the 
 **For the report:** the start gesture is part of the design, not just a way to turn the piece on. I chose a mat over a sensor because it makes the visitor's decision to take part a physical, deliberate act.
 
 
+## 13 Nov: the Leonardo works, and buying the materials
+
+### Testing the board
+I used an Arduino Leonardo borrowed from uni and a micro-USB data cable. Before uploading my own program I uploaded the built-in **Blink** example. The small light on the board blinked, so the cable, board and port were fine. Then I uploaded `mat_leonardo.ino`.
+
+- **A pop-up about a keyboard.** The Mac opened its Keyboard Setup Assistant and asked me to press keys, and every key was "wrong". The board now looks like a new keyboard, but it can only send Enter, so it cannot answer the assistant. I closed it and it did no harm.
+- **Nothing happened at first.** I had a jumper wire joining pin 2 to GND all the time, so the board thought the mat was pressed from the moment it started. It sent its one Enter 3 seconds after power-up, before I had clicked into a text document, and then it waited for the wire to come out. I pulled one end out, pressed the reset button, clicked into TextEdit, waited, and touched the wire to GND. The light on the board flashed and one Enter appeared in the document.
+
+![The Leonardo with a jumper wire between pin 2 and GND for the touch test](visuals/process/18-leonardo-touch-test.jpg)
+
+So the electronics work. Waiting 10 seconds between touches, and holding the wire on GND for several seconds still gives only one Enter, which is how the program is written. **A lesson for the report:** the program fires when the mat closes, not while it is held, so a mat that is already pressed when the board is plugged in will fire once at start-up. I will check the mat is empty before I plug it in.
+
+### Buying the materials
+- **Foam.** At Hobbycraft I looked at foam board (5 mm, white, rigid) and soft craft foam sheets (22.5 x 30 cm, 60p each, about 2 mm thick). I chose the soft sheets, because the foam between the foils has to let the top layer bend through the holes, and rigid foam board would not. Two stacked sheets give about 4 mm. I bought four.
+- **Cardboard, foil and tape** I have at home. **Wire** is thin hook-up wire from the uni workshop (3 m of red and 3 m of black), and I took some copper tape for the contacts.
+- **Size and holes.** I decided the mat can be about 30 x 40 cm, which is enough for one pair of feet, with 12 to 15 holes of 4 to 5 cm cut through the foam, leaving at least 3 cm of uncut foam around the edge for the tape.
+
+## 16 and 17 Nov: telling the visitor when to speak, and a shorter argument
+
+### Why it needed a visible cue
+In the exhibition nobody will see the terminal, and the only sign that the microphone was open was the word "Listening..." printed there. A visitor could be talking while nothing was being recorded and have no idea. So the piece itself has to say when it is listening, with a picture and a sound.
+
+### What I changed in the program
+- `osc_sender.py` has a new message, `send_listening`, which sends 1 while the microphone is open and 0 when it closes.
+- `voice_input.py` still measures the background noise first. Right after that it sends listening = 1 and plays a short, soft Mac chime. It ignores the first 0.4 seconds after the chime, so the chime itself is never taken for speech, and it sends 0 when it stops. The signal only appears when the system really is listening.
+- `run_experiment.py` resets the signal to 0 when the clouds calm. If nothing is heard when the visitor is asked for their name or what is wrong, the narrator voice says "Sorry, I didn't catch that. Please say it again." and listens once more. Silence in the middle of the argument still counts as silence, because that is part of the visitor's behaviour.
+
+### The "Speak now" sign in TouchDesigner
+Three new nodes put the words on the output: a Text TOP (`speaknow`), a Level TOP (`speaknow_fade`) that sets how visible it is, and an Over TOP (`over2`) that lays it over the orbs. `window1` now shows `over2` and not `bg_mix`. A Select CHOP (`select_listen`) picks the `listening` channel from `oscin1`, and a Lag CHOP (`lag_listen`, 0.5 seconds in and 0.8 out) smooths it, so the sign fades in when the microphone opens and fades out when it closes. The text is an expression that adds one, two and then three dots about twice a second ("Speak now", "Speak now.", "Speak now..", "Speak now...").
+
+![The nodes for the sign: speaknow, speaknow_fade and over2, which feeds window1](visuals/process/20-speak-now-nodes.png)
+
+![The sign at the bottom of the screen, under the orbs](visuals/process/21-speak-now-sign.png)
+
+### Four rounds, with the peak in round 3
+My last full session took 7 minutes 54 seconds, and I wanted about 5. From the log, the greeting took about 55 seconds, each round about 65 seconds (30 of that is the doctors and the rest is the visitor), and the final question and goodbyes about a minute. I changed the argument to **4 rounds** (`MAX_ROUNDS = 4` in `run_experiment.py`) and the "are you satisfied?" round no longer happens, because the session ends first. I estimate about 6 minutes. I have not cut the doctors' replies any shorter yet. They are limited to 65 words, and about 55 would save close to another minute.
+
+The argument now has a clear shape:
+
+1. **Round 1:** composed.
+2. **Round 2:** heated, with raised voices (voice level 2).
+3. **Round 3:** shouting, the peak (voice level 3), and the colour is full red.
+4. **Round 4:** still shouting, but it is the wrap-up round. Each doctor gives a closing statement: the one thing to remember, what to do today, and one last reason not to follow the other doctor. They cannot bring up anything new or ask a question.
+
+In `personas.py` I rewrote `escalation_instruction`, and in `speech.py` `heat_level` now returns 0, 2, 3, 3 for rounds 1 to 4. In TouchDesigner I changed the round limit in the `master` expression from `/ 3.5` to `/ 2.5`, so the round value reaches 1 at round 3 and stays there in round 4.
+
+**For the report:** the shape of the argument and its length are my design choices, not something the visitors decided. Every visitor now gets the same fixed climb, calm to heated to shouting to a closing statement, and then they make their choice. That makes sessions easy to compare, but it also means I am measuring trust after a staged escalation and not after an open-ended conversation. I will say so in the limitations.
+
+### Starting the mat
+I cut two pieces of cardboard (about 30 x 40 cm, medium thickness) and covered one face of each with kitchen foil. The foil sits on the face that will point inwards, towards the foam, because the two foil faces are what touch when someone steps on the mat. I folded the edges to the back and taped them there, so no tape is on the foil.
+
+![A cardboard board covered in kitchen foil](visuals/process/19-mat-foil-board.jpg)
+
+Still to do: cut the foam spacer, attach the red and black wires, assemble the layers, test it with a text document and then with the installation, and add the rug and footprints.
+
+### Challenges
+- **The sign was stretched and huge.** The Over TOP was set to "Fill", which stretched the small Text TOP over the whole screen. I set Pre-Fit Overlay to Native Resolution, made the Text TOP 600 x 100, and moved it down with Translate Y.
+- **The expression showed up as text.** A text field in TouchDesigner does not switch to expression mode by itself, so the screen showed the code. I set the expression and the mode from the Textport (`par.text.expr` and `par.text.mode = ParMode.EXPRESSION`).
+- **One capital letter.** In the Select CHOP I had typed `Listening`, but the channel is `listening`. Channel names are case-sensitive, so nothing came through until I changed it.
+- **A pop-up that looked like an error.** The Mac's keyboard setup question looked like a fault, but it was just the board introducing itself as a keyboard.
+
+**Still to do:** make the sign's text crisper (draw it at double size and shrink it), finish the mat, and do a full run with the mat starting the doctors.
+
+
 # (REFERENCES)
