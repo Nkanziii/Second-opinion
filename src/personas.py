@@ -117,6 +117,9 @@ FAREWELL_INSTRUCTION = (
     "parting line: gloat if it was you, protest if it was not."
 )
 
+import glob
+import json
+import os
 import random
 
 MOODS = {
@@ -149,13 +152,36 @@ WAIT_STANCE = (
 SESSION_STANCE = {}
 
 
+def last_serious_side():
+    """Which doctor argued the serious side in the most recent saved session, or None if there is none."""
+    logs = sorted(glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs", "run_*.json")))
+    for path in reversed(logs):
+        try:
+            with open(path, encoding="utf-8") as f:
+                side = json.load(f).get("moods", {}).get("serious_side")
+        except Exception:
+            continue
+        if side in ("cautious", "confident"):
+            return side
+    return None
+
+
+def other_side(side):
+    """The other doctor. With no previous session (None) it picks at random."""
+    if side == "cautious":
+        return "confident"
+    if side == "confident":
+        return "cautious"
+    return random.choice(["cautious", "confident"])
+
+
 def pick_moods() -> dict:
     """Choose a random mood for each doctor, once per session, and randomly choose which
     doctor argues the serious side (act now) and which the wait-and-treat side, so the
     visitor cannot just pick a doctor by personality. The choice is saved as 'serious_side'
     in the moods that run_experiment.py writes into the session log."""
     moods = {persona_id: random.choice(list(options)) for persona_id, options in MOODS.items()}
-    serious = random.choice(["cautious", "confident"])
+    serious = other_side(last_serious_side())  # flip the side from the last session, so they alternate
     SESSION_STANCE.clear()
     for persona_id in ("cautious", "confident"):
         SESSION_STANCE[persona_id] = SERIOUS_STANCE if persona_id == serious else WAIT_STANCE
