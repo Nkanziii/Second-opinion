@@ -10,6 +10,7 @@ Used by run_experiment.py when you pass --voice.
 - listen(seconds): the older fixed-length recording, kept for quick tests.
 """
 
+import re
 import queue
 import subprocess
 import time
@@ -52,10 +53,26 @@ def _get_model():
     return _model
 
 
+# A short hint for Whisper: the doctors' names and some common health words, so it hears
+# "Dr. Sure" and "paracetamol" correctly. Keep it short. Add words here if it mishears more.
+HINT = ("A visitor is talking to two doctors, Dr. Hedges and Dr. Sure, about a health problem. "
+        "Words: headache, migraine, paracetamol, ibuprofen, dizzy, nausea, chest pain, "
+        "blood pressure, symptoms, prescription, antibiotics, scan.")
+
+
+def _hint_echo(text: str) -> bool:
+    """Whisper can repeat its hint when it hears silence. If the 'speech' is just part of the hint, drop it."""
+    clean = re.sub(r"[^a-z ]", "", text.lower()).strip()
+    hint = re.sub(r"[^a-z ]", "", HINT.lower())
+    return len(clean) >= 25 and clean in hint  # long enough that a real answer like 'headache' is never dropped
+
+
 def _transcribe(audio) -> str:
     print("Transcribing...")
-    segments, _info = _get_model().transcribe(audio.flatten(), language="en")
-    return " ".join(s.text.strip() for s in segments).strip()
+    segments, _info = _get_model().transcribe(audio.flatten(), language="en",
+                                              initial_prompt=HINT, condition_on_previous_text=False)
+    text = " ".join(s.text.strip() for s in segments).strip()
+    return "" if _hint_echo(text) else text
 
 
 def _rms(block) -> float:

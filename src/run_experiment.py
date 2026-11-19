@@ -143,9 +143,14 @@ def parse_choice(text: str):
     """'cautious' (Dr. Hedges), 'confident' (Dr. Sure) or None if it is not clear."""
     lowered = text.lower()
     words = re.findall(r"[a-z']+", lowered)
-    hedges = any(w.startswith("hedg") for w in words) or "cautious" in words or "careful" in words
-    sure = (bool(re.search(r"\b(dr\.?|doctor)\s+(sure|shore|shure)\b", lowered)) or words == ["sure"]
-            or "confident" in words or "decisive" in words)
+    hedges = (any(w.startswith("hedg") or w.startswith("edg") for w in words)
+              or "cautious" in words or "careful" in words)
+    sure = (bool(re.search(r"\b(dr\.?|doctor)\s+(sure|shore|shure|shaw|shah|sher|sheer|shur|sir)\b", lowered))
+            or words == ["sure"] or "confident" in words or "decisive" in words)
+    # There are only two doctors. If the visitor names a "Dr. something" and it is not Hedges,
+    # it must be Dr. Sure, however the speech recognition spelled it (Shaw, Shore, ...).
+    if not hedges and not sure and re.search(r"\b(dr\.?|doctor)\s+[a-z]+", lowered):
+        sure = True
     if len(words) <= 4:  # short answers like "her", "him", "left", "right"
         hedges = hedges or any(w in ("h", "her", "she", "woman", "female", "first", "left") for w in words)
         sure = sure or any(w in ("s", "him", "he", "man", "male", "second", "right") for w in words)
