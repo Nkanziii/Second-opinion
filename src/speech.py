@@ -22,6 +22,7 @@ import wave
 import select
 import sys
 import random
+from difflib import SequenceMatcher
 
 import numpy as np
 
@@ -97,6 +98,50 @@ def heat_level(turn_index: int, phase: str = "consult") -> int:
     return {0: 0, 1: 2}.get(turn_index, 3)  # round 2 = raised voices, round 3 = shouting, round 4 = still shouting
 
 
+CUT_RETRIES = 2        # how many extra times to make a line again if it was cut off
+CUT_END_LEVEL = 0.25   # the last 60 ms must be quieter than this share of the normal loudness; if not, the line was cut
+
+
+def end_level(path: str) -> float:
+    """How loud the very end of the sound is compared with the rest (0 = silent, 1 = as loud as the speech).
+    A line that finished fades out, so this is small. A line that was cut off in a word is still loud."""
+    with wave.open(path, "rb") as w:
+        rate = w.getframerate()
+        data = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768.0
+    step = int(rate / LEVEL_HZ)
+    count = len(data) // step
+    if count < 3:
+        return 0.0
+    frames = np.sqrt((data[:count * step].reshape(count, step) ** 2).mean(axis=1))
+    ref = np.percentile(frames, 95)
+    if ref <= 0:
+        return 0.0
+    tail = data[-int(rate * 0.06):]
+    return float(np.sqrt((tail ** 2).mean()) / ref)
+
+
+VERIFY_ENDING = True   # also listen to each finished line and check its last word is really there
+
+
+def says_last_word(path: str, spoken: str) -> bool:
+    """Listen to the finished line (OpenAI speech-to-text) and check that its last word is in the last
+    few words heard. This catches a line that stopped early at the end of a sentence, which still sounds quiet
+    at the end. If the check itself fails (no internet, odd file), the line is accepted."""
+    try:
+        with open(path, "rb") as f:
+            heard_text = _openai.audio.transcriptions.create(model="whisper-1", file=f).text
+    except Exception as e:
+        print(f"(could not check the ending of the line: {e})")
+        return True
+    heard = re.findall(r"[a-z']+", heard_text.lower())
+    target = re.findall(r"[a-z']+", spoken.lower())
+    if not target:
+        return True
+    if not heard:
+        return False
+    return any(SequenceMatcher(None, target[-1], w).ratio() >= 0.7 for w in heard[-3:])
+
+
 def synthesize_openai(persona_id: str, spoken: str, path: str, intensity: int = 0) -> bool:
     """Save the line with an OpenAI voice. Returns False if it can't, so the caller uses the Mac voice."""
     global _openai
@@ -108,12 +153,19 @@ def synthesize_openai(persona_id: str, spoken: str, path: str, intensity: int = 
             import llm_client  # loads the keys from .env
             from openai import OpenAI
             _openai = OpenAI()
-        reply = _openai.audio.speech.create(model="gpt-4o-mini-tts", voice=pick["voice"],
-                                            input=spoken, instructions=pick["style"] + HEAT_STYLE.get(intensity, ""),
-                                            response_format="wav")
-        with open(path, "wb") as f:
-            f.write(reply.content)
-        return True
+        # The OpenAI voice sometimes stops before the end of the line. A line that ended properly
+        # fades to quiet at the end. If the end is still loud, the sound was cut off, so make it again.
+        for attempt in range(1, CUT_RETRIES + 2):
+            reply = _openai.audio.speech.create(model="gpt-4o-mini-tts", voice=pick["voice"],
+                                                input=spoken, instructions=pick["style"] + HEAT_STYLE.get(intensity, ""),
+                                                response_format="wav")
+            with open(path, "wb") as f:
+                f.write(reply.content)
+            if end_level(path) <= CUT_END_LEVEL and (not VERIFY_ENDING or says_last_word(path, spoken)):
+                return True
+            if attempt <= CUT_RETRIES:
+                print(f"(the voice was cut off, making it again: try {attempt + 1} of {CUT_RETRIES + 1})")
+        return True  # still cut off after the retries: use the last one anyway
     except Exception as e:
         print(f"(OpenAI voice failed, using the Mac voice: {e})")
         return False

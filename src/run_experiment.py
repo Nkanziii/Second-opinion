@@ -212,6 +212,7 @@ def ask_final_choice(visitor_name: str, use_voice: bool, speak: bool, moods: dic
 
 # introduction + vistor name inclusion
 
+NOT_NAMES = {"i", "me", "my", "myself", "a", "an", "the", "yes", "no", "yeah", "yep", "ok", "okay", "sure", "well", "so", "and", "wait", "bye", "goodbye", "hello", "hi", "hey"}
 NAME_LEADS = ("my name is", "my name's", "i am", "i'm", "im", "it's", "its", "call me", "this is")
 
 LABELS = {"cautious": CAUTIOUS_PERSONA["label"], "confident": CONFIDENT_PERSONA["label"]}
@@ -241,6 +242,10 @@ def extract_name(text: str) -> str:
         fillers = ("hi", "hello", "hey", "um", "uh", "is", "my", "name")
         words = [w for w in re.findall(r"[A-Za-z'-]+", cleaned) if w.lower() not in fillers]
         word = words[0] if words else ""
+    # A heard "name" that is really a small word ("I", "me", "yes") is a mishearing, so use "friend".
+    # Otherwise the doctors call the visitor "I", and the log scrub turns every "I" into [name].
+    if len(word) < 2 or word.lower() in NOT_NAMES:
+        word = ""
     return word.capitalize() if word else "friend"
 
 NOTICE = ("Before we begin: we are part of an art installation, not real doctors, so please "
