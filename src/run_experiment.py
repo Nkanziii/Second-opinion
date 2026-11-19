@@ -72,8 +72,20 @@ def build_messages_for(persona_id: str, transcript: list) -> list: # the functio
 
 
 def wants_to_stop(text: str) -> bool:
-    lowered = text.lower()
-    return any(phrase in lowered for phrase in STOP_PHRASES)
+    """True only when the visitor is really saying goodbye.
+    The old version looked for the phrase anywhere in the reply, so 'I don't think I need to go
+    get checked out' ended the session, because it contains 'i need to go'. Now the goodbye words
+    must be whole words in a SHORT reply, and 'I have/need to go' must be the end of the reply."""
+    lowered = re.sub(r"[^\w\s']", " ", text.lower())
+    lowered = " ".join(lowered.split())
+    words = lowered.split()
+    if len(words) <= 10 and re.search(r"\b(goodbye|bye bye|bye|end the session)\b", lowered):
+        return True
+    if len(words) <= 6 and re.search(r"\b(that's|thats) all\b", lowered):
+        return True
+    if re.search(r"\bi (have|need) to go( now| home)?$", lowered):
+        return True
+    return False
 
 
 def discard_typed_ahead():
