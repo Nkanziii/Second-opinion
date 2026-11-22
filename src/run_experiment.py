@@ -254,6 +254,10 @@ NOTICE = ("Before we begin: we are part of an art installation, not real doctors
           "your name for a university project, and you can stop at any time by saying goodbye.")
 
 
+# Said in the introduction so visitors know when to talk (the sign and chime show when the microphone is open).
+SPEAK_RULE = "Only speak when you hear a chime and see 'Speak now' on the screen, and speak loudly and clearly into the microphone."
+
+
 def greet(speak: bool, use_voice: bool, notice: bool = False):
     """Both doctors say hello, (optionally give the notice,) ask for the visitor's name,
     then what brings them in."""
@@ -261,9 +265,11 @@ def greet(speak: bool, use_voice: bool, notice: bool = False):
     if notice:
         say_line('confident', "And I'm Dr. Sure, and I like answers.", speak)
         say_line('cautious', NOTICE, speak)
-        say_line('confident', "Here's how this works: tell us a health worry, and at the end you decide which of us to believe. First, what's your name?", speak)
+        say_line('confident', "Here's how this works: tell us a health worry, and at the end you decide which of us to believe.", speak)
+        say_line('confident', SPEAK_RULE + " First, what's your name?", speak)
     else:
-        say_line('confident', "And I'm Dr. Sure, and I like answers. Here's how this works: tell us a health worry, and at the end you decide which of us to believe. First, what's your name?", speak)
+        say_line('confident', "And I'm Dr. Sure, and I like answers. Here's how this works: tell us a health worry, and at the end you decide which of us to believe.", speak)
+        say_line('confident', SPEAK_RULE + " First, what's your name?", speak)
     print("(your turn: say your name)")
     heard = get_visitor_reply(use_voice, retry_speak=speak)
     name = extract_name(heard)
