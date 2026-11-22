@@ -65,6 +65,32 @@ A session starts when Enter is pressed. A pressure mat built around an Arduino L
 
 # images of final prototype
 
+### Screen captures from the final run
+
+Single frames from a screen recording of the final version, from calm to the final verdict. The blue orb is Dr. Hedges and the green and yellow orb is Dr. Sure.
+
+<p align="center"><img src="visuals/final/final-01-calm-start.jpg" alt="Calm at the start: Dr. Hedges (blue) and Dr. Sure (green)." width="600"><br><em>Calm at the start: Dr. Hedges (blue) and Dr. Sure (green).</em></p>
+
+<p align="center"><img src="visuals/final/final-02-speak-now.jpg" alt="The 'Speak now' sign appears when the microphone opens." width="600"><br><em>The "Speak now" sign appears when the microphone opens.</em></p>
+
+<p align="center"><img src="visuals/final/final-03-dr-sure-speaking.jpg" alt="Dr. Sure speaking early in the argument: his orb changes shape as he talks." width="600"><br><em>Dr. Sure speaking early in the argument: his orb changes shape as he talks.</em></p>
+
+<p align="center"><img src="visuals/final/final-04-disagreement-rising.jpg" alt="Disagreement rising: the colours begin to shift towards cyan and yellow as Dr. Hedges speaks." width="600"><br><em>Disagreement rising: the colours begin to shift towards cyan and yellow as Dr. Hedges speaks.</em></p>
+
+<p align="center"><img src="visuals/final/final-05-dr-hedges-speaking-conflict.jpg" alt="Dr. Hedges speaking as the argument heats up." width="600"><br><em>Dr. Hedges speaking as the argument heats up.</em></p>
+
+<p align="center"><img src="visuals/final/final-06-dr-sure-speaking-conflict.jpg" alt="Dr. Sure speaking, with Dr. Hedges glowing cyan and blue." width="600"><br><em>Dr. Sure speaking, with Dr. Hedges glowing cyan and blue.</em></p>
+
+<p align="center"><img src="visuals/final/final-07-peak-colours.jpg" alt="The peak: both orbs have turned to pink, red and orange." width="600"><br><em>The peak: both orbs have turned to pink, red and orange.</em></p>
+
+<p align="center"><img src="visuals/final/final-08-dr-hedges-speaking-peak.jpg" alt="Dr. Hedges speaking at the peak of the argument." width="600"><br><em>Dr. Hedges speaking at the peak of the argument.</em></p>
+
+<p align="center"><img src="visuals/final/final-09-dr-sure-speaking-peak.jpg" alt="Dr. Sure speaking at the peak of the argument." width="600"><br><em>Dr. Sure speaking at the peak of the argument.</em></p>
+
+<p align="center"><img src="visuals/final/final-10-final-verdict-end.jpg" alt="The end of the session, after the final verdict: the orbs stay warm." width="600"><br><em>The end of the session, after the final verdict: the orbs stay warm.</em></p>
+
+### Photos from the user test
+
 Photos from the user test on 20 November 2026, with the installation projected in the lab.
 
 <p align="center"><img src="visuals/user_testing/small/3.jpg" alt="A participant watching the orbs on the projected screen" width="500"></p>
@@ -118,6 +144,7 @@ Photos from the user test on 20 November 2026, with the installation projected i
 | [`second-opinion-exhibit-diagram.png`](visuals/second-opinion-exhibit-diagram.png) | Diagram of the exhibit setup. |
 | [`process/`](visuals/process) | Screenshots from the build, used in the weblog. |
 | [`_recording_review/`](visuals/_recording_review) | Stills taken from my screen recordings of the orbs from calm to conflict. |
+| [`final/`](visuals/final) | Single frames from a screen recording of the final version, from calm to the final verdict. |
 | [`moodboard/`](visuals/moodboard) | Reference images from the internet showing the look I first wanted for the orbs. Not my own work. |
 | [`user_testing/`](visuals/user_testing) | Photos from the user tests on 7 and 20 November, in `small/` as web-sized copies. The full-size originals and the videos are not in the repo because of their size. |
 
