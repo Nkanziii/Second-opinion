@@ -403,7 +403,7 @@ For a couple days now I have been working on my visuals and how I wanted it to l
 
 # Moodboard: what I first wanted the orbs to look like
 
-These are reference images I collected from the internet before building the visuals. They are not my work. I used them for the feel I wanted: soft, glowing spheres and dot-based forms that hold a sphere shape and can distort. Sources were not recorded, except image 4, which is from galvesgal on Tumblr.
+These are reference images I collected from the internet before building the visuals. They are not my work. I used them for the feel I wanted: soft, glowing spheres and dot-based forms that hold a sphere shape and can distort. 
 
 <p align="center"><img src="visuals/moodboard/moodboard-1-glowing-sphere.gif" alt="A glowing sphere with flowing purple, pink and orange texture" width="400"></p>
 
