@@ -9,6 +9,7 @@ MSc Creative Computing final project, UAL Creative Computing Institute. Author: 
 ## Where to look first
 
 - **[`Second-opinion.md`](Second-opinion.md)** is the project weblog: the project and technical descriptions, demo videos, final prototype images, dated entries showing how the project developed, a list of every file, and the references.
+- **Dissertation:** [`dissertation/Second-Opinion-Thesis.pdf`](dissertation/Second-Opinion-Thesis.pdf) is the written thesis.
 - **Demo videos:** [Demo video 1](https://youtube.com/shorts/U_fWN9pFOxY), [Demo video 2](https://youtu.be/20xMTaUQ-HQ) and the [final verdict screen recording](https://youtu.be/WHbyPrwcFn4).
 
 ## How it works
