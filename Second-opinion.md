@@ -1204,9 +1204,11 @@ I tested before taping the edges. I put the red wire in pin 2 and the black wire
 - The program sends one Enter when the mat is pressed. It can only send another after 10 seconds, and only once the mat is empty. If a visitor steps off and back on in the middle of a session, the extra Enter could interrupt the doctors. I need to either ignore Enter during a session or end the session when they step off.
 - I will add a rug on top, footprints and a "Step here" label so visitors know what to do.
 
-### Next
+## 20 November: User testing part 2
+(jpeg images 3-9 with withd of 500)
 
-Fix the wire connection, tape the edges, test the mat with the full program, and take photos and video for the weblog and demo.
+Today, I went to campus to conduct a proper user test on several students who were already there. I also wanted advice on the pressure sensor mat, which i decided to completely change the approach and instead of creating it out of cardboard to make it from a wooden board, with springs and metal discs, for the winter festival.
 
+Regarding the user testing, I tested on several students and recieved insightful feedback, based on their opinions and Json Logs.
 
 # (REFERENCES)
