@@ -36,6 +36,22 @@ Version: Claude Sonnet 5.5, model ID `claude-sonnet-5-5`.
 # (demo video)
 # (images of final prototype)
 
+Photos from the user test on 20 November 2026, with the installation projected in the lab.
+
+<p align="center"><img src="visuals/user_testing/small/3.jpg" alt="A participant watching the orbs on the projected screen" width="500"></p>
+
+<p align="center"><img src="visuals/user_testing/small/4.jpg" alt="The orbs on the big screen while a participant listens" width="500"></p>
+
+<p align="center"><img src="visuals/user_testing/small/5.jpg" alt="A participant speaking into the external microphone while the orbs react" width="500"></p>
+
+<p align="center"><img src="visuals/user_testing/small/6.jpg" alt="A participant at the microphone as the blue and yellow orbs wait" width="500"></p>
+
+<p align="center"><img src="visuals/user_testing/small/7.jpg" alt="The Speak now sign showing over the orbs" width="500"></p>
+
+<p align="center"><img src="visuals/user_testing/small/8.jpg" alt="The Speak now sign on the projected screen, wide view" width="500"></p>
+
+<p align="center"><img src="visuals/user_testing/small/9.jpg" alt="The orbs in conflict colours while a participant watches" width="500"></p>
+
 # All code and visual files
 
 ### Code (`src/`)
@@ -1004,8 +1020,7 @@ Some visitors have accents and unusual names, and the "base" model had already m
 
 I did a quick user test on a friend of mine today. She is unrelated to the course and field, so it was nice to have a fresh perspective. She was impressed and amused by the doctors' responses. However, she was confused about how to navigate the experience, when to speak, and what the research question even meant.
 
-<img align="center" src="visuals/user_testing/small/1.jpg" alt="My friend trying the doctors on a laptop" width="400">
-
+<p align="center"><img src="visuals/user_testing/small/1.jpg" alt="My friend trying the doctors on a laptop" width="400"></p>
 
 ### How the test ran
 
@@ -1218,9 +1233,9 @@ I tested before taping the edges. I put the red wire in pin 2 and the black wire
 
 Today I went to campus to run a proper user test with students who were already there. I also wanted advice on the pressure sensor mat. I decided to change the approach completely: instead of cardboard, I will build it from a wooden board with springs and metal discs, for the winter festival.
 
-<img src="visuals/user_testing/small/3.jpg" alt="A participant watching the orbs on the projected screen" width="500">
+<p align="center"><img src="visuals/user_testing/small/3.jpg" alt="A participant watching the orbs on the projected screen" width="500"></p>
 
-<img src="visuals/user_testing/small/4.jpg" alt="The orbs on the big screen while a participant listens" width="500">
+<p align="center"><img src="visuals/user_testing/small/4.jpg" alt="The orbs on the big screen while a participant listens" width="500"></p>
 
 ### How the test ran
 
@@ -1231,15 +1246,15 @@ Today I went to campus to run a proper user test with students who were already 
 - **Starting.** I started each session by pressing Enter, because the pressure mat was not finished.
 - **Data.** Each session was saved as a JSON log. The name is replaced by [name] and each session has a random ID. The logs hold the conversation, the doctor chosen, the sureness rating, the time to decide and the reply times. I also kept notes on what people said and did.
 
-<img src="visuals/user_testing/small/5.jpg" alt="A participant speaking into the external microphone while the orbs react" width="500">
+<p align="center"><img src="visuals/user_testing/small/5.jpg" alt="A participant speaking into the external microphone while the orbs react" width="500"></p>
 
-<img src="visuals/user_testing/small/6.jpg" alt="A participant at the microphone as the blue and yellow orbs wait" width="500">
+<p align="center"><img src="visuals/user_testing/small/6.jpg" alt="A participant at the microphone as the blue and yellow orbs wait" width="500"></p>
 
-<img src="visuals/user_testing/small/7.jpg" alt="The Speak now sign showing over the orbs" width="500">
+<p align="center"><img src="visuals/user_testing/small/7.jpg" alt="The Speak now sign showing over the orbs" width="500"></p>
 
-<img src="visuals/user_testing/small/8.jpg" alt="The Speak now sign on the projected screen, wide view" width="500">
+<p align="center"><img src="visuals/user_testing/small/8.jpg" alt="The Speak now sign on the projected screen, wide view" width="500"></p>
 
-<img src="visuals/user_testing/small/9.jpg" alt="The orbs in conflict colours while a participant watches" width="500">
+<p align="center"><img src="visuals/user_testing/small/9.jpg" alt="The orbs in conflict colours while a participant watches" width="500"></p>
 
 ### Results
 
