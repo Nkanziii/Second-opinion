@@ -1112,8 +1112,6 @@ I want the mat to look like part of the piece and not like a pile of foil. The p
 
 I also sketched ideas for housing a sensor, before I decided on the mat: a small box with two "eyes", a white clinic check-in pillar with an LED ring, and a framed certificate with the sensor behind it. I may still use the clinic idea to hide the board and give it a status light.
 
-![Three ideas for housing a sensor: robot eyes on a stand, a clinic check-in pillar with an LED ring and footprints, and a framed certificate](visuals/process/17-installation-housing-ideas.png)
-
 ### Materials and plan
 I can borrow the Arduino Leonardo, a micro-USB data cable, jumper wires and the long wire from uni. I have foil and cardboard, and I will look for foam or order it. The plan is to get the board on Thursday morning and build the mat before Monday, then run one day of user testing next week. If I cannot get the board by Friday, I will start the installation with a plain USB button or by pressing Enter myself, so the mat cannot hold up the rest of the project.
 
