@@ -108,6 +108,7 @@ Photos from the user test on 20 November 2026, with the installation projected i
 | [`second-opinion-exhibit-diagram.png`](visuals/second-opinion-exhibit-diagram.png) | Diagram of the exhibit setup. |
 | [`process/`](visuals/process) | Screenshots from the build, used in the weblog. |
 | [`_recording_review/`](visuals/_recording_review) | Stills taken from my screen recordings of the orbs from calm to conflict. |
+| [`user_testing/`](visuals/user_testing) | Photos from the user tests on 7 and 20 November. The `small/` folder has the web-sized copies used in the weblog. The videos are not in the repo because of their size. |
 
 ### Early material
 [`Assets/`](Assets) holds images from the first weeks (terminal and Ollama tests).
