@@ -1001,10 +1001,21 @@ Some visitors have accents and unusual names, and the "base" model had already m
 - **Whisper and "Dr. Sure".** In one test it heard "Dr. Sure" as "Dr. Shaw", and the doctors went along with it. Bigger model first, and I will watch for it in testing.
 
 ## 7 Nov: User testing part 1
- <user_testing/1.jpeg/ width=400
- user_testing/2.jpeg/ width=400
 
- I did a quick user test on a friend of mine today. She is unrelated to the course and field, so it was nice to have a fresh persepective. She was impressed and amused by the doctors responses. However was confused on how to navigate through the experience, when to speak and whether what the research question even meant.
+I did a quick user test on a friend of mine today. She is unrelated to the course and field, so it was nice to have a fresh perspective. She was impressed and amused by the doctors' responses. However, she was confused about how to navigate the experience, when to speak, and what the research question even meant.
+
+<img src="visuals/user_testing/small/1.jpg" alt="My friend trying the doctors on a laptop" width="400">
+
+<img src="visuals/user_testing/small/2.jpg" alt="My friend watching the orbs react as the doctors argue" width="400">
+
+### How the test ran
+
+Before she took part I gave her a printed participant information sheet and consent form, which I had built on UAL's template (see 4 Nov). She then tried the doctors herself, and I kept notes on what she said and did.
+
+### What I took from it
+
+- **Confusing start.** She did not know when to talk or what was expected of her. This was a design problem rather than a user problem: the installation gave almost no introduction or instruction. I answered it with a longer spoken introduction and later the "Speak now" sign and chime (16 and 17 Nov).
+- **The doctors landed.** She found their personalities funny, and she was open about using AI for everyday things, which made her a useful contrast to the art students I tested later.
 
 ## 10 Nov: rethinking the doctors so they argue the diagnosis
 
@@ -1205,10 +1216,63 @@ I tested before taping the edges. I put the red wire in pin 2 and the black wire
 - I will add a rug on top, footprints and a "Step here" label so visitors know what to do.
 
 ## 20 November: User testing part 2
-(jpeg images 3-9 with withd of 500)
 
-Today, I went to campus to conduct a proper user test on several students who were already there. I also wanted advice on the pressure sensor mat, which i decided to completely change the approach and instead of creating it out of cardboard to make it from a wooden board, with springs and metal discs, for the winter festival.
+Today I went to campus to run a proper user test with students who were already there. I also wanted advice on the pressure sensor mat. I decided to change the approach completely: instead of cardboard, I will build it from a wooden board with springs and metal discs, for the winter festival.
 
-Regarding the user testing, I tested on several students and recieved insightful feedback, based on their opinions and Json Logs.
+<img src="visuals/user_testing/small/3.jpg" alt="A participant watching the orbs on the projected screen" width="500">
+
+<img src="visuals/user_testing/small/4.jpg" alt="The orbs on the big screen while a participant listens" width="500">
+
+### How the test ran
+
+- **Paperwork.** Every participant was given a printed participant pack (information sheet and consent form) and read it before taking part.
+- **Who.** Four participants, mostly art students and peers on campus. I called them P1 to P4.
+- **What they did.** Each person used the installation on their own. They gave their name, described a health worry, and then took part in four rounds of the doctors arguing. At the end the narrator asked which doctor they believed and how sure they were, from 1 (not at all) to 7 (completely). A session took about six minutes.
+- **Which doctor argued the extreme side.** It alternated with each new participant, so neither doctor was always the extreme one.
+- **Starting.** I started each session by pressing Enter, because the pressure mat was not finished.
+- **Data.** Each session was saved as a JSON log. The name is replaced by [name] and each session has a random ID. The logs hold the conversation, the doctor chosen, the sureness rating, the time to decide and the reply times. I also kept notes on what people said and did.
+
+<img src="visuals/user_testing/small/5.jpg" alt="A participant speaking into the external microphone while the orbs react" width="500">
+
+<img src="visuals/user_testing/small/6.jpg" alt="A participant at the microphone as the blue and yellow orbs wait" width="500">
+
+<img src="visuals/user_testing/small/7.jpg" alt="The Speak now sign showing over the orbs" width="500">
+
+<img src="visuals/user_testing/small/8.jpg" alt="The Speak now sign on the projected screen, wide view" width="500">
+
+<img src="visuals/user_testing/small/9.jpg" alt="The orbs in conflict colours while a participant watches" width="500">
+
+### Results
+
+The mat was not used, and one sureness rating was not recorded, so the numbers are small and are only exploratory.
+
+**Table 1. Results from the four participants on 20 November.**
+
+| Visitor | Health worry raised | Extreme doctor | Chose | Sureness (1 to 7) | Time to decide |
+|---|---|---|---|---|---|
+| P1 | Stomach ache and nausea | Dr. Hedges (cautious) | Dr. Sure (wait and treat) | 7 | 7 s |
+| P2 | A back problem | Dr. Sure (confident) | Dr. Hedges (wait and treat) | 3 | 7 s |
+| P3 | Waking at 3am most nights | Dr. Hedges | Dr. Sure (wait and treat) | Not recorded | 26 s |
+| P4 | Sneezing whenever they walk into a bakery | Dr. Sure | Dr. Hedges (wait and treat) | 1 | 57 s |
+
+- All four chose the doctor who argued for waiting and treating, which in every session was the doctor who was not arguing the extreme side.
+- Sureness was recorded for three people (7, 3 and 1), an average of about 3.7 out of 7.
+- Decision times ranged from 7 to 57 seconds, with an average of about 24 seconds. The slowest decision (P4, 57 s) came with the lowest rating (1). With four people this is only an observation, but it fits the idea that people who hesitate longer are less sure, which is why I log the times.
+- P4 spoke a reason into the microphone when the program wanted a number, and settled on 1 after almost a minute. She found it funny rather than serious, and had no intention of following the advice. She also wanted to pick neither doctor, an option I had not included.
+
+### What people said
+
+Participants liked the idea, the visuals and the colour change. They noticed straight away that the tension had risen when the colours turned red and the voices got louder. They enjoyed the doctors' personalities and found the arguments funny. After each session I also asked informally how they use AI and how much they trust it, and these conversations feed into my dissertation.
+
+### Problems and what I did
+
+1. **Not sure when to speak.** Even with the "Speak now" sign, people spoke out of turn. I added a line to the introduction: only speak when you hear the chime and see the sign. I have not re-tested this yet.
+2. **The microphone was tied to my laptop,** which had to stay in sight. I will use an external microphone on a table beside the participant so the laptop can be hidden.
+3. **Replies were too slow.** The check that each line is finished added 1 to 2 seconds per line. I shortened the doctors' replies from 65 to 50 words.
+4. **People spoke too quietly,** and I had to ask them to speak up during sessions. I added "speak loudly and clearly" to the instructions before a session starts.
+
+### Still to do
+
+Re-test the new introduction, set up the external microphone, and build the wooden mat with springs and metal discs.
 
 # (REFERENCES)
