@@ -108,6 +108,7 @@ Photos from the user test on 20 November 2026, with the installation projected i
 | [`second-opinion-exhibit-diagram.png`](visuals/second-opinion-exhibit-diagram.png) | Diagram of the exhibit setup. |
 | [`process/`](visuals/process) | Screenshots from the build, used in the weblog. |
 | [`_recording_review/`](visuals/_recording_review) | Stills taken from my screen recordings of the orbs from calm to conflict. |
+| [`moodboard/`](visuals/moodboard) | Reference images from the internet showing the look I first wanted for the orbs. Not my own work. |
 | [`user_testing/`](visuals/user_testing) | Photos from the user tests on 7 and 20 November. The `small/` folder has the web-sized copies used in the weblog. The videos are not in the repo because of their size. |
 
 ### Early material
@@ -395,7 +396,17 @@ For a couple days now I have been working on my visuals and how I wanted it to l
 
 ---
 
-# (moodboard wat i want it to look like)
+# Moodboard: what I first wanted the orbs to look like
+
+These are reference images I collected from the internet before building the visuals. They are not my work. I used them for the feel I wanted: soft, glowing spheres and dot-based forms that hold a sphere shape and can distort. Sources were not recorded, except image 4, which is from galvesgal on Tumblr.
+
+<p align="center"><img src="visuals/moodboard/moodboard-1-glowing-sphere.gif" alt="A glowing sphere with flowing purple, pink and orange texture" width="400"></p>
+
+<p align="center"><img src="visuals/moodboard/moodboard-2-dotted-form.jpg" alt="A blue and violet surface made of dots, folding and bending" width="400"></p>
+
+<p align="center"><img src="visuals/moodboard/moodboard-3-particle-sphere.gif" alt="A sphere made of scattered white particles" width="400"></p>
+
+<p align="center"><img src="visuals/moodboard/moodboard-4-dot-sphere.gif" alt="A sphere made of evenly spaced white dots" width="400"></p>
 
 ---
 
