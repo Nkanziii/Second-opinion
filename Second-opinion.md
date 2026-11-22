@@ -57,7 +57,7 @@ Second Opinion is a Python program that runs on my MacBook and drives a TouchDes
 
 A session starts when Enter is pressed. A pressure mat built around an Arduino Leonardo ([`hardware/mat_leonardo`](hardware/mat_leonardo)), which sends an Enter key press, is still a prototype. [`launch-second-opinion.command`](launch-second-opinion.command) opens TouchDesigner and starts the doctors in loop mode. API keys go in a `.env` file that is not in the repo (see [`.env.example`](.env.example)), and packages are listed in [`requirements.txt`](requirements.txt). [`test_orbs.py`](src/test_orbs.py) plays a fake argument into TouchDesigner for testing the visuals without a microphone or API.
 
-# (demo video)
+# Demo video
 
 
 - [Demo video 1 (YouTube Short)](https://youtube.com/shorts/U_fWN9pFOxY)
@@ -126,7 +126,7 @@ Photos from the user test on 20 November 2026, with the installation projected i
 
 ---
 
-# (research)
+# Weblog: research and development
 
 ---
 
