@@ -1004,9 +1004,8 @@ Some visitors have accents and unusual names, and the "base" model had already m
 
 I did a quick user test on a friend of mine today. She is unrelated to the course and field, so it was nice to have a fresh perspective. She was impressed and amused by the doctors' responses. However, she was confused about how to navigate the experience, when to speak, and what the research question even meant.
 
-<img src="visuals/user_testing/small/1.jpg" alt="My friend trying the doctors on a laptop" width="400">
+<img align="center" src="visuals/user_testing/small/1.jpg" alt="My friend trying the doctors on a laptop" width="400">
 
-<img src="visuals/user_testing/small/2.jpg" alt="My friend watching the orbs react as the doctors argue" width="400">
 
 ### How the test ran
 
@@ -1271,8 +1270,5 @@ Participants liked the idea, the visuals and the colour change. They noticed str
 3. **Replies were too slow.** The check that each line is finished added 1 to 2 seconds per line. I shortened the doctors' replies from 65 to 50 words.
 4. **People spoke too quietly,** and I had to ask them to speak up during sessions. I added "speak loudly and clearly" to the instructions before a session starts.
 
-### Still to do
-
-Re-test the new introduction, set up the external microphone, and build the wooden mat with springs and metal discs.
 
 # (REFERENCES)
