@@ -14,7 +14,7 @@ I used an AI assistant, Claude Sonnet 5.5 (Anthropic, 2026), throughout this pro
 
 **What I did**
 
-- I re-wrote the some of code files instead of pasting everything, and did unrelated studying writing challanging Python scripts completely independently as personal study and improving in python language, I also looked through and took inspiration from my supervisors (Louis Busby) code files. 
+- I re-wrote the some of code files instead of pasting everything. I also looked through and took inspiration from my supervisors (Louis Busby) code files. 
 - Decided the concept, research question, design and tone of the installation (for example the two doctors' characters, that they argue, that the safety warning sits in the pack and not in their speech, and when the colour and voices peak).
 - Built, wired and tuned the visuals in TouchDesigner, chose the voices, ran all the tests, and made every decision about what to keep or remove.
 - Ran the visitor testing and I am writing the report and analysis myself.
@@ -31,10 +31,30 @@ Version: Claude Sonnet 5.5, model ID `claude-sonnet-5-5`.
 
 --- 
 
-# (project description)
-# (technical description) 
+# project description
+
+Second Opinion is an interactive installation that explores how trust in AI advice is affected when people watch AI systems disagree with each other. My research question is: how does viewing multi-agent systems disagreeing affect user trust in AI-generated advice, explored through healthcare?
+
+Visitors tell two AI doctors about a health worry. Dr. Hedges is cautious, and Dr. Sure is confident and assertive. They are voice driven, they listen to the visitor, and they respond to what is said. They also argue with each other about the diagnosis over four rounds. Each doctor is visualised as a glowing orb in TouchDesigner. As the disagreement grows, the orbs change colour and shape, and the voices get louder.
+
+At the end, the visitor decides which doctor they believe and how sure they are, from 1 (not at all) to 7 (completely). I tested the installation with a small group of participants. The point is not to find the correct diagnosis, but to see how it feels to choose between two convincing AI voices that don't agree.
+
+# technical description
+Second Opinion is a Python program that runs on my MacBook and drives a TouchDesigner project in real time.
+
+How a session works
+
+1. Listening. The visitor speaks into a microphone, and Whisper turns the speech into text. The "small" model of faster-whisper runs on my laptop, so the visitor's voice is never recorded or sent anywhere.
+2. The doctors. The text goes to Claude Sonnet 5.5 through Anthropic's API. Two prompts, in personas.py, create Dr. Hedges (cautious) and Dr. Sure (confident). Each is told to argue its side of the diagnosis, and replies are kept to about 50 words. The doctors argue over four rounds, and the doctor who takes the extreme side alternates each session.
+3. Scoring the disagreement. After each round, divergence.py gives a 0 to 1 divergence score. It combines the gap between the two doctors' stated confidence and how different their wording is, using a simple bag-of-words comparison. This is a deliberately basic version of the "embedding similarity plus confidence gap" in my concept, and I note that as a limit.
+4. Voices. OpenAI text-to-speech (gpt-4o-mini-tts) reads each reply, with Coral for Dr. Hedges, Echo for Dr. Sure and Ballad for the narrator. Dr. Hedges plays from the left speaker and Dr. Sure from the right. The voices get louder and more forceful in each round.
+5. Visuals. osc_sender.py sends live values over OSC (UDP, port 9000) to TouchDesigner: the divergence score, which doctor is speaking, how loud they are, whether they are thinking, whether the microphone is open, and the round number. TouchDesigner turns these into two orbs. Dr. Hedges is blue on the left and Dr. Sure is yellow and green on the right. The colour and shape of the orbs follow the disagreement, and the colour builds across the rounds, so full red is reached only in round 4. A "Speak now" sign and a chime show when the microphone is open.
+6. Decision and log. At the end the narrator asks which doctor the visitor believes and how sure they are, from 1 to 7. Each session is saved as a JSON log with the conversation, the doctor chosen, the rating, the time to decide and reply times. The name is replaced by [name] and the logs stay off GitHub.
+
+Starting and running it. A session starts when Enter is pressed. A pressure mat built around an Arduino Leonardo, which sends an Enter key press, is still a prototype. launch-second-opinion.command opens TouchDesigner and starts the doctors in loop mode. API keys go in a .env file that is not in the repo, and packages are listed in requirements.txt. test_orbs.py plays a fake argument into TouchDesigner for testing the visuals without a microphone or API.
+
 # (demo video)
-# (images of final prototype)
+# images of final prototype
 
 Photos from the user test on 20 November 2026, with the installation projected in the lab.
 
