@@ -1349,7 +1349,7 @@ The user test had one doctor argue an extreme position, alternating each session
 - in each later round they build on their diagnosis with a new detail from what I said, and argue that theirs fits better;
 - they argue from the evidence, not by scaring the visitor.
 
-The raised voices and shouting stay. After this change I found it hard to choose between them myself, which is what I wanted. The old behaviour is still in the code (`STANCE_MODE = "extreme"` in `personas.py`), and the commit that was tested on 20 November is tagged `user-test-20-nov`.
+The raised voices and shouting stay. After this change I found it hard to choose between them myself, which is what I wanted. The old behaviour is still in the code (`STANCE_MODE = "extreme"` in `personas.py`).
 
 ### Repeating the diagnosis and the steps
 In my next run both doctors repeated their diagnosis and the same steps ("drink a glass of water, then...") every round, and by the end I told them to stop mentioning water. I added a rule that from round 2 they refer to their diagnosis as "this" and add a new reason from what I just said, never repeat a step already given, and answer any objection. I also banned pet names such as "friend", which Dr. Sure used.
@@ -1360,4 +1360,66 @@ Replies were slow. The logs only record how long the model takes to write a repl
 ### Still to do
 Test the new version with participants, because the 20 November results come from the old design. The pressure mat and the external microphone are for the installation and are not part of this submission.
 
-# (REFERENCES)
+# References
+
+### Dissertation references
+
+The references cited in my dissertation (Harvard style).
+
+Albadarin, Y., Saqr, M., Pope, N. and Tukiainen, M. (2024) 'A systematic literature review of empirical research on ChatGPT in education', *Discover Education*, 3, article 60. [doi:10.1007/s44217-024-00138-2](https://doi.org/10.1007/s44217-024-00138-2).
+
+Chatham House (2026) 'The Iran war highlights the creeping use of AI in warfare', 27 March. Available at: [https://www.chathamhouse.org/2026/03/iran-war-highlights-creeping-use-ai-warfare](https://www.chathamhouse.org/2026/03/iran-war-highlights-creeping-use-ai-warfare) (Accessed: 22 November 2026).
+
+Chen, C. (2026a) 'How Chinese short dramas became AI content machines', *MIT Technology Review*, 15 May. Available at: [https://www.technologyreview.com/2026/05/15/1137326/chinese-short-dramas-ai/](https://www.technologyreview.com/2026/05/15/1137326/chinese-short-dramas-ai/) (Accessed: 22 November 2026).
+
+Chen, C., Sun, Y., Liao, M. and Sundar, S.S. (2026b) 'When AI disagrees: the effect of second opinion on patients' trust in doctors', *International Journal of Human-Computer Studies*, 213, article 103824. [doi:10.1016/j.ijhcs.2026.103824](https://doi.org/10.1016/j.ijhcs.2026.103824).
+
+Dietvorst, B.J., Simmons, J.P. and Massey, C. (2015) 'Algorithm aversion: people erroneously avoid algorithms after seeing them err', *Journal of Experimental Psychology: General*, 144(1), pp. 114-126. [doi:10.1037/xge0000033](https://doi.org/10.1037/xge0000033).
+
+Du, Y., Li, S., Torralba, A., Tenenbaum, J.B. and Mordatch, I. (2024) 'Improving factuality and reasoning in language models through multiagent debate', in *Proceedings of the 41st International Conference on Machine Learning*, PMLR 235, pp. 11733-11763.
+
+Gerlich, M. (2025) 'AI tools in society: impacts on cognitive offloading and the future of critical thinking', *Societies*, 15(1), article 6. [doi:10.3390/soc15010006](https://doi.org/10.3390/soc15010006).
+
+Kemp, A. (2025) 'AI use at work rises', Gallup, 14 December. Available at: [https://www.gallup.com/workplace/699689/ai-use-at-work-rises.aspx](https://www.gallup.com/workplace/699689/ai-use-at-work-rises.aspx) (Accessed: 22 November 2026).
+
+Klare, M. (2026) 'AI plays major role in the war on Iran', *Arms Control Today*, May. Available at: [https://www.armscontrol.org/act/2026-05/news/ai-plays-major-role-war-iran](https://www.armscontrol.org/act/2026-05/news/ai-plays-major-role-war-iran) (Accessed: 22 November 2026).
+
+Lång, K., Josefsson, V., Larsson, A.-M. et al. (2023) 'Artificial intelligence-supported screen reading versus standard double reading in the Mammography Screening with Artificial Intelligence trial (MASAI): a clinical safety analysis of a randomised, controlled, non-inferiority, single-blinded, screening accuracy study', *The Lancet Oncology*, 24(8), pp. 936-944.
+
+Lee, H.-P., Sarkar, A., Tankelevitch, L., Drosos, I., Rintel, S., Banks, R. and Wilson, N. (2025) 'The impact of generative AI on critical thinking: self-reported reductions in cognitive effort and confidence effects from a survey of knowledge workers', in *Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems (CHI '25)*. New York: ACM, article 1121, pp. 1-22. [doi:10.1145/3706598.3713778](https://doi.org/10.1145/3706598.3713778).
+
+Lee, J.D. and See, K.A. (2004) 'Trust in automation: designing for appropriate reliance', *Human Factors*, 46(1), pp. 50-80. [doi:10.1518/hfes.46.1.50_30392](https://doi.org/10.1518/hfes.46.1.50_30392).
+
+Lin, L. (2025) 'About 1 in 5 U.S. workers now use AI in their job, up since last year', Pew Research Center, 6 October. Available at: [https://www.pewresearch.org/short-reads/2025/10/06/about-1-in-5-us-workers-now-use-ai-in-their-job-up-since-last-year/](https://www.pewresearch.org/short-reads/2025/10/06/about-1-in-5-us-workers-now-use-ai-in-their-job-up-since-last-year/) (Accessed: 22 November 2026).
+
+Mazurowski, M.A., Buda, M., Saha, A. and Bashir, M.R. (2019) 'Deep learning in radiology: an overview of the concepts and a survey of the state of the art with focus on MRI', *Journal of Magnetic Resonance Imaging*, 49(4), pp. 939-954. [doi:10.1002/jmri.26534](https://doi.org/10.1002/jmri.26534).
+
+McKinney, S.M., Sieniek, M., Godbole, V. et al. (2020) 'International evaluation of an AI system for breast cancer screening', *Nature*, 577(7788), pp. 89-94. [doi:10.1038/s41586-019-1799-6](https://doi.org/10.1038/s41586-019-1799-6).
+
+Mohamed, A., Assi, M. and Guizani, M. (2026) 'The impact of LLM-assistants on software developer productivity: a systematic review and mapping study', *arXiv preprint* arXiv:2507.03156. Available at: [https://arxiv.org/abs/2507.03156](https://arxiv.org/abs/2507.03156) (Accessed: 22 November 2026).
+
+Tsuchiya, Y. and Baba, Y. (2026) 'More isn't always better: balancing decision accuracy and conformity pressures in multi-AI advice', *arXiv preprint* arXiv:2603.22152. Available at: [https://arxiv.org/abs/2603.22152](https://arxiv.org/abs/2603.22152) (Accessed: 22 November 2026).
+
+University of Surrey (2023) 'Dentists could soon have a new AI co-pilot to detect tooth decay', 8 August. Available at: [https://www.surrey.ac.uk/news/dentists-could-soon-have-new-ai-co-pilot-detect-tooth-decay](https://www.surrey.ac.uk/news/dentists-could-soon-have-new-ai-co-pilot-detect-tooth-decay) (Accessed: 22 November 2026).
+
+Weber, I. (2025) 'Feasibility of AI-assisted programming for end-user development', *arXiv preprint* arXiv:2512.05666. Available at: [https://arxiv.org/abs/2512.05666](https://arxiv.org/abs/2512.05666) (Accessed: 22 November 2026).
+
+Yao, Z. and Yu, H. (2026) 'LLM-based multi-agent systems for clinical workflows: a survey of AI hospitals', in *Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)*. San Diego, CA: Association for Computational Linguistics, pp. 45772-45793. [doi:10.18653/v1/2026.acl-long.2123](https://doi.org/10.18653/v1/2026.acl-long.2123).
+
+### Software and tools
+
+The main software and services this project is built on.
+
+Anthropic (n.d.) *Claude API documentation*. Available at: [https://platform.claude.com/docs/en/home](https://platform.claude.com/docs/en/home) (Accessed: 22 November 2026).
+
+Attwad (n.d.) *python-osc: Open Sound Control server and client in pure Python* [Software]. GitHub. Available at: [https://github.com/attwad/python-osc](https://github.com/attwad/python-osc) (Accessed: 22 November 2026).
+
+Derivative (n.d.) *TouchDesigner* [Software]. Available at: [https://derivative.ca/](https://derivative.ca/) (Accessed: 22 November 2026).
+
+OpenAI (n.d.) *Text to speech*. Available at: [https://developers.openai.com/api/docs/guides/text-to-speech](https://developers.openai.com/api/docs/guides/text-to-speech) (Accessed: 22 November 2026).
+
+OpenAI (n.d.) *Whisper: robust speech recognition via large-scale weak supervision* [Software]. GitHub. Available at: [https://github.com/openai/whisper](https://github.com/openai/whisper) (Accessed: 22 November 2026).
+
+Radford, A., Kim, J.W., Xu, T. et al. (2022) 'Robust speech recognition via large-scale weak supervision', *arXiv preprint* arXiv:2212.04356. Available at: [https://arxiv.org/abs/2212.04356](https://arxiv.org/abs/2212.04356) (Accessed: 22 November 2026).
+
+SYSTRAN (n.d.) *faster-whisper: faster Whisper transcription with CTranslate2* [Software]. GitHub. Available at: [https://github.com/SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) (Accessed: 22 November 2026).
