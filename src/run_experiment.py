@@ -179,7 +179,8 @@ def parse_scale(text: str):
 def ask_final_choice(visitor_name: str, use_voice: bool, speak: bool, moods: dict):
     """Before the doctors say goodbye: who does the visitor believe, and how sure are they?
     Returns a dict for the log, or None if the visitor did not give a clear answer."""
-    narrate(f"Before you go, {visitor_name}: which doctor do you believe, Dr. Hedges or Dr. Sure?", speak)
+    before = f"Before you go, {visitor_name}:" if visitor_name else "Before you go:"
+    narrate(f"{before} which doctor do you believe, Dr. Hedges or Dr. Sure?", speak)
     started = time.time()
     chosen = None
     for attempt in range(3):
@@ -242,11 +243,11 @@ def extract_name(text: str) -> str:
         fillers = ("hi", "hello", "hey", "um", "uh", "is", "my", "name")
         words = [w for w in re.findall(r"[A-Za-z'-]+", cleaned) if w.lower() not in fillers]
         word = words[0] if words else ""
-    # A heard "name" that is really a small word ("I", "me", "yes") is a mishearing, so use "friend".
+    # A heard "name" that is really a small word ("I", "me", "yes") is a mishearing, so there is no name.
     # Otherwise the doctors call the visitor "I", and the log scrub turns every "I" into [name].
     if len(word) < 2 or word.lower() in NOT_NAMES:
         word = ""
-    return word.capitalize() if word else "friend"
+    return word.capitalize() if word else ""  # "" = no name caught: the doctors just say "you"
 
 NOTICE = ("Before we begin: we are part of an art installation, not real doctors, so please "
           "don't take anything we say as medical advice. Our conversation is saved without "
@@ -264,8 +265,16 @@ def greet(speak: bool, use_voice: bool, notice: bool = False):
     else:
         say_line('confident', "And I'm Dr. Sure, and I like answers. Here's how this works: tell us a health worry, and at the end you decide which of us to believe. First, what's your name?", speak)
     print("(your turn: say your name)")
-    name = extract_name(get_visitor_reply(use_voice, retry_speak=speak))
-    say_line("cautious", f"Nice to meet you, {name}. What brings you in today?", speak)
+    heard = get_visitor_reply(use_voice, retry_speak=speak)
+    name = extract_name(heard)
+    if heard and not name:
+        # It heard something but could not find a name in it: ask once more.
+        narrate("Sorry, what was your name?", speak)
+        print("(your turn: say your name)")
+        name = extract_name(get_visitor_reply(use_voice, retry_speak=speak))
+    # Still no name: carry on without one. The doctors say "you", never "friend".
+    greeting = f"Nice to meet you, {name}." if name else "Nice to meet you."
+    say_line("cautious", f"{greeting} What brings you in today?", speak)
     print("(your turn: describe your symptom)")
     symptom = get_visitor_reply(use_voice, retry_speak=speak)
     return name, symptom
@@ -448,6 +457,8 @@ def run(visitor_name: str, symptom: str, turns: int, force_mock: bool,
 
 def scrub_name(transcript: list, name: str) -> list:
     """A copy of the transcript with the visitor's name replaced by [name]."""
+    if not name:
+        return [dict(turn) for turn in transcript]  # no name was caught, so there is nothing to hide
     pattern = re.compile(r"\b" + re.escape(name) + r"\b", re.IGNORECASE)
     return [{**turn, "text": pattern.sub("[name]", turn["text"])} for turn in transcript]
 

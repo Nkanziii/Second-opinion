@@ -217,7 +217,7 @@ ARGUE_INSTRUCTION = (
 )
 
 LENGTH_INSTRUCTION = (
-    " Hard limit: under 65 words in total, not counting the confidence line, in at most three "
+    " Hard limit: under 50 words in total, not counting the confidence line, in at most three "
     "sentences. Put the single most useful fact or instruction first and give your plan in one "
     "short sentence, never a list. Do not go over this even if the visitor asked a detailed question."
 )
@@ -263,6 +263,10 @@ def escalation_instruction(turn_index: int) -> str:
             "medical reason.")
 
 
+NO_NAME_INSTRUCTION = (" You do not know the visitor's name. Never use a name for them, never call them "
+                       "'friend', 'dear' or any pet name, and never write [name]. Just say 'you'.")
+
+
 def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
                         max_rounds: int, phase: str = "consult", mood: str = None) -> str:
     """The persona's system prompt plus the conversation-mode instructions."""
@@ -292,4 +296,10 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
         extra += escalation_instruction(turn_index)
     if phase in ("consult", "check_in"):
         extra += LENGTH_INSTRUCTION
+    if not visitor_name:
+        # The visitor's name was not caught: the doctors speak to "you" and use no name at all.
+        base = (base.replace("A visitor named {visitor_name}", "A visitor")
+                    .replace("addressing {visitor_name} by name", "speaking to them directly"))
+        extra += NO_NAME_INSTRUCTION
+        visitor_name = "the visitor"
     return (base + extra + CONFIDENCE_LINE_INSTRUCTION).format(visitor_name=visitor_name)
