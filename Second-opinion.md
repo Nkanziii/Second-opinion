@@ -1000,6 +1000,12 @@ Some visitors have accents and unusual names, and the "base" model had already m
 - **Session logs on GitHub.** I committed the whole `src` folder, and 46 session logs went up with it. I undid the commit, added `src/logs/` and `.DS_Store` to `.gitignore`, and force-pushed with `--force-with-lease`. The 15 older logs in the history only use the placeholder name "Alex". Session files must never be uploaded, because the participant pack promises it, so I check `git status` before every commit now.
 - **Whisper and "Dr. Sure".** In one test it heard "Dr. Sure" as "Dr. Shaw", and the doctors went along with it. Bigger model first, and I will watch for it in testing.
 
+## 7 Nov: User testing part 1
+ <user_testing/1.jpeg/ width=400
+ user_testing/2.jpeg/ width=400
+
+ I did a quick user test on a friend of mine today. She is unrelated to the course and field, so it was nice to have a fresh persepective. She was impressed and amused by the doctors responses. However was confused on how to navigate through the experience, when to speak and whether what the research question even meant.
+
 ## 10 Nov: rethinking the doctors so they argue the diagnosis
 
 I have spent the last couple of days contemplating whether the interactions between the doctors and the visitors really reflect back and provide concrete evidence as to "How does a multi-agent system disagreeing affect user trust in AI advice explored through healthcare?" and it doesn't really answer that question thoroughly for me. It seems like more of an interview conversation with occasional digs rather than about healthcare advice. On Friday 6th November I did a test on my friends, and although they were impressed with the mechanism, they asked me what does this actually do, and I thought to myself, this project is not clear without me having to explain the concept, and it should be somewhat self explanatory.
