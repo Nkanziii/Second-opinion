@@ -54,6 +54,11 @@ How a session works
 Starting and running it. A session starts when Enter is pressed. A pressure mat built around an Arduino Leonardo, which sends an Enter key press, is still a prototype. launch-second-opinion.command opens TouchDesigner and starts the doctors in loop mode. API keys go in a .env file that is not in the repo, and packages are listed in requirements.txt. test_orbs.py plays a fake argument into TouchDesigner for testing the visuals without a microphone or API.
 
 # (demo video)
+
+
+https://youtube.com/shorts/U_fWN9pFOxY?feature=share
+https://youtu.be/20xMTaUQ-HQ?si=wjmAVsj4Jw_qWiU2
+
 # images of final prototype
 
 Photos from the user test on 20 November 2026, with the installation projected in the lab.
