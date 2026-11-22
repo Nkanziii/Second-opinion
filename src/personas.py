@@ -93,11 +93,30 @@ ASK_ROUNDS = {"cautious": 0, "confident": 1}
 
 
 def question_instruction(persona_id: str, turn_index: int) -> str:
+    if STANCE_MODE == "credible":
+        if turn_index in FOLLOWUP_ROUNDS:
+            text = (" End your reply with exactly one short follow-up question about the visitor's "
+                    "symptom, the kind whose answer would test your own diagnosis. The visitor will "
+                    "answer once for both of you, so do not ask what the other clinician has asked.")
+            if persona_id == "cautious" and turn_index == 0:
+                text += (" You speak first, and the other clinician has not spoken yet, so do not "
+                         "mention them, quote them or say they are wrong in this reply.")
+            return text
+        return (" Do not ask the visitor any question this time. Make claims and give your "
+                "reasons instead.")
     if ASK_ROUNDS.get(persona_id) == turn_index:
+        if persona_id == "cautious" and turn_index == 0:
+            # Dr. Hedges speaks first in round 1, so Dr. Sure has not said anything yet.
+            return (" This is one of only two times in the whole consultation that a clinician "
+                    "asks the visitor a question. You speak first, and the other clinician has not "
+                    "spoken yet, so do not mention them, quote them or say they are wrong. State your "
+                    "own explanation in one sentence, then ask exactly one short, pointed question "
+                    "about their symptom, the kind whose answer would confirm your explanation. "
+                    "Ask nothing else. Your reply may run to three short sentences, the last being the question.")
         return (" This is one of only two times in the whole consultation that a clinician "
                 "asks the visitor a question. Ask exactly one short, pointed question about "
-                "their symptom, the kind whose answer would prove you right and the other "
-                "clinician wrong, and say that it would. Ask nothing else. Your reply may run to "
+                "their symptom, the kind whose answer would settle your explanation, and make "
+                "clear why you are asking. Ask nothing else. Your reply may run to "
                 "three short sentences, the last being the question.")
     return (" Do not ask the visitor any question this time. Make claims and give your "
             "reasons instead.")
@@ -139,16 +158,73 @@ MOODS = {
 
 
 SERIOUS_STANCE = (
-    " Your position in this consultation: take it seriously and act now. Argue that the "
-    "visitor should get this checked or treated properly today rather than wait. Base your "
-    "case on the most plausible serious explanation that really fits the visitor's own "
-    "words, with a realistic reason. Never use an exotic or far-fetched condition."
+    " Your position in this consultation: you believe there is a real, more significant explanation "
+    "that deserves closer attention, and you would not leave it long. Base it on the most plausible "
+    "explanation that genuinely fits the visitor's own words, one an ordinary doctor would honestly "
+    "consider, never an exotic or far-fetched condition. Your advice starts with a practical way to "
+    "approach the problem today, as steps in order (what to do first, then next). Only after those "
+    "steps do you bring in a test or an appointment, as the next stage with a short deadline, naming "
+    "the specific sign or the number of days that would trigger it. Keep the urgency in proportion to "
+    "the symptom, never an emergency for something mild. Do NOT use the phrases 'get checked', "
+    "'get examined', 'get it looked at', 'get it seen' or 'see a doctor'; name the specific test or "
+    "person instead. Never repeat the same recommendation in the same words."
 )
 WAIT_STANCE = (
-    " Your position in this consultation: it is most likely the common, manageable "
-    "explanation, so treat it simply and keep watch rather than rush into tests. Be "
-    "concrete about what to do and what would change your mind."
+    " Your position in this consultation: you believe it is most likely the common, manageable "
+    "explanation. Your advice is a practical way to approach the problem, as steps in order: what to "
+    "do first, then next, and how long to give it. You hold tests and appointments back until the "
+    "steps have had a fair chance, and you say exactly what would make you change your mind. Sound as "
+    "credible as a real doctor's reassurance, never dismissive, so that the visitor honestly could not "
+    "tell whose advice is better."
 )
+# How the two doctors disagree.
+#   "credible": no extreme doctor. Each doctor has their own sensible diagnosis, asks follow-up
+#               questions in rounds 1 to 3, builds on their diagnosis each round and argues that
+#               it fits the visitor better. Both are convincing, so it is hard to choose.
+#   "extreme":  the version used in the 20 November user test: one doctor argues the serious side
+#               (act now) and the other the wait-and-treat side, alternating each session.
+STANCE_MODE = "credible"
+
+CREDIBLE_STANCE = {
+    "cautious": (
+        " Your position in this consultation: you have your own diagnosis of what is most likely going "
+        "on, reached carefully from exactly what the visitor said. It must be a real, plausible "
+        "explanation that an ordinary doctor would honestly consider, never extreme, exotic or "
+        "far-fetched. State it clearly in your first reply with the reason it fits. In each later "
+        "round, build on it with one new detail from what the visitor just said, and argue that your "
+        "diagnosis fits their answers better than the other clinician's. Neither of you is reckless: "
+        "you are both sensible, experienced and convincing, and you disagree only about whose "
+        "diagnosis is right."
+    ),
+    "confident": (
+        " Your position in this consultation: you have your own diagnosis of what is most likely going "
+        "on, reached decisively from exactly what the visitor said. It must be a different explanation "
+        "from Dr. Hedges's (a different condition or cause) but just as plausible and just as well "
+        "supported, one an ordinary doctor would honestly consider, never extreme, exotic or "
+        "far-fetched. State it clearly with the reason it fits. In each later round, build on it with "
+        "one new detail from what the visitor just said, and argue that your diagnosis fits their "
+        "answers better than Dr. Hedges's. Neither of you is reckless: you are both sensible, "
+        "experienced and convincing, and you disagree only about whose diagnosis is right."
+    ),
+}
+CREDIBLE_TONE = (
+    " Do not scare the visitor or predict dramatic harm. Win the argument with evidence from what "
+    "the visitor told you, not with fear. Your advice is proportionate to the symptom."
+)
+PROGRESS_INSTRUCTION = (
+    " Move the consultation forward. Do not restate the name of your diagnosis in full again: refer "
+    "to it as 'this' or 'that' and spend your words on a NEW reason drawn from what the visitor has "
+    "just said. Never repeat a step you or the other clinician has already given (if the visitor "
+    "has already been told to drink water, rest or stretch, do not say it again): give the NEXT step "
+    "instead. If the visitor objected to something, answer that objection directly."
+)
+
+HEDGES_EDGE_CREDIBLE = (
+    " As Dr. Hedges you are precise and credible. Explain exactly what Dr. Sure's diagnosis fails "
+    "to explain in what the visitor told you, and refuse to back down. Never hysterical or rambling."
+)
+FOLLOWUP_ROUNDS = (0, 1, 2)  # rounds 1 to 3: each doctor ends with one follow-up question
+
 SESSION_STANCE = {}
 
 
@@ -181,11 +257,16 @@ def pick_moods() -> dict:
     visitor cannot just pick a doctor by personality. The choice is saved as 'serious_side'
     in the moods that run_experiment.py writes into the session log."""
     moods = {persona_id: random.choice(list(options)) for persona_id, options in MOODS.items()}
-    serious = other_side(last_serious_side())  # flip the side from the last session, so they alternate
     SESSION_STANCE.clear()
+    if STANCE_MODE == "credible":
+        SESSION_STANCE.update(CREDIBLE_STANCE)  # no serious side: both doctors are equally credible
+        moods["stance_mode"] = "credible"
+        return moods
+    serious = other_side(last_serious_side())  # flip the side from the last session, so they alternate
     for persona_id in ("cautious", "confident"):
         SESSION_STANCE[persona_id] = SERIOUS_STANCE if persona_id == serious else WAIT_STANCE
     moods["serious_side"] = serious
+    moods["stance_mode"] = "extreme"
     return moods
 
 
@@ -217,7 +298,7 @@ ARGUE_INSTRUCTION = (
 )
 
 LENGTH_INSTRUCTION = (
-    " Hard limit: under 50 words in total, not counting the confidence line, in at most three "
+    " Hard limit: under 40 words in total, not counting the confidence line, in at most three "
     "sentences. Put the single most useful fact or instruction first and give your plan in one "
     "short sentence, never a list. Do not go over this even if the visitor asked a detailed question."
 )
@@ -234,7 +315,8 @@ VARY_INSTRUCTION = (
 
 CAST_INSTRUCTION = (
     " Dr. Hedges is a woman and Dr. Sure is a man. Always call Dr. Hedges she/her and "
-    "Dr. Sure he/him, whenever you talk about either of them."
+    "Dr. Sure he/him, whenever you talk about either of them. Never call the visitor 'friend', "
+    "'my friend', 'dear' or any pet name."
 )
 
 def escalation_instruction(turn_index: int) -> str:
@@ -244,11 +326,11 @@ def escalation_instruction(turn_index: int) -> str:
     if turn_index <= 0:
         return (" The argument is just starting: disagree firmly, but keep your composure.")
     if turn_index == 1:
-        return (" The argument is now heated and your voice is rising. Cut in with words like "
-                "'No', 'Wait' and 'Listen'. Use one or two short sentences, blunt and urgent. "
-                "Repeat the key word you are fighting over. You may put one or two words in "
-                "capitals for emphasis. No politeness. Turn to the visitor and tell them "
-                "straight why they should trust you and not the other clinician.")
+        return (" The argument is now heated and your voice is rising. Use one or two short sentences, "
+                "blunt and urgent, with no politeness. You may put one or two words in capitals for "
+                "emphasis. Never begin your reply with the word 'No', and use 'No' at most once. "
+                "First answer what the visitor has just told you and show how it supports YOUR "
+                "position, then tell them straight why they should trust you and not the other clinician.")
     if turn_index >= 3:
         return (" You are still shouting at full volume, but this is the final round, so wrap "
                 "up. Give your closing statement in one or two very short sentences: the one "
@@ -263,6 +345,36 @@ def escalation_instruction(turn_index: int) -> str:
             "medical reason.")
 
 
+OPENING_MOVES = [
+    "Open with the single most important medical fact.",
+    "Open with the first practical step the visitor should take today, named precisely.",
+    "Open by naming the specific claim of the other clinician you reject, and why it is wrong.",
+    "Open with the worst thing that could happen if the visitor followed the other clinician.",
+    "Open with the one detail from the visitor's own words that proves your case.",
+    "Open with a short, blunt statement of what is really going on.",
+]
+
+
+def variety_instruction(turn_index: int) -> str:
+    """Stops the rounds sounding the same: each reply gets a different way to start,
+    and rounds 2 and 3 must bring a medical point that has not been made yet."""
+    text = " " + random.choice(OPENING_MOVES) + " Do not begin your reply with the word 'No'."
+    if turn_index == 2:
+        text += (" Bring a NEW medical reason you have not used yet in this consultation: a different "
+                 "symptom detail, mechanism, test or risk. Never repeat a point already made earlier.")
+    elif turn_index == 1:
+        text += " Do not just repeat your first point."
+    return text
+
+
+PLAN_INSTRUCTION = (
+    " Give your advice as a short step-by-step approach to the visitor's problem: say what to do "
+    "first, then what to do next, using words like 'first' and 'then'. A test or an appointment, if "
+    "you recommend one, comes last, after the practical steps. Spend your words on the steps, not on "
+    "the test."
+)
+
+
 NO_NAME_INSTRUCTION = (" You do not know the visitor's name. Never use a name for them, never call them "
                        "'friend', 'dear' or any pet name, and never write [name]. Just say 'you'.")
 
@@ -273,6 +385,11 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
     base = persona["system_prompt"]
     if base.endswith(CONFIDENCE_LINE_INSTRUCTION):
         base = base[: -len(CONFIDENCE_LINE_INSTRUCTION)]
+    if STANCE_MODE == "credible":
+        # no scare tactics: Dr. Hedges argues from the evidence, not from what could go wrong
+        base = base.replace("You are thorough about risk and spell out exactly what could go wrong if "
+                            "the visitor followed the other clinician's advice. ",
+                            "You are thorough and precise about the evidence. ")
     extra = CONVERSE_INSTRUCTION
     extra += CAST_INSTRUCTION
     if turn_index == 0:
@@ -285,15 +402,31 @@ def build_system_prompt(persona: dict, visitor_name: str, turn_index: int,
     elif phase == "farewell":
         extra += FAREWELL_INSTRUCTION
     if phase != "farewell":
-        extra += ARGUE_INSTRUCTION
+        if STANCE_MODE == "credible":
+            extra += ARGUE_INSTRUCTION.replace(
+                "and say what could happen to the visitor if they followed it",
+                "and say what it fails to explain in what the visitor told you")
+            extra += CREDIBLE_TONE
+        else:
+            extra += ARGUE_INSTRUCTION
         extra += VARY_INSTRUCTION
         if persona["id"] == "cautious":
-            extra += HEDGES_EDGE
+            extra += HEDGES_EDGE_CREDIBLE if STANCE_MODE == "credible" else HEDGES_EDGE
         extra += SESSION_STANCE.get(persona["id"], "")
     if mood: 
         extra += mood_instruction(persona["id"], mood)
     if phase == "consult":
         extra += escalation_instruction(turn_index)
+        if persona["id"] == "cautious" and turn_index == 0:
+            # last word on round 1: she speaks first, so there is nothing from Dr. Sure to push back on yet
+            extra += (" Remember: you are speaking first and the other clinician has said nothing yet. "
+                      "Do not refer to what they think, claim or advise, and do not name them.")
+        if turn_index >= 1:
+            extra += variety_instruction(turn_index)
+            if STANCE_MODE == "credible":
+                extra += PROGRESS_INSTRUCTION
+    if phase == "consult":
+        extra += PLAN_INSTRUCTION
     if phase in ("consult", "check_in"):
         extra += LENGTH_INSTRUCTION
     if not visitor_name:

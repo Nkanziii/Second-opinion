@@ -1305,4 +1305,38 @@ Participants liked the idea, the visuals and the colour change. They noticed str
 4. **People spoke too quietly,** and I had to ask them to speak up during sessions. I added "speak loudly and clearly" to the instructions before a session starts.
 
 
+## 22 Nov: after the user test, changing how the doctors talk and argue
+
+After the user test on 20 November I worked through the problems the participants raised, and then through what I noticed myself when I ran the installation again. All of this is in `src/` and none of it has been tested with participants yet.
+
+### Telling visitors how to take part, first
+Visitors were still unsure when to speak. I moved the instructions to the very start, before either doctor introduces themselves, and gave them to the narrator voice, so they sound like the installation and not like part of the argument: "Welcome to Second Opinion. Tell the doctors a health worry, then pick who to believe. When you hear a chime and see 'Speak now', speak loudly into the microphone." My first version was about 20 seconds long, which felt too slow, so I cut it to about 11.
+
+### Asking for the name again
+If the name is not caught, the doctors now ask again, up to twice, in their own voices and asking the visitor to speak louder ("Sorry, I didn't quite catch your name. Could you say it again, nice and loud?"). Only after that do they carry on without a name, saying "you" and never "friend".
+
+### What I noticed when I ran it again
+- **Dr. Hedges referred to Dr. Sure before he had spoken.** She speaks first in round 1, but her question was told to "prove you right and the other clinician wrong". I told her she speaks first and must not mention him in that reply.
+- **Both doctors began round 2 with "No".** The round 2 prompt told them to cut in with "No", "Wait" and "Listen". I removed that, and each reply now gets a randomly chosen way to open, so the rounds sound different.
+- **The "serious" doctor kept saying "get it examined".** My own opener list pushed it, and the model copied its earlier lines. I banned "get checked" and "get examined", and asked for step-by-step advice first (what to do first, then next), with any test or appointment last.
+
+### No extreme doctor
+The user test had one doctor argue an extreme position, alternating each session. When I ran it myself, the extreme doctor made the choice too easy, because one of them was obviously going too far. I changed it so that neither is extreme:
+
+- each doctor gives their own sensible diagnosis, and Dr. Sure must pick a different cause from Dr. Hedges that is just as believable;
+- each asks one short follow-up question in rounds 1 to 3, and I answer once for both;
+- in each later round they build on their diagnosis with a new detail from what I said, and argue that theirs fits better;
+- they argue from the evidence, not by scaring the visitor.
+
+The raised voices and shouting stay. After this change I found it hard to choose between them myself, which is what I wanted. The old behaviour is still in the code (`STANCE_MODE = "extreme"` in `personas.py`), and the commit that was tested on 20 November is tagged `user-test-20-nov`.
+
+### Repeating the diagnosis and the steps
+In my next run both doctors repeated their diagnosis and the same steps ("drink a glass of water, then...") every round, and by the end I told them to stop mentioning water. I added a rule that from round 2 they refer to their diagnosis as "this" and add a new reason from what I just said, never repeat a step already given, and answer any objection. I also banned pet names such as "friend", which Dr. Sure used.
+
+### Speed
+Replies were slow. The logs only record how long the model takes to write a reply (about 2 to 3 seconds), so I added timers to the speech-to-text and voice steps to find the rest. I also shortened the wait after the visitor stops talking from 2 seconds to 1.5, set the model's thinking effort to "low", and lowered the reply limit from 50 to 40 words.
+
+### Still to do
+Test the new version with participants, because the 20 November results come from the old design. The pressure mat and the external microphone are for the installation and are not part of this submission.
+
 # (REFERENCES)

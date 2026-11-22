@@ -266,6 +266,7 @@ def prepare_audio(persona_id: str, text: str, intensity: int = 0) -> dict:
     if not spoken:
         return {"kind": "empty"}
     path = os.path.join(tempfile.gettempdir(), f"second_opinion_{persona_id}.wav")
+    made_at = time.time()
     if not synthesize_openai(persona_id, spoken, path, intensity):
         voice = VOICES.get(persona_id)
         cmd = ["say"] + (["-v", voice] if voice else []) + [
@@ -274,6 +275,7 @@ def prepare_audio(persona_id: str, text: str, intensity: int = 0) -> dict:
             return {"kind": "say_only", "spoken": spoken}  # could not save the sound: just speak it, no levels
     levels = loudness_levels(path)
     path = make_panned(path, persona_id)
+    print(f"(voice for {persona_id} ready in {time.time() - made_at:.1f} s)")
     return {"kind": "audio", "path": path, "levels": levels, "volume": HEAT_VOLUME.get(intensity, 1.0)}
 
 

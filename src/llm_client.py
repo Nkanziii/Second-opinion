@@ -101,7 +101,7 @@ class LLMClient:
             # Sonnet 5.5 thinks before it answers by default, and that thinking counts toward
             # max_tokens, so a short reply could be cut off. These settings turn off the up-front
             # thinking and give plenty of room. If the API refuses them, the defaults are used.
-            extras = {"output_config": {"effort": "medium"}, "thinking": {"type": "between_tools"}}
+            extras = {"output_config": {"effort": "low"}, "thinking": {"type": "between_tools"}}
             for attempt in range(3):
                 try:
                     resp = self._client.messages.create(

@@ -69,9 +69,11 @@ def _hint_echo(text: str) -> bool:
 
 def _transcribe(audio) -> str:
     print("Transcribing...")
+    started = time.time()
     segments, _info = _get_model().transcribe(audio.flatten(), language="en",
                                               initial_prompt=HINT, condition_on_previous_text=False)
     text = " ".join(s.text.strip() for s in segments).strip()
+    print(f"(transcribed in {time.time() - started:.1f} s)")
     return "" if _hint_echo(text) else text
 
 
@@ -90,7 +92,7 @@ def listen(seconds: int = 8) -> str:
     return text
 
 
-def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 2.0,
+def listen_until_silence(max_seconds: float = 20, silence_seconds: float = 1.5,
                          wait_seconds: float = 10) -> str:
     """Wait for the visitor to start talking, record until they pause for
     `silence_seconds`, and return what they said.

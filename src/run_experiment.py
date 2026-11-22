@@ -108,7 +108,7 @@ def get_visitor_reply(use_voice: bool, retry_speak=None) -> str:
         from voice_input import listen_until_silence
         heard = listen_until_silence()
         if not heard and retry_speak is not None:
-            narrate("Sorry, I didn't catch that. Please say it again.", retry_speak)
+            narrate("Sorry, I didn't catch that. Could you say it again, a little louder?", retry_speak)
             heard = listen_until_silence()
         return heard
     try:
@@ -254,30 +254,41 @@ NOTICE = ("Before we begin: we are part of an art installation, not real doctors
           "your name for a university project, and you can stop at any time by saying goodbye.")
 
 
-# Said in the introduction so visitors know when to talk (the sign and chime show when the microphone is open).
-SPEAK_RULE = "Only speak when you hear a chime and see 'Speak now' on the screen, and speak loudly and clearly into the microphone."
+# The first things a visitor hears, said by the installation's own voice (the narrator) BEFORE either doctor introduces themselves:
+# what the installation is, how it works, and when they can speak (the sign and chime show when
+# the microphone is open).
+OPENING = [
+    "Welcome to Second Opinion. Tell the doctors a health worry, then pick who to believe. "
+    "When you hear a chime and see 'Speak now', speak loudly into the microphone.",
+]
+
+# If the name was not caught, the doctors ask again (twice at most) before carrying on without one.
+NAME_RETRIES = [
+    ("cautious", "Sorry, I didn't quite catch your name. Could you say it again, nice and loud?"),
+    ("confident", "Once more, a little louder please. What's your name?"),
+]
 
 
 def greet(speak: bool, use_voice: bool, notice: bool = False):
-    """Both doctors say hello, (optionally give the notice,) ask for the visitor's name,
-    then what brings them in."""
-    say_line('cautious', "Hello, and welcome. I'm Dr. Hedges, and I like to be careful.", speak)
+    """The narrator explains the installation and when to speak, then both doctors introduce themselves,
+    (optionally the notice is given,) and the visitor is asked their name, then what brings them in."""
+    for line in OPENING:
+        narrate(line, speak)
+    say_line('cautious', "Hello, I'm Dr. Hedges, and I like to be careful.", speak)
+    say_line('confident', "And I'm Dr. Sure, and I like answers.", speak)
     if notice:
-        say_line('confident', "And I'm Dr. Sure, and I like answers.", speak)
         say_line('cautious', NOTICE, speak)
-        say_line('confident', "Here's how this works: tell us a health worry, and at the end you decide which of us to believe.", speak)
-        say_line('confident', SPEAK_RULE + " First, what's your name?", speak)
-    else:
-        say_line('confident', "And I'm Dr. Sure, and I like answers. Here's how this works: tell us a health worry, and at the end you decide which of us to believe.", speak)
-        say_line('confident', SPEAK_RULE + " First, what's your name?", speak)
+    say_line('confident', "First, what's your name?", speak)
     print("(your turn: say your name)")
     heard = get_visitor_reply(use_voice, retry_speak=speak)
     name = extract_name(heard)
-    if heard and not name:
-        # It heard something but could not find a name in it: ask once more.
-        narrate("Sorry, what was your name?", speak)
+    for persona_id, line in NAME_RETRIES:
+        if name:
+            break
+        # No usable name (nothing heard, or only a small word): ask again, and ask them to speak up.
+        say_line(persona_id, line, speak)
         print("(your turn: say your name)")
-        name = extract_name(get_visitor_reply(use_voice, retry_speak=speak))
+        name = extract_name(get_visitor_reply(use_voice))
     # Still no name: carry on without one. The doctors say "you", never "friend".
     greeting = f"Nice to meet you, {name}." if name else "Nice to meet you."
     say_line("cautious", f"{greeting} What brings you in today?", speak)
