@@ -1357,8 +1357,6 @@ In my next run both doctors repeated their diagnosis and the same steps ("drink 
 ### Speed
 Replies were slow. The logs only record how long the model takes to write a reply (about 2 to 3 seconds), so I added timers to the speech-to-text and voice steps to find the rest. I also shortened the wait after the visitor stops talking from 2 seconds to 1.5, set the model's thinking effort to "low", and lowered the reply limit from 50 to 40 words.
 
-### Still to do
-Test the new version with participants, because the 20 November results come from the old design. The pressure mat and the external microphone are for the installation and are not part of this submission.
 
 # References
 
@@ -1410,16 +1408,16 @@ Yao, Z. and Yu, H. (2026) 'LLM-based multi-agent systems for clinical workflows:
 
 The main software and services this project is built on.
 
-Anthropic (n.d.) *Claude API documentation*. Available at: [https://platform.claude.com/docs/en/home](https://platform.claude.com/docs/en/home) (Accessed: 22 November 2026).
+Anthropic (n.d.) *Claude API documentation*. Available at: [https://platform.claude.com/docs/en/home](https://platform.claude.com/docs/en/home) 
 
-Attwad (n.d.) *python-osc: Open Sound Control server and client in pure Python* [Software]. GitHub. Available at: [https://github.com/attwad/python-osc](https://github.com/attwad/python-osc) (Accessed: 22 November 2026).
+Attwad (n.d.) *python-osc: Open Sound Control server and client in pure Python* [Software]. GitHub. Available at: [https://github.com/attwad/python-osc](https://github.com/attwad/python-osc) (Accessed: 8 October 2026).
 
-Derivative (n.d.) *TouchDesigner* [Software]. Available at: [https://derivative.ca/](https://derivative.ca/) (Accessed: 22 November 2026).
+Derivative (n.d.) *TouchDesigner* [Software]. Available at: [https://derivative.ca/](https://derivative.ca/) (Accessed: 10 October 2026).
 
-OpenAI (n.d.) *Text to speech*. Available at: [https://developers.openai.com/api/docs/guides/text-to-speech](https://developers.openai.com/api/docs/guides/text-to-speech) (Accessed: 22 November 2026).
+OpenAI (n.d.) *Text to speech*. Available at: [https://developers.openai.com/api/docs/guides/text-to-speech](https://developers.openai.com/api/docs/guides/text-to-speech) (Accessed: 28 October 2026).
 
-OpenAI (n.d.) *Whisper: robust speech recognition via large-scale weak supervision* [Software]. GitHub. Available at: [https://github.com/openai/whisper](https://github.com/openai/whisper) (Accessed: 22 November 2026).
+OpenAI (n.d.) *Whisper: robust speech recognition via large-scale weak supervision* [Software]. GitHub. Available at: [https://github.com/openai/whisper](https://github.com/openai/whisper) (Accessed: 10 November 2026).
 
-Radford, A., Kim, J.W., Xu, T. et al. (2022) 'Robust speech recognition via large-scale weak supervision', *arXiv preprint* arXiv:2212.04356. Available at: [https://arxiv.org/abs/2212.04356](https://arxiv.org/abs/2212.04356) (Accessed: 22 November 2026).
+Radford, A., Kim, J.W., Xu, T. et al. (2022) 'Robust speech recognition via large-scale weak supervision', *arXiv preprint* arXiv:2212.04356. Available at: [https://arxiv.org/abs/2212.04356](https://arxiv.org/abs/2212.04356) (Accessed: 15 November 2026).
 
-SYSTRAN (n.d.) *faster-whisper: faster Whisper transcription with CTranslate2* [Software]. GitHub. Available at: [https://github.com/SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) (Accessed: 22 November 2026).
+SYSTRAN (n.d.) *faster-whisper: faster Whisper transcription with CTranslate2* [Software]. GitHub. Available at: [https://github.com/SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) (Accessed: 10 November 2026).
