@@ -62,7 +62,7 @@ A session starts when Enter is pressed. A pressure mat built around an Arduino L
 
 - [Demo video 1 (YouTube Short)](https://youtube.com/shorts/U_fWN9pFOxY)
 - [Demo video 2 (YouTube)](https://youtu.be/20xMTaUQ-HQ)
-- [Final verdict: screen recording of the final version (YouTube)](https://youtu.be/8XeHi8RpC0s)
+- [Final verdict: screen recording of the final version (YouTube)](https://youtu.be/3QrU7d-710I)
 
 # images of final prototype
 
